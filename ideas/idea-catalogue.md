@@ -24,7 +24,7 @@
 | A3 | Pass Quality card | Distance, ball speed, completion probability, lines broken → difficulty 0–100 | S | ★★★★ | [01](../mockups/png/01-moment-explainer.png) |
 | A4 | Speed-trigger player tags | AR name tags that appear only when a speed/distance threshold or record fires | S | ★★★ | [01](../mockups/png/01-moment-explainer.png), [04](../mockups/png/04-player-focus.png) |
 | A5 | Shot DNA | Explainable xG → xGOT with factor bars and shot speed | S | ★★★★ | [16](../mockups/png/16-shot-dna.png) |
-| A6 | Predict → Reveal alerts | Ring the likely runner *before* it happens, resolve "called it ✓ / ✗", keep a public model scorecard | M | ★★★★★ | — |
+| A6 | Predict → Reveal alerts | Ring the likely runner *before* it happens, resolve "called it ✓ / ✗", keep a public model scorecard | M | ★★★★★ | [21](../mockups/png/21-predict-reveal.png) |
 | A7 | The Pass Not Played | Counterfactual ghost pass: the option the model rated higher | M | ★★★★ | [19](../mockups/png/19-ghost-pass.png) |
 | A8 | Pressure gauge & press escapes | Live pressure on the ball carrier, "escaped the press" moments, ball-recovery clock | M | ★★★ | [02](../mockups/png/02-control-vs-chaos.png) |
 | A9 | Shape Shift | "What changed after X": before/after team shape at goals, subs, red cards | M | ★★★ | [15](../mockups/png/15-ask-the-match.png) |
@@ -116,7 +116,7 @@ The Premier League's closest existing product is the Genius Sports / PLP **Data 
 - **What:** Before the moment, ring the player most likely to run in behind or trigger the press. Five seconds later, resolve it: "called it ✓" or "✗". A running scorecard ("7/9 alerts right today") builds trust in the machine, which is explainability through *track record*.
 - **Stages:** Int · **Ex** · **Re**. **Precedent:** Prime Video *Defensive Alerts* (NFL). **New:** football, with honest public calibration.
 - **Agentic angle:** Forecaster agent + Referee/Judge agent that grades the forecasts.
-- **Prize fit:** GP, FDY (Foundry evaluations as a live product feature). **Effort:** M. **Mockup:** worth adding in round two.
+- **Prize fit:** GP, FDY (Foundry evaluations as a live product feature). **Effort:** M. **Mockup:** 21.
 
 ### A7. The Pass Not Played (counterfactual)
 - **What:** Analyst mode shows the ghost of the option the model rated higher (e.g. through-ball +0.11 xT at 46% vs sideways +0.01 at 94%), with risk/reward language. It is phrased respectfully, as "the machine's view", not "he got it wrong".

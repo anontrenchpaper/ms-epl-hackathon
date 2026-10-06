@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Auto-eventing — vision loop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .modes { position: absolute; left: 64px; top: 116px; display: flex; gap: 10px; }
+  .dark { background: rgba(7,11,23,.82); border-color: var(--line-strong); }
+
+  .side { position: absolute; left: 1452px; top: 40px; width: 444px; height: 992px; padding: 22px 22px 18px; display: flex; flex-direction: column; background: rgba(9,14,30,.9); }
+  .side h2 { font-family: var(--font-display); font-weight: 800; font-size: 40px; line-height: .95; text-transform: uppercase; margin-top: 6px; }
+  .side .lead { font-size: 17px; color: var(--muted); margin-top: 8px; line-height: 1.4; }
+  .sec { font-family: var(--font-display); font-weight: 700; font-size: 20px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 18px 0 10px; display: flex; align-items: center; gap: 10px; }
+  .sec::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+
+  .pipe { display: flex; flex-direction: column; gap: 0; }
+  .pc { display: grid; grid-template-columns: 30px 1fr auto; gap: 12px; align-items: center; padding: 8px 12px; border-radius: 10px; background: rgba(255,255,255,.04); border: 1px solid var(--line); }
+  .pc .n { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; font-family: var(--font-mono); font-weight: 700; font-size: 15px; color: #0b1124; }
+  .pc .t { font-size: 17px; font-weight: 700; white-space: nowrap; }
+  .pc .s { font-size: 15px; color: var(--muted); font-weight: 500; white-space: nowrap; }
+  .pc .ms { font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: var(--text); white-space: nowrap; }
+  .pa { height: 12px; width: 2px; background: var(--line-strong); margin-left: 26px; }
+  .out { margin-top: 8px; display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; background: rgba(200,255,61,.1); border: 1px solid rgba(200,255,61,.5); font-size: 16px; font-weight: 700; }
+  .out .k { font-family: var(--font-display); font-weight: 800; font-size: 22px; letter-spacing: .08em; color: var(--lime); }
+
+  table.gt { width: 100%; border-collapse: collapse; }
+  table.gt th { font-size: 15px; color: var(--dim); font-weight: 700; text-align: right; padding: 0 0 6px; letter-spacing: .04em; }
+  table.gt th:first-child { text-align: left; }
+  table.gt td { font-size: 17px; padding: 7px 0; border-top: 1px solid var(--line); }
+  table.gt td.v { text-align: right; font-family: var(--font-mono); font-weight: 700; font-size: 18px; }
+  table.gt td.tg { text-align: right; font-family: var(--font-mono); font-size: 15px; color: var(--dim); width: 70px; }
+  table.gt td.ok { text-align: right; width: 30px; color: var(--mint); font-weight: 900; }
+  .why { margin-top: 14px; padding: 12px 14px; border-radius: 10px; background: rgba(58,215,255,.08); border-left: 3px solid var(--cyan); font-size: 16px; line-height: 1.4; }
+  .why b { color: var(--cyan); }
+  .gpu { margin-top: auto; display: flex; align-items: center; gap: 10px; font-size: 15px; color: var(--muted); font-weight: 600; }
+
+  .strip { position: absolute; left: 40px; top: 906px; width: 1392px; height: 126px; display: grid; grid-template-columns: 1fr 420px; background: rgba(9,14,30,.9); }
+  .strip .trk { padding: 14px 20px; position: relative; }
+  .strip .hd { display: flex; align-items: center; gap: 14px; }
+  .strip .hd b { font-family: var(--font-display); font-weight: 700; font-size: 20px; letter-spacing: .14em; text-transform: uppercase; }
+  .strip .hd span { font-size: 15px; color: var(--muted); font-weight: 600; }
+  .loop { border-left: 1px solid var(--line); padding: 14px 18px; display: flex; flex-direction: column; justify-content: center; gap: 8px; }
+  .loop .h { font-family: var(--font-display); font-weight: 700; font-size: 20px; letter-spacing: .14em; text-transform: uppercase; color: var(--lime); }
+  .loop .c { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 15px; font-weight: 700; }
+  .loop .c span.s { padding: 3px 8px; border-radius: 6px; background: rgba(255,255,255,.07); border: 1px solid var(--line); }
+  .loop .c i { font-style: normal; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="frame" id="f">
+  <svg class="stage noqa" id="stage"></svg>
+  <svg class="abs" id="cv" width="1920" height="1080" style="left:0;top:0"></svg>
+
+  <div class="scorebug">
+    <div class="league">SYN</div>
+    <div class="team"><span class="swatch" style="background:var(--home)"></span>HAR</div>
+    <div class="score">1 – 1</div>
+    <div class="team">KMA<span class="swatch" style="background:var(--away)"></span></div>
+    <div class="clock">67:04</div>
+  </div>
+  <div class="modes">
+    <span class="chip lime dark" style="color:var(--lime)">CV DEBUG VIEW</span>
+    <span class="chip dark">Frame 101,862 · 25 fps</span>
+    <span class="chip dark">19 tracks · 1 ball · 24 keypoints</span>
+  </div>
+
+  <!-- ===== side panel ===== -->
+  <div class="side glass">
+    <div class="eyebrow">Auto-eventing</div>
+    <h2>Closing the loop</h2>
+    <div class="lead">Vision models watch our own synthetic broadcast and turn pixels back into events. Every frame comes with exact labels.</div>
+
+    <div class="sec">Pipeline · per frame</div>
+    <div class="pipe">
+      <div class="pc"><div class="n" style="background:var(--cyan)">1</div><div><div class="t">Detector</div><div class="s">YOLO-family · players + ball</div></div><div class="ms">6.1 ms</div></div>
+      <div class="pa"></div>
+      <div class="pc"><div class="n" style="background:var(--cyan)">2</div><div><div class="t">Tracker</div><div class="s">ByteTrack · stable IDs</div></div><div class="ms">1.2 ms</div></div>
+      <div class="pa"></div>
+      <div class="pc"><div class="n" style="background:var(--violet)">3</div><div><div class="t">Team classifier</div><div class="s">kit-colour embeddings</div></div><div class="ms">0.8 ms</div></div>
+      <div class="pa"></div>
+      <div class="pc"><div class="n" style="background:var(--violet)">4</div><div><div class="t">Pitch homography</div><div class="s">24 keypoints · RMSE 0.31 m</div></div><div class="ms">2.4 ms</div></div>
+      <div class="pa"></div>
+      <div class="pc"><div class="n" style="background:var(--lime)">5</div><div><div class="t">Event classifier</div><div class="s">temporal model · 16-frame window</div></div><div class="ms">3.9 ms</div></div>
+    </div>
+    <div class="out"><span class="k">PASS</span><span>E-1893 · Marchetti → Calloway</span><span class="mint" style="margin-left:auto">✓ matches GT</span></div>
+
+    <div class="sec">Detected vs ground truth</div>
+    <table class="gt">
+      <tr><th>Metric · last 10 min</th><th>Detected</th><th>Target</th><th></th></tr>
+      <tr><td>Pass precision</td><td class="v">0.94</td><td class="tg">≥ 0.90</td><td class="ok">✓</td></tr>
+      <tr><td>Pass recall</td><td class="v">0.91</td><td class="tg">≥ 0.90</td><td class="ok">✓</td></tr>
+      <tr><td>Ball speed MAE</td><td class="v">2.1 km/h</td><td class="tg">≤ 3.0</td><td class="ok">✓</td></tr>
+      <tr><td>Player speed MAE</td><td class="v">0.6 km/h</td><td class="tg">≤ 1.0</td><td class="ok">✓</td></tr>
+      <tr><td>ID switches</td><td class="v">3 / 10 min</td><td class="tg">≤ 5</td><td class="ok">✓</td></tr>
+    </table>
+    <div class="why"><b>Why synthetic footage?</b> The renderer knows where every player and the ball really are, so labels are perfect and free. We score each model exactly and retrain on its misses.</div>
+    <div class="gpu"><svg width="18" height="18" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3" fill="none" stroke="#a3afc9" stroke-width="2"/><rect x="9" y="9" width="6" height="6" fill="#a3afc9"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M1 9h3M1 15h3M20 9h3M20 15h3" stroke="#a3afc9" stroke-width="2"/></svg>Runs on Azure Container Apps serverless GPU</div>
+  </div>
+
+  <!-- ===== bottom strip ===== -->
+  <div class="strip glass">
+    <div class="trk">
+      <div class="hd"><b>Pass events · last 60 s</b><span>66:04 – 67:04</span>
+        <span style="margin-left:auto" class="row"><span class="row" style="gap:6px"><i style="width:12px;height:12px;border-radius:50%;background:var(--mint);display:inline-block"></i>matched 11</span><span class="row" style="gap:6px"><i style="width:12px;height:12px;border-radius:50%;border:2px solid var(--amber);display:inline-block"></i>missed 1</span><span class="row" style="gap:6px"><i style="width:12px;height:12px;border-radius:2px;background:var(--coral);display:inline-block;transform:rotate(45deg)"></i>false alarm 1</span></span></div>
+      <svg id="trk" width="932" height="70" style="margin-top:6px"></svg>
+    </div>
+    <div class="loop">
+      <div class="h">The loop</div>
+      <div class="c"><span class="s">Synthetic tracking</span><i>→</i><span class="s">Render</span><i>→</i><span class="s">Detect</span><i>→</i><span class="s">Compare to GT</span><i>→</i><span class="s" style="color:var(--lime);border-color:rgba(200,255,61,.5)">Retrain on misses ↺</span></div>
+    </div>
+  </div>
+
+  <div class="mock-title">Concept 09 · Auto-eventing</div>
+  <div class="mock-note">Concept mockup · synthetic data · fictional clubs and players</div>
+</div>
+
+<script src="assets/pitch.js"></script>
+<script>
+  const v = Pitch.broadcast(document.getElementById('stage'), {
+    scene: 'linebreak', seed: 9,
+    camera: { pos: [78, -36, 20], target: [79, 33, 0], fov: 27 }
+  });
+  const L = Pitch.L, W = Pitch.W;
+  const el = Pitch.el;
+
+  // ---------- homography grid (5 m) on the grass ----------
+  for (let x = 0; x <= L; x += 5) v.line([[x, 0], [x, W]], 'rgba(58,215,255,0.22)', 1.2);
+  for (let y = 0; y <= W; y += 5) v.line([[0, y], [L, y]], 'rgba(58,215,255,0.22)', 1.2);
+
+  // ball trajectory: past positions (dots) + predicted pass path (dashed)
+  const past = [[56.4, 29.2], [57.3, 29.9], [58.1, 30.5], [58.9, 31.0], [59.7, 31.6], [60.5, 32.0]];
+  const cv = document.getElementById('cv');
+  past.forEach((p, i) => { const q = v.at(p[0], p[1], 0.11); el('circle', { cx: q.x, cy: q.y, r: 4, fill: '#c8ff3d', opacity: 0.25 + i * 0.12 }, cv); });
+  v.line([[61.2, 32.4], [64, 34.1], [67, 35.9], [70, 37.6], [72.6, 39.2], [75.0, 40.7]], '#c8ff3d', 3, '10 9');
+
+  // ---------- pitch keypoints ----------
+  const kps = [[52.5, 0], [52.5, 68], [52.5, 24.85], [52.5, 43.15], [52.5, 34], [88.5, 13.84], [88.5, 54.16], [99.5, 24.84], [99.5, 43.16], [88.5, 26.69], [88.5, 41.31], [0, 68]];
+  kps.forEach((k, i) => {
+    const q = v.at(k[0], k[1], 0);
+    if (q.x < 10 || q.x > 1440 || q.y < 300 || q.y > 900) return;
+    el('circle', { cx: q.x, cy: q.y, r: 7, fill: 'none', stroke: '#9c8cff', 'stroke-width': 2.5 }, cv);
+    el('path', { d: `M${q.x - 12} ${q.y}h24M${q.x} ${q.y - 12}v24`, stroke: '#9c8cff', 'stroke-width': 1.6 }, cv);
+    const t = el('text', { x: q.x + 10, y: q.y - 10, fill: '#cfc7ff', 'font-family': 'JetBrains Mono', 'font-size': 15, 'font-weight': 700, 'paint-order': 'stroke', stroke: '#070b17', 'stroke-width': 4 }, cv);
+    t.textContent = 'k' + String(i + 1).padStart(2, '0');
+  });
+
+  // ---------- detections ----------
+  const ids = { home: { 4: 3, 3: 21, 6: 7, 8: 12, 10: 9, 11: 16, 9: 4, 7: 18, 2: 22, 5: 25 }, away: { 9: 5, 10: 11, 7: 14, 8: 2, 4: 19, 11: 8, 2: 13, 5: 6, 6: 17, 3: 20, 1: 1 } };
+  const conf = { home: { 4: .97, 3: .95, 6: .99, 8: .98, 10: .99, 11: .94, 9: .97, 7: .98, 2: .99, 5: .93 }, away: { 9: .98, 10: .97, 7: .95, 8: .96, 4: .71, 11: .99, 2: .94, 5: .96, 6: .97, 3: .98, 1: .96 } };
+  const COL = { home: '#5b8dff', away: '#ff5d6c' };
+  const scene = v.scene;
+  const all = scene.home.map((p) => ['home', p]).concat(scene.away.map((p) => ['away', p]));
+  all.forEach(([team, p]) => {
+    const foot = v.at(p.x, p.y, 0), head = v.at(p.x, p.y, 1.98);
+    const h = foot.y - head.y + 6, w = h * 0.52;
+    const x = foot.x - w / 2, y = head.y - 4;
+    if (foot.x < 20 || x + w > 1440) return;
+    const low = conf[team][p.n] < 0.8;
+    const key = (team === 'home' && (p.n === 6 || p.n === 10));
+    const c = low ? '#ffb648' : COL[team];
+    el('rect', { x, y, width: w, height: h, fill: 'none', stroke: c, 'stroke-width': key ? 3.2 : 2.2, 'stroke-dasharray': low ? '6 4' : '', rx: 2 }, cv);
+    // corner ticks
+    [[x, y, 1, 1], [x + w, y, -1, 1], [x, y + h, 1, -1], [x + w, y + h, -1, -1]].forEach(([cx, cy, dx, dy]) => el('path', { d: `M${cx} ${cy + dy * 9}V${cy}H${cx + dx * 9}`, stroke: c, 'stroke-width': key ? 4.5 : 3.5, fill: 'none' }, cv));
+    const label = `${ids[team][p.n]} · ${conf[team][p.n].toFixed(2)}`;
+    const tw = label.length * 9.1 + 12;
+    el('rect', { x: foot.x - tw / 2, y: y - 24, width: tw, height: 21, rx: 4, fill: c }, cv);
+    const t = el('text', { x: foot.x, y: y - 8, 'text-anchor': 'middle', fill: '#07101f', 'font-family': 'JetBrains Mono', 'font-size': 15, 'font-weight': 700 }, cv);
+    t.textContent = label;
+  });
+
+  // speed callouts on passer and receiver
+  function callout(team, n, lines, dx, dy) {
+    const head = v.head(team, n, 0);
+    const x = head.x + dx, y = head.y + dy;
+    el('line', { x1: head.x + 14, y1: head.y + 8, x2: x, y2: y + 18, stroke: 'rgba(255,255,255,.55)', 'stroke-width': 1.5 }, cv);
+    el('rect', { x, y, width: 178, height: 22 + lines.length * 20, rx: 8, fill: 'rgba(7,11,23,.9)', stroke: 'rgba(255,255,255,.28)' }, cv);
+    lines.forEach((ln, i) => { const t = el('text', { x: x + 12, y: y + 26 + i * 20, fill: i === 0 ? '#f2f5fb' : '#a3afc9', 'font-family': 'JetBrains Mono', 'font-size': 15, 'font-weight': 700 }, cv); t.textContent = ln; });
+  }
+  callout('home', 10, ['ID 9 · HAR #10', 'speed 28.4 km/h', 'GT    28.9 km/h'], 34, -60);
+  callout('home', 6, ['ID 7 · HAR #6', 'speed 12.1 km/h', 'GT    12.4 km/h'], -230, -110);
+
+  // ball box
+  const b = v.at(61.2, 32.4, 0.11);
+  el('rect', { x: b.x - 11, y: b.y - 13, width: 22, height: 22, fill: 'none', stroke: '#c8ff3d', 'stroke-width': 2.5 }, cv);
+  el('line', { x1: b.x + 11, y1: b.y + 9, x2: b.x + 40, y2: b.y + 52, stroke: '#c8ff3d', 'stroke-width': 1.5 }, cv);
+  el('rect', { x: b.x + 34, y: b.y + 52, width: 214, height: 44, rx: 8, fill: 'rgba(7,11,23,.9)', stroke: 'rgba(200,255,61,.6)' }, cv);
+  [['BALL · 0.88 · 61 km/h', '#c8ff3d'], ['GT 62.3 km/h · err 1.3', '#a3afc9']].forEach(([s, c], i) => { const t = el('text', { x: b.x + 46, y: b.y + 70 + i * 19, fill: c, 'font-family': 'JetBrains Mono', 'font-size': 15, 'font-weight': 700 }, cv); t.textContent = s; });
+
+  // ---------- event track (GT vs detected) ----------
+  const trk = document.getElementById('trk');
+  const X0 = 110, X1 = 920;
+  const tx = (s) => X0 + (s / 60) * (X1 - X0);
+  [['Ground truth', 20], ['Detected', 52]].forEach(([lab, y]) => {
+    const t = el('text', { x: 0, y: y + 5, fill: '#a3afc9', 'font-family': 'Inter', 'font-size': 15, 'font-weight': 600 }, trk); t.textContent = lab;
+    el('line', { x1: X0, y1: y, x2: X1, y2: y, stroke: 'rgba(255,255,255,.18)', 'stroke-width': 2 }, trk);
+  });
+  const gt = [3.2, 7.9, 12.4, 16.0, 21.3, 26.8, 30.1, 34.6, 39.9, 45.2, 51.7, 59.2];
+  const missed = 34.6;
+  gt.forEach((s) => {
+    const m = s === missed;
+    el('circle', { cx: tx(s), cy: 20, r: 6, fill: m ? 'none' : '#4ff0b0', stroke: m ? '#ffb648' : 'none', 'stroke-width': 2.5 }, trk);
+    if (!m) { el('circle', { cx: tx(s + 0.15), cy: 52, r: 6, fill: '#4ff0b0' }, trk); el('line', { x1: tx(s), y1: 27, x2: tx(s + 0.15), y2: 45, stroke: 'rgba(79,240,176,.35)', 'stroke-width': 1.5 }, trk); }
+  });
+  const fa = tx(42.6);
+  el('rect', { x: fa - 6, y: 46, width: 12, height: 12, fill: '#ff5d6c', transform: `rotate(45 ${fa} 52)` }, trk);
+  const lab1 = el('text', { x: tx(missed) + 10, y: 25, fill: '#ffb648', 'font-family': 'Inter', 'font-size': 15, 'font-weight': 700 }, trk); lab1.textContent = 'occluded';
+  // E-1893 marker
+  el('line', { x1: tx(59.2), y1: 8, x2: tx(59.2), y2: 64, stroke: '#c8ff3d', 'stroke-width': 2 }, trk);
+  const lab2 = el('text', { x: tx(59.2) - 8, y: 70, 'text-anchor': 'end', fill: '#c8ff3d', 'font-family': 'JetBrains Mono', 'font-size': 15, 'font-weight': 700 }, trk); lab2.textContent = 'E-1893';
+</script>
+</body>
+</html>

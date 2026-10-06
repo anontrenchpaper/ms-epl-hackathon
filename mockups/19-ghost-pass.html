@@ -12,9 +12,9 @@
   .seg span { padding: 6px 14px; border-radius: 999px; color: var(--muted); letter-spacing: .02em; }
   .seg span.on { background: var(--lime); color: #0b1124; }
 
-  .headline { position: absolute; left: 64px; top: 124px; }
+  .headline { position: absolute; left: 64px; top: 114px; }
   .headline .eyebrow { display: flex; align-items: center; gap: 10px; }
-  .headline h1 { font-family: var(--font-display); font-weight: 800; font-size: 56px; line-height: 1; text-transform: uppercase; letter-spacing: .01em; margin-top: 6px; text-shadow: 0 4px 24px rgba(0,0,0,.6); }
+  .headline h1 { font-family: var(--font-display); font-weight: 800; font-size: 52px; line-height: 1; text-transform: uppercase; letter-spacing: .01em; margin-top: 6px; text-shadow: 0 4px 24px rgba(0,0,0,.6); }
   .headline h1 em { font-style: normal; color: var(--lime); }
 
   /* ---------- comparison band ---------- */
@@ -150,8 +150,8 @@
         const cx = x + S / 2, cy = y + S / 2;
         const th = tReach(home, cx, cy, runBonus), ta = tReach(away, cx, cy);
         const c = 1 / (1 + Math.exp(-(ta - th) * 3.2));   // P(Harbour City wins this square)
-        if (c > 0.55) {
-          const a = Math.min(0.42, (c - 0.55) * 0.9);
+        if (c > 0.6) {
+          const a = Math.min(0.42, (c - 0.6) * 1.1);
           el('polygon', { points: pts([[x + .1, y + .1], [x + S - .1, y + .1], [x + S - .1, y + S - .1], [x + .1, y + S - .1]]), fill: '#c8ff3d', 'fill-opacity': a }, g);
         } else if (c < 0.3) {
           const a = Math.min(0.2, (0.3 - c) * 0.5);

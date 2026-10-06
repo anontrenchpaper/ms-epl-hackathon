@@ -28,11 +28,12 @@ research/        Seven deep-research reports (sources inline, claims tagged [V] 
 ideas/
   idea-catalogue.md                  50 ideas in six themes, each mapped to stages, precedent, Azure, prizes
   shortlist-and-recommendation.md    Scoring, four flagship concepts, recommendation, MVP cut lines, plan, decisions
+  research-backlog.md                Open questions for the targeted research round, prioritised
 architecture/
   tech-stack.md                      Proposed Azure-native stack, agent roster, overlay cue contract, practices
   azure-learning-plan.md             Learn-by-building plan for getting good at Azure during the hackathon
 mockups/
-  NN-*.html                          20 concept mockups (static HTML)
+  NN-*.html                          21 concept mockups (static HTML)
   png/                               Rendered 1920×1080 PNGs
   assets/pitch.js                    Synthetic broadcast renderer (virtual camera over synthetic tracking)
   assets/theme.css                   Shared visual language
@@ -54,6 +55,7 @@ mockups/
 | 08 | Scenario Lab (synthetic match engine) | 18 | Edge-of-Seat alerts |
 | 09 | Vision loop (auto-eventing on synthetic video) | 19 | The Pass Not Played (counterfactual) |
 | 10 | Catch Me Up | 20 | Reference architecture |
+| | | 21 | Predict → Reveal (alerts + public model scorecard) |
 
 Re-render after editing: `node mockups/render.mjs` (uses Playwright + Chromium; fonts load from Google Fonts).
 

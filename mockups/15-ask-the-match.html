@@ -53,21 +53,23 @@
   .fe .id { font-family: var(--font-mono); font-size: 15px; color: var(--cyan); margin-top: 2px; }
   .fe.cited .x { color: var(--text); font-weight: 600; }
   .fe.cited .m { color: var(--lime); }
+  .hist { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 10px; background: rgba(255,255,255,.04); border: 1px solid var(--line); font-size: 16px; color: #dfe5f3; margin-top: -6px; }
+  .hist span { font-family: var(--font-mono); font-size: 15px; color: var(--dim); }
   .pin { margin-top: auto; padding: 12px 14px; border-radius: 12px; background: rgba(255,255,255,.04); border: 1px solid var(--line); }
   .pin .t { font-weight: 800; font-size: 16px; }
   .pin .d { font-size: 15px; color: var(--muted); margin-top: 2px; }
 
   .main { padding: 18px 26px 18px; min-width: 0; display: flex; flex-direction: column; gap: 10px; min-height: 0; background: linear-gradient(180deg, #0a0f1f, #0b1124); }
-  .q { align-self: flex-end; max-width: 640px; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+  .q { align-self: flex-end; display: flex; flex-direction: row-reverse; align-items: center; gap: 12px; flex: none; }
   .q .bub { padding: 11px 20px; border-radius: 22px 22px 6px 22px; background: #2f6bff; font-size: 21px; font-weight: 600; }
   .q .ts { font-size: 15px; color: var(--dim); }
-  .ans { border-radius: 20px; background: #0f172e; border: 1px solid var(--line-strong); padding: 16px 22px 16px; display: flex; flex-direction: column; gap: 10px; }
+  .ans { flex: none; border-radius: 20px; background: #0f172e; border: 1px solid var(--line-strong); padding: 16px 22px 16px; display: flex; flex-direction: column; gap: 10px; }
   .ans .hd { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 700; color: var(--muted); }
   .ans .hd .mk { width: 26px; height: 26px; border-radius: 8px; background: conic-gradient(from 200deg, var(--lime), var(--cyan), var(--violet), var(--lime)); }
   .ans .hd .chip { font-size: 15px; padding: 3px 10px; }
   .ans .tl { font-size: 26px; font-weight: 800; line-height: 1.2; letter-spacing: -.01em; }
   .ans .tl span { color: var(--lime); }
-  .ans .tx { font-size: 19px; line-height: 1.52; color: #dfe5f3; }
+  .ans .tx { font-size: 19px; line-height: 1.48; color: #dfe5f3; }
   .ans .tx b { color: var(--text); }
   .ev { display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: var(--cyan); background: rgba(58,215,255,.12); border: 1px solid rgba(58,215,255,.4); border-radius: 7px; padding: 0 7px; line-height: 1.5; vertical-align: 1px; white-space: nowrap; }
   .vis { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 12px; }
@@ -97,8 +99,8 @@
   .trace .step .n { width: 20px; height: 20px; border-radius: 50%; background: rgba(156,140,255,.25); color: var(--violet); display: grid; place-items: center; font-size: 15px; font-weight: 700; flex: none; }
   .trace .step .ms { margin-left: auto; color: var(--dim); }
   .trace .step.arr { height: 12px; color: var(--dim); padding-left: 6px; }
-  .fu { display: flex; gap: 8px; flex-wrap: nowrap; }
-  .fu .chip { font-size: 16px; padding: 8px 14px; white-space: nowrap; background: rgba(255,255,255,.05); }
+  .fu { display: flex; gap: 8px; flex-wrap: nowrap; flex: none; }
+  .fu .chip { font-size: 16px; padding: 7px 12px; letter-spacing: 0; white-space: nowrap; background: rgba(255,255,255,.05); }
   .composer { margin-top: auto; flex: none; display: flex; align-items: center; gap: 12px; height: 64px; padding: 0 10px 0 22px; border-radius: 999px; background: #121b38; border: 1px solid var(--line-strong); }
   .composer .ph { font-size: 19px; color: var(--dim); flex: 1; }
   .talk { display: flex; align-items: center; gap: 12px; height: 50px; padding: 0 22px 0 8px; border-radius: 999px; background: var(--lime); color: #0b1124; font-weight: 800; font-size: 18px; }
@@ -140,6 +142,9 @@
             <div class="fe cited"><span class="m">73'</span><div><div class="x">Rook + Lindqvist 2-v-1 on Strand</div><div class="id">evt-6133</div></div></div>
             <div class="fe cited"><span class="m">71'</span><div><div class="x">Achterberg shot saved after left-side move</div><div class="id">evt-6120</div></div></div>
           </div>
+          <div class="sh" style="margin-top:4px">Earlier questions</div>
+          <div class="hist"><div>“Why is Calloway so free?”</div><span>67'</span></div>
+          <div class="hist"><div>“Who is pressing the most?”</div><span>62'</span></div>
           <div class="pin"><div class="t">Pinned · Formation tracker</div><div class="d">KMA 5-3-2 since 79' · HAR 4-3-3</div></div>
         </div>
 
@@ -158,9 +163,10 @@
                 <div class="lane"><span class="ln">Centre</span><span class="tr"><i style="width:24%;background:rgba(200,255,61,.55)"></i></span><span class="v">24%</span></div>
                 <div class="lane"><span class="ln">Right</span><span class="tr"><i style="width:12%;background:rgba(200,255,61,.35)"></i></span><span class="v">12%</span></div>
                 <div style="font-size:15px;color:var(--muted);margin-top:6px">25 final-third entries · HAR’s left = KMA’s right</div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:10px;padding:7px 10px;border-radius:10px;background:rgba(255,182,72,.1);border:1px solid rgba(255,182,72,.35);font-size:16px"><span class="dot" style="color:var(--amber)"></span>Strand left 2-v-1: <b class="mono" style="color:var(--amber)">5×</b> in 70'–79'</div>
               </div>
               <div class="tile">
-                <div class="tt"><b>KMA shape · before / after</b><span>2 snapshots</span></div>
+                <div class="tt"><b>KMA shape · before / after</b><span style="letter-spacing:0;font-weight:700;text-transform:none"><span class="dot" style="color:#e8434f"></span> KMA &nbsp;<span class="dot" style="color:#5b8cff"></span> HAR</span></div>
                 <div class="formrow">
                   <div><div class="fcap"><span>4-4-2</span><span class="k">75:00</span></div><svg id="fa" width="240" height="155" style="display:block"></svg></div>
                   <svg width="34" height="24" viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" stroke="#a3afc9" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -257,7 +263,6 @@
     Object.entries({ x: x * sx, y: (68 - y) * sy, fill: col, 'font-family': 'Inter', 'font-weight': 800, 'font-size': 15, 'text-anchor': 'middle', 'paint-order': 'stroke', stroke: '#0c1830', 'stroke-width': 4 }).forEach(([k, v]) => tx.setAttribute(k, v)); tx.textContent = txt; s.appendChild(tx); };
   lbl('fa', 66, 60, '2-v-1', '#ffb648');
   lbl('fb', 74, 9, 'Quill drops', '#c8ff3d');
-  lbl('fa', 40, 9, 'HAR', '#5b8cff'); lbl('fa', 40, 62, 'KMA', '#ff5d6c');
 
   // composer mini waveform (voice ready)
   (function () {
