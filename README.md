@@ -10,7 +10,7 @@ Pre-build research for our entry to the **Microsoft Premier League Hackathon** (
 
 | If you have… | Read |
 |---|---|
-| 5 minutes | The deck (link shared separately) or [`ideas/shortlist-and-recommendation.md`](ideas/shortlist-and-recommendation.md) |
+| 5 minutes | The [research & ideas deck](https://claude.ai/artifact/8wqTNgAJetU7kH4p7u1Kyx) (private until shared) or [`ideas/shortlist-and-recommendation.md`](ideas/shortlist-and-recommendation.md) |
 | 30 minutes | + [`ideas/idea-catalogue.md`](ideas/idea-catalogue.md) and the mockups in [`mockups/png/`](mockups/png/) |
 | An afternoon | + the seven research reports below |
 
