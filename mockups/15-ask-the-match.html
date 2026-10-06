@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ask the Match — grounded second-screen assistant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .bg { position: absolute; inset: 0;
+    background:
+      radial-gradient(800px 700px at 10% 40%, rgba(58,215,255,.08), transparent 65%),
+      radial-gradient(1100px 800px at 70% 50%, rgba(156,140,255,.10), transparent 65%),
+      var(--ink); }
+
+  /* left story */
+  .left { position: absolute; left: 64px; top: 84px; width: 400px; }
+  .left h1 { font-family: var(--font-display); font-weight: 800; font-size: 72px; line-height: .94; text-transform: uppercase; margin-top: 14px; }
+  .left h1 em { font-style: normal; color: var(--lime); }
+  .left .lead { font-size: 21px; line-height: 1.45; color: #dfe5f3; margin-top: 22px; }
+  .pts { margin-top: 28px; display: flex; flex-direction: column; gap: 18px; }
+  .pt { display: grid; grid-template-columns: 40px 1fr; gap: 14px; }
+  .pt .ic { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; background: rgba(200,255,61,.12); border: 1px solid rgba(200,255,61,.45); }
+  .pt .t { font-weight: 800; font-size: 19px; }
+  .pt .d { font-size: 18px; color: var(--muted); line-height: 1.38; margin-top: 2px; }
+
+  /* tablet */
+  .tablet { position: absolute; left: 500px; top: 42px; width: 1356px; height: 984px; border-radius: 40px; background: #0a0f1f; border: 14px solid #1b2340;
+    box-shadow: 0 40px 90px rgba(0,0,0,.6), inset 0 0 0 2px #2a3456; overflow: hidden; }
+  .tablet .cam { position: absolute; top: 50%; left: -9px; width: 6px; height: 6px; border-radius: 50%; background: #2a3456; }
+  .ui { position: absolute; inset: 0; display: grid; grid-template-rows: 60px minmax(0, 1fr); grid-template-columns: minmax(0, 1fr); }
+  .topbar { display: flex; align-items: center; gap: 14px; padding: 0 22px; background: #0d1530; border-bottom: 1px solid var(--line); }
+  .brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 800; font-size: 26px; letter-spacing: .06em; text-transform: uppercase; }
+  .brand .mk { width: 32px; height: 32px; border-radius: 9px; background: conic-gradient(from 200deg, var(--lime), var(--cyan), var(--violet), var(--lime)); display: grid; place-items: center; }
+  .bug { display: flex; align-items: stretch; height: 36px; border-radius: 8px; overflow: hidden; font-family: var(--font-display); font-weight: 700; font-size: 22px; letter-spacing: .04em; margin-left: 18px; }
+  .bug > div { display: flex; align-items: center; padding: 0 10px; gap: 8px; background: #121a33; }
+  .bug .sw { width: 6px; height: 20px; border-radius: 2px; }
+  .bug .sc { background: #f2f5fb; color: #0b1124; }
+  .bug .ck { font-family: var(--font-mono); font-size: 17px; background: #0b1124; }
+  .topbar .r { margin-left: auto; display: flex; gap: 8px; }
+  .topbar .chip { font-size: 15px; }
+
+  .body { display: grid; grid-template-columns: 320px minmax(0, 1fr); min-height: 0; }
+  .side { border-right: 1px solid var(--line); padding: 18px 16px; display: flex; flex-direction: column; gap: 14px; background: #0b1124; min-height: 0; }
+  .thumb { position: relative; height: 162px; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); }
+  .thumb svg { position: absolute; left: 0; top: 0; }
+  .thumb .chip { position: absolute; left: 8px; top: 8px; font-size: 15px; background: rgba(7,11,23,.8); padding: 3px 9px; }
+  .sh { font-size: 15px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .feed { display: flex; flex-direction: column; }
+  .fe { display: grid; grid-template-columns: 38px 1fr; gap: 8px; padding: 9px 0; border-top: 1px solid var(--line); }
+  .fe .m { font-family: var(--font-mono); font-weight: 700; font-size: 15px; color: var(--muted); padding-top: 1px; }
+  .fe .x { font-size: 16px; line-height: 1.32; color: #dfe5f3; }
+  .fe .id { font-family: var(--font-mono); font-size: 15px; color: var(--cyan); margin-top: 2px; }
+  .fe.cited .x { color: var(--text); font-weight: 600; }
+  .fe.cited .m { color: var(--lime); }
+  .pin { margin-top: auto; padding: 12px 14px; border-radius: 12px; background: rgba(255,255,255,.04); border: 1px solid var(--line); }
+  .pin .t { font-weight: 800; font-size: 16px; }
+  .pin .d { font-size: 15px; color: var(--muted); margin-top: 2px; }
+
+  .main { padding: 18px 26px 18px; min-width: 0; display: flex; flex-direction: column; gap: 10px; min-height: 0; background: linear-gradient(180deg, #0a0f1f, #0b1124); }
+  .q { align-self: flex-end; max-width: 640px; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+  .q .bub { padding: 11px 20px; border-radius: 22px 22px 6px 22px; background: #2f6bff; font-size: 21px; font-weight: 600; }
+  .q .ts { font-size: 15px; color: var(--dim); }
+  .ans { border-radius: 20px; background: #0f172e; border: 1px solid var(--line-strong); padding: 16px 22px 16px; display: flex; flex-direction: column; gap: 10px; }
+  .ans .hd { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 700; color: var(--muted); }
+  .ans .hd .mk { width: 26px; height: 26px; border-radius: 8px; background: conic-gradient(from 200deg, var(--lime), var(--cyan), var(--violet), var(--lime)); }
+  .ans .hd .chip { font-size: 15px; padding: 3px 10px; }
+  .ans .tl { font-size: 26px; font-weight: 800; line-height: 1.2; letter-spacing: -.01em; }
+  .ans .tl span { color: var(--lime); }
+  .ans .tx { font-size: 19px; line-height: 1.52; color: #dfe5f3; }
+  .ans .tx b { color: var(--text); }
+  .ev { display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: var(--cyan); background: rgba(58,215,255,.12); border: 1px solid rgba(58,215,255,.4); border-radius: 7px; padding: 0 7px; line-height: 1.5; vertical-align: 1px; white-space: nowrap; }
+  .vis { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 12px; }
+  .tile { border-radius: 14px; background: rgba(255,255,255,.035); border: 1px solid var(--line); padding: 12px 14px; }
+  .tile .tt { display: flex; justify-content: space-between; align-items: baseline; white-space: nowrap; font-size: 15px; font-weight: 800; letter-spacing: .03em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+  .tile .tt b { color: var(--text); }
+  .lane { display: grid; grid-template-columns: 64px 1fr 52px; gap: 10px; align-items: center; height: 36px; }
+  .lane .ln { font-size: 16px; font-weight: 700; }
+  .lane .tr { height: 16px; border-radius: 4px; background: rgba(255,255,255,.07); position: relative; overflow: hidden; }
+  .lane .tr i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; }
+  .lane .v { font-family: var(--font-mono); font-weight: 700; font-size: 17px; text-align: right; }
+  .formrow { display: grid; grid-template-columns: 1fr 34px 1fr; align-items: center; gap: 6px; }
+  .fcap { display: flex; justify-content: space-between; font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .fcap .k { font-family: var(--font-mono); color: var(--muted); }
+  .meta { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; }
+  .meta .chip { font-size: 15px; white-space: nowrap; }
+  .conf { display: inline-flex; gap: 3px; margin-left: 4px; }
+  .conf i { width: 14px; height: 8px; border-radius: 2px; background: rgba(255,255,255,.18); }
+  .conf i.on { background: var(--amber); }
+  .how { border-radius: 14px; border: 1px solid rgba(200,255,61,.3); background: rgba(200,255,61,.05); padding: 10px 16px; display: grid; grid-template-columns: minmax(0, 1fr) 318px; gap: 16px; align-items: center; }
+  .how .h { font-size: 15px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--lime); margin-bottom: 6px; }
+  .how ul { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+  .how li { font-size: 16px; line-height: 1.34; color: #dfe5f3; padding-left: 16px; position: relative; }
+  .how li::before { content: ""; position: absolute; left: 0; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--lime); }
+  .trace { border-left: 1px solid var(--line); padding-left: 16px; }
+  .trace .step { display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 15px; color: var(--text); height: 26px; }
+  .trace .step .n { width: 20px; height: 20px; border-radius: 50%; background: rgba(156,140,255,.25); color: var(--violet); display: grid; place-items: center; font-size: 15px; font-weight: 700; flex: none; }
+  .trace .step .ms { margin-left: auto; color: var(--dim); }
+  .trace .step.arr { height: 12px; color: var(--dim); padding-left: 6px; }
+  .fu { display: flex; gap: 8px; flex-wrap: nowrap; }
+  .fu .chip { font-size: 16px; padding: 8px 14px; white-space: nowrap; background: rgba(255,255,255,.05); }
+  .composer { margin-top: auto; flex: none; display: flex; align-items: center; gap: 12px; height: 64px; padding: 0 10px 0 22px; border-radius: 999px; background: #121b38; border: 1px solid var(--line-strong); }
+  .composer .ph { font-size: 19px; color: var(--dim); flex: 1; }
+  .talk { display: flex; align-items: center; gap: 12px; height: 50px; padding: 0 22px 0 8px; border-radius: 999px; background: var(--lime); color: #0b1124; font-weight: 800; font-size: 18px; }
+  .talk .mic { width: 40px; height: 40px; border-radius: 50%; background: #0b1124; display: grid; place-items: center; }
+  .talk small { display: block; font-size: 15px; font-weight: 700; opacity: .7; margin-top: -2px; }
+</style>
+</head>
+<body>
+<div class="frame" id="f">
+  <div class="bg"></div>
+
+  <div class="left">
+    <div class="eyebrow">Ask the Match · second screen</div>
+    <h1>Ask why. <em>It shows its working.</em></h1>
+    <div class="lead">A match-aware assistant answers fan questions from the live synthetic event stream, cites the events it used and says how sure it is.</div>
+    <div class="pts">
+      <div class="pt"><span class="ic"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M4 10.5l4 4 8-9" stroke="#c8ff3d" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><div class="t">Grounded</div><div class="d">Every claim links back to event IDs and snapshots.</div></div></div>
+      <div class="pt"><span class="ic"><svg width="20" height="20" viewBox="0 0 20 20"><rect x="2" y="3" width="7" height="6" rx="1.5" stroke="#c8ff3d" stroke-width="2" fill="none"/><rect x="11" y="11" width="7" height="6" rx="1.5" stroke="#c8ff3d" stroke-width="2" fill="none"/><path d="M9 6h4.5v5" stroke="#c8ff3d" stroke-width="2" fill="none"/></svg></span><div><div class="t">Tool use over MCP</div><div class="d">Calls live match tools instead of guessing from memory.</div></div></div>
+      <div class="pt"><span class="ic"><svg width="20" height="20" viewBox="0 0 20 20"><rect x="7" y="2" width="6" height="11" rx="3" fill="#c8ff3d"/><path d="M4 10a6 6 0 0 0 12 0M10 16v3" stroke="#c8ff3d" stroke-width="2" fill="none" stroke-linecap="round"/></svg></span><div><div class="t">Real-time voice</div><div class="d">Talk to the match hands-free while you watch.</div></div></div>
+      <div class="pt"><span class="ic"><svg width="20" height="20" viewBox="0 0 20 20"><rect x="2" y="12" width="4" height="6" rx="1" fill="#c8ff3d"/><rect x="8" y="8" width="4" height="10" rx="1" fill="#c8ff3d"/><rect x="14" y="4" width="4" height="14" rx="1" fill="#c8ff3d" opacity=".35"/></svg></span><div><div class="t">Honest confidence</div><div class="d">Says what it can’t observe, like a manager’s intent.</div></div></div>
+    </div>
+  </div>
+
+  <div class="tablet"><span class="cam"></span>
+    <div class="ui">
+      <div class="topbar">
+        <div class="brand"><span class="mk"></span>Ask the Match</div>
+        <div class="bug"><div><span class="sw" style="background:var(--home)"></span>HAR</div><div class="sc">1 – 1</div><div>KMA<span class="sw" style="background:var(--away)"></span></div><div class="ck">81:05</div></div>
+        <div class="r"><span class="chip coral"><span class="live-dot"></span> LIVE</span><span class="chip lime">Grounded answers</span><span class="chip">EN</span></div>
+      </div>
+      <div class="body">
+        <div class="side">
+          <div class="thumb"><svg id="th"></svg><span class="chip">Synthetic feed</span></div>
+          <div class="sh">Live events</div>
+          <div class="feed">
+            <div class="fe"><span class="m">81'</span><div><div class="x">HAR corner won on the left</div><div class="id">evt-6342</div></div></div>
+            <div class="fe cited"><span class="m">79'</span><div><div class="x">KMA shape change detected: 5-3-2</div><div class="id">evt-6288</div></div></div>
+            <div class="fe cited"><span class="m">76'</span><div><div class="x">Kalem (KMA #6) booked</div><div class="id">evt-6201</div></div></div>
+            <div class="fe cited"><span class="m">73'</span><div><div class="x">Rook + Lindqvist 2-v-1 on Strand</div><div class="id">evt-6133</div></div></div>
+            <div class="fe cited"><span class="m">71'</span><div><div class="x">Achterberg shot saved after left-side move</div><div class="id">evt-6120</div></div></div>
+          </div>
+          <div class="pin"><div class="t">Pinned · Formation tracker</div><div class="d">KMA 5-3-2 since 79' · HAR 4-3-3</div></div>
+        </div>
+
+        <div class="main">
+          <div class="q"><div class="bub">Why did Kingsmoor switch to a back five?</div><div class="ts">You · 80:52</div></div>
+
+          <div class="ans">
+            <div class="hd"><span class="mk"></span>Ask the Match<span class="chip lime">Grounded</span><span style="margin-left:auto">answered in 1.4 s</span></div>
+            <div class="tl">To stop Harbour City <span>overloading their right side</span>.</div>
+            <div class="tx">Since 70', <b>64% of Harbour City’s attacks</b> have come down their left, where Rook overlaps and Calloway drifts inside, leaving right-back Strand in 2-v-1s <span class="ev">evt-6120</span> <span class="ev">evt-6133</span>. After Kalem’s booking <span class="ev">evt-6201</span>, Quill dropped between the centre-backs <span class="ev">evt-6288</span>, so a defender can now slide out to help Strand.</div>
+
+            <div class="vis">
+              <div class="tile">
+                <div class="tt"><b>HAR attacks · channel</b><span>since 70'</span></div>
+                <div class="lane"><span class="ln">Left</span><span class="tr"><i style="width:64%;background:var(--lime)"></i></span><span class="v">64%</span></div>
+                <div class="lane"><span class="ln">Centre</span><span class="tr"><i style="width:24%;background:rgba(200,255,61,.55)"></i></span><span class="v">24%</span></div>
+                <div class="lane"><span class="ln">Right</span><span class="tr"><i style="width:12%;background:rgba(200,255,61,.35)"></i></span><span class="v">12%</span></div>
+                <div style="font-size:15px;color:var(--muted);margin-top:6px">25 final-third entries · HAR’s left = KMA’s right</div>
+              </div>
+              <div class="tile">
+                <div class="tt"><b>KMA shape · before / after</b><span>2 snapshots</span></div>
+                <div class="formrow">
+                  <div><div class="fcap"><span>4-4-2</span><span class="k">75:00</span></div><svg id="fa" width="240" height="155" style="display:block"></svg></div>
+                  <svg width="34" height="24" viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" stroke="#a3afc9" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <div><div class="fcap"><span style="color:var(--lime)">5-3-2</span><span class="k">80:00</span></div><svg id="fb" width="240" height="155" style="display:block"></svg></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="meta">
+              <span class="chip">Based on 38 events · 2 formation snapshots</span>
+              <span class="chip amber">Confidence: medium <span class="conf"><i class="on"></i><i class="on"></i><i></i></span></span>
+              <span class="chip" style="margin-left:auto;color:var(--lime);border-color:rgba(200,255,61,.45)">How I know ▴</span>
+            </div>
+            <div class="how">
+              <div>
+                <ul>
+                  <li>Shape from 3-minute average positions: Quill sits 15 m deeper at 80:00 than at 75:00.</li>
+                  <li>Channel share from 25 Harbour City final-third entries since 70'.</li>
+                  <li><b style="color:var(--amber)">Why medium:</b> intent isn’t observable. The timing after the booking is suggestive, not proof.</li>
+                </ul>
+              </div>
+              <div class="trace">
+                <div class="h" style="color:var(--violet)">Tools used · MCP</div>
+                <div class="step"><span class="n">1</span>query_match_state<span class="ms">180 ms</span></div>
+                <div class="step"><span class="n">2</span>get_formation_snapshots<span class="ms">420 ms</span></div>
+                <div class="step"><span class="n">3</span>compute_flank_share<span class="ms">310 ms</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="fu">
+            <span class="chip">Is the back five working?</span>
+            <span class="chip">Calloway’s touches since 79'</span>
+            <span class="chip">What should Harbour City do now?</span>
+            <span class="chip">Explain it simply</span>
+          </div>
+
+          <div class="composer">
+            <span class="ph">Ask anything about this match…</span>
+            <svg id="mw" width="120" height="34"></svg>
+            <div class="talk"><span class="mic"><svg width="16" height="22" viewBox="0 0 16 22"><rect x="4" y="1" width="8" height="13" rx="4" fill="#c8ff3d"/><path d="M1.5 10.5a6.5 6.5 0 0 0 13 0M8 17v4" stroke="#c8ff3d" stroke-width="2" fill="none" stroke-linecap="round"/></svg></span><div>Talk to the match<small>real-time voice</small></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mock-title">Concept 15 · Ask the Match</div>
+  <div class="mock-note">Concept mockup · synthetic data · fictional clubs and players</div>
+</div>
+
+<script src="assets/pitch.js"></script>
+<script>
+  const NS = 'http://www.w3.org/2000/svg';
+  // thumbnail: synthetic broadcast, HAR attacking down the left (far side)
+  const th = document.getElementById('th');
+  const scene = {
+    ball: [84, 56, 0.11],
+    home: [{ n: 3, x: 84, y: 56 }, { n: 11, x: 91, y: 60 }, { n: 10, x: 80, y: 47 }, { n: 9, x: 93, y: 38 }, { n: 8, x: 72, y: 40 }, { n: 7, x: 92, y: 20 }, { n: 6, x: 64, y: 34 }],
+    away: [{ n: 1, x: 102, y: 34 }, { n: 2, x: 88, y: 55 }, { n: 5, x: 93, y: 44 }, { n: 4, x: 94, y: 35 }, { n: 6, x: 93, y: 27 }, { n: 3, x: 88, y: 15 }, { n: 7, x: 84, y: 50 }, { n: 8, x: 82, y: 37 }, { n: 11, x: 82, y: 22 }],
+    camera: { pos: [80, -26, 16], target: [84, 36, 0], fov: 26 }
+  };
+  Pitch.broadcast(th, { scene });
+  th.setAttribute('viewBox', '160 120 1600 900');
+  th.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+  th.setAttribute('width', 288); th.setAttribute('height', 162);
+
+  // formation boards
+  function board(id, kma, har, highlight, backline) {
+    const s = document.getElementById(id);
+    const t = Pitch.tactical(s, { x: 0, y: 0, w: 240, h: 155, grass: '#0c1830', lineColor: 'rgba(255,255,255,0.25)', stripes: false });
+    // back line connector
+    const pts = backline.map(n => { const p = kma.find(q => q[0] === n); return t.P(p[1], p[2]).join(','); }).join(' ');
+    const pl = document.createElementNS(NS, 'polyline');
+    Object.entries({ points: pts, fill: 'none', stroke: '#ff5d6c', 'stroke-width': 2, 'stroke-dasharray': '5 4', opacity: .8 }).forEach(([k, v]) => pl.setAttribute(k, v));
+    t.g.appendChild(pl);
+    if (highlight) highlight(t);
+    har.forEach(([n, x, y]) => t.dot(x, y, '#5b8cff', null, 6));
+    kma.forEach(([n, x, y]) => t.dot(x, y, n === 1 ? '#9c8cff' : '#e8434f', null, n === 4 ? 7.5 : 6));
+    return t;
+  }
+  const har = [[3, 84, 60], [11, 92, 57], [10, 79, 47]];
+  const before = [[1, 102, 34], [2, 88, 54], [5, 89, 40], [6, 89, 27], [3, 88, 14], [7, 76, 52], [8, 77, 40], [4, 77, 28], [11, 76, 15], [9, 64, 40], [14, 64, 28]];
+  const after = [[1, 102, 34], [2, 86, 58], [5, 91, 44], [4, 92, 34], [6, 91, 24], [3, 86, 10], [7, 78, 48], [8, 78, 34], [11, 77, 20], [9, 66, 40], [14, 66, 28]];
+  board('fa', before, har, (t) => {
+    // 2-v-1 zone around Strand
+    t.zone([[80, 50], [95, 50], [95, 64], [80, 64]], '#ffb648', 0.18);
+  }, [2, 5, 6, 3]);
+  board('fb', after, har, (t) => {
+    t.arrow([77, 28], [91.2, 33.4], '#c8ff3d', 2, '4 3', 0.1);
+  }, [2, 5, 4, 6, 3]);
+  const lbl = (id, x, y, txt, col) => { const s = document.getElementById(id); const tx = document.createElementNS(NS, 'text');
+    const sx = 240 / 105, sy = 155 / 68;
+    Object.entries({ x: x * sx, y: (68 - y) * sy, fill: col, 'font-family': 'Inter', 'font-weight': 800, 'font-size': 15, 'text-anchor': 'middle', 'paint-order': 'stroke', stroke: '#0c1830', 'stroke-width': 4 }).forEach(([k, v]) => tx.setAttribute(k, v)); tx.textContent = txt; s.appendChild(tx); };
+  lbl('fa', 66, 60, '2-v-1', '#ffb648');
+  lbl('fb', 74, 9, 'Quill drops', '#c8ff3d');
+  lbl('fa', 40, 9, 'HAR', '#5b8cff'); lbl('fa', 40, 62, 'KMA', '#ff5d6c');
+
+  // composer mini waveform (voice ready)
+  (function () {
+    const svg = document.getElementById('mw'); let out = '';
+    for (let i = 0; i < 24; i++) { const h = 6 + Math.abs(Math.sin(i * 0.9) * 22) * (0.5 + 0.5 * Math.abs(Math.cos(i * 0.37)));
+      out += `<rect x="${i * 5}" y="${(34 - h) / 2}" width="3" height="${h}" rx="1.5" fill="${i < 15 ? '#c8ff3d' : 'rgba(255,255,255,.25)'}"/>`; }
+    svg.innerHTML = out;
+  })();
+</script>
+</body>
+</html>

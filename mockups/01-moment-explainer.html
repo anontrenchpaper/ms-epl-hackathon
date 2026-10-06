@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Moment Explainer — broadcast overlay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .why {
+    position: absolute; left: 64px; right: 64px; bottom: 50px; height: 214px;
+    display: grid; grid-template-columns: 250px 1fr 420px; overflow: hidden;
+    border-radius: 18px; background: rgba(7, 11, 23, 0.9); border: 1px solid var(--line-strong);
+    box-shadow: 0 24px 60px rgba(0,0,0,.55);
+  }
+  .why .tagcol { background: var(--lime); color: #0b1124; padding: 26px 26px; display: flex; flex-direction: column; justify-content: space-between; }
+  .why .tagcol .t { font-family: var(--font-display); font-weight: 800; font-size: 46px; line-height: .92; text-transform: uppercase; }
+  .why .tagcol .s { font-weight: 700; font-size: 16px; letter-spacing: .08em; text-transform: uppercase; opacity: .8; }
+  .why .story { padding: 26px 34px; display: flex; flex-direction: column; justify-content: center; gap: 14px; }
+  .why .story p { font-size: 29px; line-height: 1.28; font-weight: 500; }
+  .why .story b { color: var(--lime); font-weight: 700; }
+  .why .delta { border-left: 1px solid var(--line); padding: 24px 30px; display: flex; flex-direction: column; justify-content: center; gap: 12px; }
+  .prob { display: flex; align-items: baseline; gap: 16px; font-family: var(--font-display); font-weight: 700; }
+  .prob .from { font-size: 48px; color: var(--muted); }
+  .prob .arrow { font-size: 34px; color: var(--muted); }
+  .prob .to { font-size: 84px; color: var(--lime); line-height: .9; }
+  .track { position: relative; height: 14px; border-radius: 8px; background: rgba(255,255,255,.08); }
+  .track i { position: absolute; top: 0; bottom: 0; border-radius: 8px; }
+
+  .pq { position: absolute; right: 64px; top: 140px; width: 390px; padding: 24px 26px; }
+  .pq h4 { font-family: var(--font-display); font-size: 24px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .pq .big { display: flex; align-items: flex-end; justify-content: space-between; margin: 10px 0 16px; }
+  .pq .big .v { font-family: var(--font-display); font-weight: 800; font-size: 96px; line-height: .85; color: var(--lime); }
+  .pq .big .v small { font-size: 36px; color: var(--muted); font-weight: 600; }
+  .pq .grade { font-family: var(--font-display); font-weight: 700; font-size: 28px; text-transform: uppercase; color: #0b1124; background: var(--lime); padding: 4px 14px; border-radius: 8px; }
+  .pq table { width: 100%; border-collapse: collapse; font-size: 19px; }
+  .pq td { padding: 9px 0; border-top: 1px solid var(--line); }
+  .pq td:last-child { text-align: right; font-family: var(--font-mono); font-weight: 700; }
+  .modes { position: absolute; right: 64px; top: 48px; display: flex; gap: 10px; align-items: center; }
+  .label-line { position: absolute; font-family: var(--font-display); font-weight: 700; font-size: 20px; letter-spacing: .12em; color: #fff; padding: 4px 10px; border-radius: 6px; background: rgba(232,67,79,.85); text-transform: uppercase; }
+</style>
+</head>
+<body>
+<div class="frame" id="f">
+  <svg class="stage" id="stage"></svg>
+
+  <div class="scorebug">
+    <div class="league">SYN</div>
+    <div class="team"><span class="swatch" style="background:var(--home)"></span>HAR</div>
+    <div class="score">1 – 1</div>
+    <div class="team">KMA<span class="swatch" style="background:var(--away)"></span></div>
+    <div class="clock">67:12</div>
+  </div>
+
+  <div class="modes">
+    <span class="chip coral"><span class="live-dot"></span> LIVE</span>
+    <span class="chip lime">AI INSIGHT</span>
+    <span class="chip">Mode: Casual fan · EN</span>
+  </div>
+
+  <div class="glass pq">
+    <h4>Pass quality</h4>
+    <div class="big"><div class="v">82<small>/100</small></div><div class="grade">Elite</div></div>
+    <table>
+      <tr><td class="muted">Distance</td><td>17.6 m</td></tr>
+      <tr><td class="muted">Ball speed</td><td>61 km/h</td></tr>
+      <tr><td class="muted">Completion probability</td><td>31%</td></tr>
+      <tr><td class="muted">Lines broken</td><td class="lime">2</td></tr>
+      <tr><td class="muted">Opponents bypassed</td><td class="lime">6</td></tr>
+    </table>
+  </div>
+
+  <div class="why">
+    <div class="tagcol">
+      <div class="t">Why it<br>matters</div>
+      <div class="s">67' · Line-breaking pass</div>
+    </div>
+    <div class="story">
+      <p><b>Marchetti</b> found Calloway between the lines, cutting out <b>six Kingsmoor players</b> in one pass. Only 3 in 10 passes like this arrive, and when they do, Harbour City usually get a shot within 10 seconds.</p>
+      <div class="row" style="gap:10px">
+        <span class="chip">Evidence: 214 similar passes</span>
+        <span class="chip">Model: pass value v3 · confidence high</span>
+        <span class="chip cyan">Hold ▸ for the maths</span>
+      </div>
+    </div>
+    <div class="delta">
+      <div class="muted" style="font-size:16px;font-weight:700;letter-spacing:.1em;text-transform:uppercase">Chance this move ends in a goal</div>
+      <div class="prob"><span class="from">3%</span><span class="arrow">→</span><span class="to">17%</span></div>
+      <div class="track"><i style="left:0;width:3%;background:var(--muted)"></i><i style="left:3%;width:14%;background:var(--lime)"></i></div>
+      <div class="muted" style="font-size:16px">+14 pts in 0.9 s, the biggest swing of the half</div>
+    </div>
+  </div>
+
+  <div class="mock-title">Concept 01 · Moment Explainer</div>
+  <div class="mock-note">Concept mockup · synthetic match render · fictional clubs and players</div>
+</div>
+
+<script src="assets/pitch.js"></script>
+<script>
+  const v = Pitch.broadcast(document.getElementById('stage'), { scene: 'linebreak' });
+  const W = Pitch.W;
+  // the two opposition lines that the pass breaks
+  v.line([[64.1, 2], [64.1, W - 2]], '#ff5d6c', 3, '14 10');
+  v.line([[79, 2], [79, W - 2]], '#ff5d6c', 3, '14 10');
+  v.ring(60.3, 32.1, 1.3, '#3ad7ff', 3);
+  v.ring(75.5, 41, 1.3, '#c8ff3d', 3);
+  v.arrow([61.2, 32.4], [75.0, 40.7], { color: '#c8ff3d', width: 0.85, bend: -0.1 });
+
+  const f = document.getElementById('f');
+  function tag(team, n, html, metric, lift) {
+    const h = v.head(team, n, lift || 0);
+    const d = document.createElement('div');
+    d.className = 'ptag';
+    d.style.left = h.x + 'px';
+    d.style.top = h.y + 'px';
+    const color = team === 'home' ? 'var(--home)' : 'var(--away)';
+    d.innerHTML = `<div class="card"><span class="num" style="background:${color}">${n}</span>${html}${metric ? `<span class="metric">${metric}</span>` : ''}</div><div class="stem"></div>`;
+    f.appendChild(d);
+  }
+  tag('home', 6, 'MARCHETTI', '', 0.4);
+  tag('home', 10, 'CALLOWAY', '28.4 km/h ▲', 0.4);
+
+  function lineLabel(x, y, text) {
+    const p = v.at(x, y, 0);
+    const d = document.createElement('div');
+    d.className = 'label-line';
+    d.textContent = text;
+    d.style.left = (p.x + 14) + 'px';
+    d.style.top = (p.y - 18) + 'px';
+    f.appendChild(d);
+  }
+  lineLabel(64.1, 19, 'Line 1');
+  lineLabel(79, 17.5, 'Line 2');
+</script>
+</body>
+</html>

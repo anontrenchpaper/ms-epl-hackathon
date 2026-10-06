@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Shot DNA — broadcast overlay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .modes { position: absolute; right: 64px; top: 48px; display: flex; gap: 10px; align-items: center; }
+  .seg { display: inline-flex; padding: 4px; border-radius: 999px; background: rgba(7,11,23,.86); border: 1px solid var(--line-strong); font-size: 15px; font-weight: 700; }
+  .seg span { padding: 6px 14px; border-radius: 999px; color: var(--muted); letter-spacing: .02em; }
+  .seg span.on { background: var(--lime); color: #0b1124; }
+
+  /* ---------- DNA panel ---------- */
+  .dna { position: absolute; left: 64px; top: 128px; bottom: 50px; width: 600px; padding: 22px 28px 24px; display: flex; flex-direction: column; gap: 16px; }
+  .dna .top { display: flex; justify-content: space-between; align-items: center; }
+  .shooter { display: flex; align-items: center; gap: 14px; }
+  .shooter .num { width: 48px; height: 48px; border-radius: 50%; background: var(--home); display: grid; place-items: center; font-family: var(--font-display); font-weight: 800; font-size: 28px; }
+  .shooter .n { font-family: var(--font-display); font-weight: 800; font-size: 38px; line-height: .9; text-transform: uppercase; }
+  .shooter .r { font-size: 16px; color: var(--muted); margin-top: 4px; }
+  .xg { display: grid; grid-template-columns: 1fr auto 1fr; align-items: end; gap: 16px; padding: 14px 0 16px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .xg .v { font-family: var(--font-display); font-weight: 800; font-size: 96px; line-height: .82; }
+  .xg .l { font-size: 15px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .xg .s { font-size: 15px; color: var(--muted); margin-top: 8px; }
+  .xg .arrow { font-family: var(--font-display); font-size: 44px; color: var(--muted); padding-bottom: 34px; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); }
+  .stats .k + .k { border-left: 1px solid var(--line); padding-left: 18px; }
+  .stats .v { font-family: var(--font-display); font-weight: 700; font-size: 42px; line-height: 1; }
+  .stats .v small { font-size: 20px; color: var(--muted); font-weight: 600; margin-left: 3px; }
+  .stats .l { font-size: 15px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; font-weight: 600; margin-top: 4px; }
+  .sect { font-family: var(--font-display); font-weight: 700; font-size: 22px; letter-spacing: .1em; text-transform: uppercase; color: var(--text); display: flex; justify-content: space-between; align-items: baseline; }
+  .sect span { font-family: var(--font-ui); font-size: 15px; letter-spacing: .02em; text-transform: none; font-weight: 500; color: var(--dim); }
+  .shap { display: flex; flex-direction: column; }
+  .shap .r { display: grid; grid-template-columns: 236px 1fr 64px; align-items: center; gap: 12px; height: 41px; border-top: 1px solid var(--line); font-size: 18px; }
+  .shap .r .nm { white-space: nowrap; }
+  .shap .r .val { font-family: var(--font-mono); font-weight: 700; font-size: 17px; text-align: right; }
+  .shap .r .trk { position: relative; height: 100%; }
+  .shap .r .trk::before { content: ""; position: absolute; left: 0; top: 4px; bottom: 4px; width: 1px; background: var(--line-strong); }
+  .shap .r .trk i { position: absolute; top: 12px; height: 16px; border-radius: 4px; }
+  .shap .r .trk em { position: absolute; top: 30px; height: 15px; width: 1px; border-left: 1px dashed rgba(255,255,255,.3); }
+  .shap .r.base, .shap .r.total { font-weight: 700; }
+  .shap .r.total { border-top: 1px solid var(--line-strong); }
+  .modelbox { margin-top: auto; padding: 10px 14px; border-radius: 10px; background: rgba(255,255,255,.06); border: 1px solid var(--line); font-size: 15px; line-height: 1.5; color: var(--muted); }
+  .modelbox b { color: var(--text); margin-right: 6px; }
+
+  /* ---------- verdict lower third ---------- */
+  .lt {
+    position: absolute; left: 688px; right: 64px; bottom: 50px; height: 188px;
+    display: grid; grid-template-columns: 210px 1fr; overflow: hidden;
+    border-radius: 18px; background: rgba(7, 11, 23, 0.9); border: 1px solid var(--line-strong);
+    box-shadow: 0 24px 60px rgba(0,0,0,.55);
+  }
+  .lt .tagcol { background: var(--lime); color: #0b1124; padding: 22px 22px; display: flex; flex-direction: column; justify-content: space-between; }
+  .lt .tagcol .t { font-family: var(--font-display); font-weight: 800; font-size: 46px; line-height: .92; text-transform: uppercase; }
+  .lt .tagcol .s { font-weight: 700; font-size: 16px; letter-spacing: .08em; text-transform: uppercase; opacity: .8; }
+  .lt .story { padding: 22px 30px; display: flex; flex-direction: column; justify-content: center; gap: 14px; }
+  .lt .story p { font-size: 27px; line-height: 1.3; font-weight: 500; }
+  .lt .story b { color: var(--lime); font-weight: 700; }
+  .lt .story b.c { color: #ff7a84; }
+
+  .mini { position: absolute; font-family: var(--font-display); font-weight: 700; font-size: 19px; letter-spacing: .1em; text-transform: uppercase; padding: 4px 10px; border-radius: 6px; white-space: nowrap; }
+</style>
+</head>
+<body>
+<div class="frame" id="f">
+  <svg class="stage" id="stage"></svg>
+
+  <div class="scorebug">
+    <div class="league">SYN</div>
+    <div class="team"><span class="swatch" style="background:var(--home)"></span>HAR</div>
+    <div class="score">1 – 1</div>
+    <div class="team">KMA<span class="swatch" style="background:var(--away)"></span></div>
+    <div class="clock">71:06</div>
+  </div>
+
+  <div class="modes">
+    <span class="chip coral"><span class="live-dot"></span> REPLAY</span>
+    <span class="chip lime">SHOT DNA</span>
+    <div class="seg"><span>Casual</span><span class="on">Analyst</span></div>
+  </div>
+
+  <!-- Shot DNA panel -->
+  <div class="glass dna">
+    <div class="top">
+      <div class="eyebrow">Shot DNA</div>
+      <span class="chip">71' · event E-6402</span>
+    </div>
+    <div class="shooter">
+      <div class="num">9</div>
+      <div>
+        <div class="n">Dami Achterberg</div>
+        <div class="r">Right foot · first time · <span class="amber" style="font-weight:700">saved by Vos</span></div>
+      </div>
+    </div>
+    <div class="xg">
+      <div>
+        <div class="l">Chance quality</div>
+        <div class="v">0.21<span style="font-size:34px;color:var(--muted);margin-left:6px">xG</span></div>
+        <div class="s">Before the strike</div>
+      </div>
+      <div class="arrow">→</div>
+      <div>
+        <div class="l lime">After placement</div>
+        <div class="v lime">0.48<span style="font-size:34px;margin-left:6px">xGOT</span></div>
+        <div class="s">Mid-height, inside the near post</div>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="k"><div class="v">104<small>km/h</small></div><div class="l">Shot speed</div></div>
+      <div class="k"><div class="v">14.8<small>m</small></div><div class="l">Distance</div></div>
+      <div class="k"><div class="v">31<small>°</small></div><div class="l">Angle</div></div>
+    </div>
+    <div class="sect">What pushed this chance up / down <span>xG points</span></div>
+    <div class="shap" id="shap"></div>
+    <div class="modelbox"><b>Model</b>xG v4 + xGOT v2 · explained with SHAP values<br><b>Evidence</b>3,412 similar shots · calibration error ±0.02</div>
+  </div>
+
+  <!-- Verdict -->
+  <div class="lt">
+    <div class="tagcol">
+      <div class="t">The<br>verdict</div>
+      <div class="s">71' · Shot saved</div>
+    </div>
+    <div class="story">
+      <p>A good chance, not a great one: <b>the through-ball created it</b>, but <b class="c">Roux's block cut the visible goal in half</b>. Achterberg found the gap; Vos was already set.</p>
+      <div class="row" style="gap:10px">
+        <span class="chip">Evidence: 3,412 similar shots · E-6398 → E-6402</span>
+        <span class="chip">Model: xG v4 · confidence high</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="mock-title">Concept 16 · Shot DNA</div>
+  <div class="mock-note">Concept mockup · synthetic data · fictional clubs and players</div>
+</div>
+
+<script src="assets/pitch.js"></script>
+<script>
+  const el = Pitch.el;
+  const f = document.getElementById('f');
+  const L = Pitch.L, W = Pitch.W;
+
+  // ---------- scene: 71', Achterberg shot (custom copy of 'shot' with Roux and Kalem in the lane) ----------
+  const scene = JSON.parse(JSON.stringify(Pitch.SCENES.shot));
+  Object.assign(scene.away.find((p) => p.n === 5), { x: 95.4, y: 32.3 });   // Roux
+  Object.assign(scene.away.find((p) => p.n === 6), { x: 96.5, y: 30.1 });   // Kalem
+  scene.camera = { pos: [89.5, -24, 19], target: [89.5, 33, 0], fov: 24 };
+  const v = Pitch.broadcast(document.getElementById('stage'), { scene });
+  const cam = v.cam;
+  const P = (x, y, z) => cam.project(x, y, z || 0);
+  const pts = (list) => list.map((q) => { const p = P(q[0], q[1], q[2] || 0); return p.x.toFixed(1) + ',' + p.y.toFixed(1); }).join(' ');
+
+  // extend the run-off and LED boards past the goal end so the right edge of frame is filled
+  (function () {
+    const svg = document.getElementById('stage');
+    const g = el('g', {}, svg);
+    svg.insertBefore(g, v.ground);
+    el('polygon', { points: pts([[116.5, -8], [150, -8], [150, W + 5], [116.5, W + 5]]), fill: '#1f5a2c' }, g);
+    el('polygon', { points: pts([[119.5, W + 5, 0], [150, W + 5, 0], [150, W + 5, 0.95], [119.5, W + 5, 0.95]]), fill: 'url(#board)' }, g);
+    el('polyline', { points: pts([[119.5, W + 5, 0.95], [150, W + 5, 0.95]]), stroke: '#c8ff3d', 'stroke-opacity': 0.55, 'stroke-width': 2, fill: 'none' }, g);
+  })();
+
+  const B = [90.5, 30.5];                        // ball at the strike
+  const G0 = W / 2 - 3.66, G1 = W / 2 + 3.66;    // posts
+  const defs = el('defs', {}, v.ground);
+  defs.innerHTML = `<pattern id="hz" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="12" height="12" fill="#ff5d6c" fill-opacity=".16"/><line x1="0" y1="0" x2="0" y2="12" stroke="#ff5d6c" stroke-opacity=".55" stroke-width="3"/></pattern>`;
+
+  // shadow of a defender on the goal line, seen from the ball
+  function shadow(dx, dy, hw) {
+    const k = (L - B[0]) / (dx - B[0]);
+    return [B[1] + (dy - hw - B[1]) * k, B[1] + (dy + hw - B[1]) * k];
+  }
+  const roux = shadow(95.4, 32.3, 0.62), kalem = shadow(96.5, 30.1, 0.5);
+  const open0 = Math.max(G0, kalem[1]), open1 = Math.min(G1, roux[0]);
+  // visible window (lime) and blocked parts (coral hatch)
+  el('polygon', { points: pts([B, [L, open0], [L, open1]]), fill: '#c8ff3d', 'fill-opacity': 0.22, stroke: '#c8ff3d', 'stroke-opacity': .8, 'stroke-width': 2 }, v.ground);
+  el('polygon', { points: pts([[95.4, 32.3 - 0.62], [L, Math.max(roux[0], G0)], [L, Math.min(roux[1], G1)], [95.4, 32.3 + 0.62]]), fill: 'url(#hz)', stroke: '#ff5d6c', 'stroke-opacity': .6, 'stroke-width': 1.5 }, v.ground);
+  el('polygon', { points: pts([[96.5, 30.1 + 0.5 - (0.5 + 0.5) * 0.36], [L, G0], [L, kalem[1]], [96.5, 30.1 + 0.5]]), fill: 'url(#hz)', stroke: '#ff5d6c', 'stroke-opacity': .6, 'stroke-width': 1.5 }, v.ground);
+  // full cone outline
+  el('polyline', { points: pts([[L, G0], B, [L, G1]]), fill: 'none', stroke: '#fff', 'stroke-opacity': .5, 'stroke-width': 1.5, 'stroke-dasharray': '6 6' }, v.ground);
+
+  // the through-ball that created it (Calloway -> Achterberg)
+  v.arrow([84.6, 39.2], [89.2, 31.8], { color: '#3ad7ff', width: 0.5, bend: -0.12, head: 1.3, opacity: 0.9 });
+
+  // ---------- ball flight (3D arc) ----------
+  const S0 = [90.5, 30.5, 0.4], SAVE = [103.55, 31.95, 1.18], GOAL = [105, 32.1, 1.2];
+  function flight(a, b, lift, n) {
+    const out = [];
+    for (let i = 0; i <= n; i++) {
+      const t = i / n;
+      out.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t + lift * Math.sin(Math.PI * t)]);
+    }
+    return out;
+  }
+  const path = flight(S0, SAVE, 0.55, 40);
+  // ground shadow of the flight
+  el('polyline', { points: pts(path.map((p) => [p[0], p[1], 0])), fill: 'none', stroke: '#000', 'stroke-opacity': .35, 'stroke-width': 4, 'stroke-linecap': 'round' }, v.ground);
+  const fdefs = el('defs', {}, v.over);
+  const a0 = P(...S0), a1 = P(...SAVE);
+  fdefs.innerHTML = `<linearGradient id="fl" gradientUnits="userSpaceOnUse" x1="${a0.x}" y1="${a0.y}" x2="${a1.x}" y2="${a1.y}"><stop offset="0" stop-color="#c8ff3d" stop-opacity=".25"/><stop offset="1" stop-color="#c8ff3d" stop-opacity="1"/></linearGradient>`;
+  el('polyline', { points: pts(path), fill: 'none', stroke: 'url(#fl)', 'stroke-width': 6, 'stroke-linecap': 'round', filter: 'url(#glow)' }, v.over);
+  // where it was heading
+  el('polyline', { points: pts([SAVE, GOAL]), fill: 'none', stroke: '#c8ff3d', 'stroke-opacity': .8, 'stroke-width': 3, 'stroke-dasharray': '4 6' }, v.over);
+  const gp = P(...GOAL);
+  el('circle', { cx: gp.x, cy: gp.y, r: 13, fill: 'none', stroke: '#c8ff3d', 'stroke-width': 3 }, v.over);
+  el('line', { x1: gp.x - 20, y1: gp.y, x2: gp.x + 20, y2: gp.y, stroke: '#c8ff3d', 'stroke-width': 2 }, v.over);
+  el('line', { x1: gp.x, y1: gp.y - 20, x2: gp.x, y2: gp.y + 20, stroke: '#c8ff3d', 'stroke-width': 2 }, v.over);
+  // save burst
+  const sp = P(...SAVE);
+  el('circle', { cx: sp.x, cy: sp.y, r: 9, fill: '#fff', stroke: '#ffb648', 'stroke-width': 4 }, v.over);
+  // speed dots along the path
+  path.forEach((p, i) => { if (i % 8 === 4) { const q = P(...p); el('circle', { cx: q.x, cy: q.y, r: 4, fill: '#fff', opacity: .85 }, v.over); } });
+
+  function tag(team, n, html, metric, lift, numBg) {
+    const h = v.head(team, n, lift || 0);
+    const d = document.createElement('div');
+    d.className = 'ptag';
+    d.style.left = h.x + 'px';
+    d.style.top = h.y + 'px';
+    const color = numBg || (team === 'home' ? 'var(--home)' : 'var(--away)');
+    d.innerHTML = `<div class="card"><span class="num" style="background:${color}">${n}</span>${html}${metric ? `<span class="metric">${metric}</span>` : ''}</div><div class="stem"></div>`;
+    f.appendChild(d);
+    return d;
+  }
+  tag('home', 9, 'ACHTERBERG', '104 km/h', 0.25);
+  const kt = tag('away', 1, 'VOS', '<span class="amber">SAVE · set 0.4 s early</span>', 1.6, 'var(--violet)');
+
+  function mini(x, y, z, text, style, transform) {
+    const p = P(x, y, z);
+    const d = document.createElement('div');
+    d.className = 'mini';
+    d.innerHTML = text;
+    Object.assign(d.style, style, { left: p.x + 'px', top: p.y + 'px', transform: transform || 'none' });
+    f.appendChild(d);
+    return d;
+  }
+  mini(95.4, 32.3, 0, '#5 Roux · blocks 47%', { background: 'rgba(232,67,79,.92)', color: '#fff' }, 'translate(-12%, 22px)');
+  mini(L, (open0 + open1) / 2, 0, 'Visible goal 45%', { background: 'rgba(7,11,23,.85)', color: '#c8ff3d', border: '1px solid rgba(200,255,61,.55)' }, 'translate(-30%, 34px)');
+  mini(86.9, 35.5, 0, 'Through-ball · Calloway', { background: 'rgba(7,11,23,.85)', color: '#3ad7ff', border: '1px solid rgba(58,215,255,.55)' }, 'translate(-64px, 92px)');
+
+  // ---------- SHAP waterfall ----------
+  (function () {
+    const rows = [
+      ['base', 'Average shot from here', 0.10],
+      ['+', 'Through-ball assist', 0.07],
+      ['+', 'Angle to goal', 0.06],
+      ['+', 'Right foot (strong side)', 0.03],
+      ['-', '2 defenders in shooting lane', -0.03],
+      ['-', 'Keeper set', -0.01],
+      ['-', 'First-time finish', -0.01],
+      ['total', 'This chance (xG)', 0.21]
+    ];
+    const host = document.getElementById('shap');
+    const MAX = 0.28, pc = (x) => (x / MAX) * 100;
+    let run = 0;
+    rows.forEach(([kind, name, val]) => {
+      const r = document.createElement('div');
+      r.className = 'r' + (kind === 'base' ? ' base' : kind === 'total' ? ' total' : '');
+      let a, b, color;
+      if (kind === 'base') { a = 0; b = val; run = val; color = 'rgba(255,255,255,.4)'; }
+      else if (kind === 'total') { a = 0; b = val; color = '#fff'; }
+      else { a = Math.min(run, run + val); b = Math.max(run, run + val); run += val; color = kind === '+' ? 'var(--lime)' : 'var(--coral)'; }
+      const bar = `<i style="left:${pc(a)}%;width:${Math.max(1.2, pc(b - a))}%;background:${color}"></i>` +
+        (kind === '+' || kind === '-' ? `<em style="left:${pc(run)}%"></em>` : '');
+      const col = kind === '+' ? 'var(--lime)' : kind === '-' ? 'var(--coral)' : 'var(--text)';
+      const txt = kind === '+' ? '+' + val.toFixed(2) : kind === '-' ? '−' + Math.abs(val).toFixed(2) : val.toFixed(2);
+      r.innerHTML = `<div class="nm">${name}</div><div class="trk">${bar}</div><div class="val" style="color:${col}">${txt}</div>`;
+      host.appendChild(r);
+    });
+  })();
+</script>
+</body>
+</html>

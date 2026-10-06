@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Reference architecture — one pipeline, five stages</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .frame { background: radial-gradient(1200px 600px at 70% -10%, #142045 0%, var(--ink) 60%); }
+  .head { position: absolute; left: 56px; top: 40px; right: 56px; display: flex; justify-content: space-between; align-items: flex-end; }
+  .head h1 { font-family: var(--font-display); font-weight: 800; font-size: 60px; line-height: 1; text-transform: uppercase; letter-spacing: .01em; }
+  .head h1 span { color: var(--lime); }
+  .cols { position: absolute; left: 56px; right: 56px; top: 150px; height: 690px; display: grid; grid-template-columns: repeat(6, 1fr); gap: 22px; }
+  .col { display: flex; flex-direction: column; gap: 12px; }
+  .stage { display: flex; align-items: baseline; gap: 10px; padding: 0 4px 6px; border-bottom: 2px solid var(--c); }
+  .stage .n { font-family: var(--font-mono); font-size: 18px; color: var(--c); font-weight: 700; }
+  .stage .t { font-family: var(--font-display); font-weight: 800; font-size: 34px; text-transform: uppercase; letter-spacing: .04em; }
+  .stage .q { font-size: 15px; color: var(--muted); margin-left: auto; }
+  .box { background: rgba(15, 23, 46, 0.92); border: 1px solid var(--line); border-left: 4px solid var(--c); border-radius: 12px; padding: 12px 14px; }
+  .box h3 { font-size: 19px; font-weight: 700; line-height: 1.2; }
+  .box p { font-size: 15.5px; color: var(--muted); margin-top: 4px; line-height: 1.32; }
+  .box .svc { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .svc span { font-size: 13.5px; font-weight: 600; padding: 3px 8px; border-radius: 6px; background: rgba(255,255,255,.07); border: 1px solid var(--line); color: #dfe6f7; }
+  .box.agents { background: linear-gradient(180deg, rgba(200,255,61,.10), rgba(15,23,46,.92)); }
+  .agentgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }
+  .agentgrid span { font-size: 14.5px; font-weight: 700; padding: 5px 8px; border-radius: 6px; background: rgba(200,255,61,.12); color: var(--lime); border: 1px solid rgba(200,255,61,.35); text-align: center; }
+  .ops { position: absolute; left: 56px; right: 56px; top: 862px; height: 150px; border-radius: 16px; background: rgba(15,23,46,.9); border: 1px solid var(--line); padding: 16px 22px; display: grid; grid-template-columns: 220px 1fr; gap: 20px; align-items: center; }
+  .ops .t { font-family: var(--font-display); font-weight: 800; font-size: 32px; text-transform: uppercase; line-height: 1; }
+  .ops .t small { display: block; font-family: var(--font-ui); font-size: 15px; font-weight: 500; color: var(--muted); text-transform: none; margin-top: 6px; line-height: 1.3; }
+  .ops .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .ops .chips span { font-size: 16px; font-weight: 600; padding: 7px 12px; border-radius: 8px; background: rgba(255,255,255,.06); border: 1px solid var(--line); }
+  .ops .chips span b { color: var(--cyan); font-weight: 700; }
+  svg.flow { position: absolute; inset: 0; pointer-events: none; }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="head">
+    <div>
+      <div class="eyebrow">Reference architecture · Azure-native</div>
+      <h1>One pipeline, <span>five stages</span></h1>
+    </div>
+    <div class="row" style="gap:10px">
+      <span class="chip lime">Agents: Microsoft Agent Framework</span>
+      <span class="chip cyan">Models + agents: Microsoft Foundry</span>
+    </div>
+  </div>
+
+  <svg class="flow" viewBox="0 0 1920 1080" id="flow"></svg>
+
+  <div class="cols">
+    <!-- 0 SIMULATE -->
+    <div class="col" style="--c: var(--violet)">
+      <div class="stage"><span class="n">00</span><span class="t">Simulate</span></div>
+      <div class="box"><h3>Scenario Lab</h3><p>Planner agent turns a storyline prompt into a match script</p><div class="svc"><span>Foundry model</span></div></div>
+      <div class="box"><h3>Match simulator</h3><p>Agent-based sim → 25 Hz tracking + events, seeded & versioned</p><div class="svc"><span>Container Apps Jobs</span></div></div>
+      <div class="box"><h3>Realism validators</h3><p>Distributions vs published references → realism score; dataset published with a datasheet</p><div class="svc"><span>Python · CI</span><span>OneLake / Blob</span></div></div>
+      <div class="box"><h3>Synthetic broadcast render</h3><p>Virtual camera from tracking, so no footage rights are needed</p><div class="svc"><span>WebGL / three.js</span></div></div>
+    </div>
+    <!-- 1 INGEST -->
+    <div class="col" style="--c: var(--cyan)">
+      <div class="stage"><span class="n">01</span><span class="t">Ingest</span></div>
+      <div class="box"><h3>Match clock replayer</h3><p>Streams events "as they happen", real-time or ×N</p><div class="svc"><span>Container Apps</span></div></div>
+      <div class="box"><h3>Event backbone</h3><p>Topics: events · tracking · metadata · cues</p><div class="svc"><span>Azure Event Hubs</span><span>Kafka API</span></div></div>
+      <div class="box"><h3>Normaliser + feed guardian</h3><p>Schema-validate, de-dupe, re-order; instant template cues</p><div class="svc"><span>Functions Flex</span></div></div>
+      <div class="box"><h3>Vision loop <i style="color:var(--dim)">(stretch)</i></h3><p>Auto-eventing on synthetic video, scored vs ground truth</p><div class="svc"><span>ACA serverless GPU</span></div></div>
+    </div>
+    <!-- 2 INTERPRET -->
+    <div class="col" style="--c: var(--mint)">
+      <div class="stage"><span class="n">02</span><span class="t">Interpret</span></div>
+      <div class="box"><h3>Metrics engine</h3><p>Pass difficulty, speeds, pressure, momentum, chaos index</p><div class="svc"><span>Container Apps + KEDA</span></div></div>
+      <div class="box"><h3>Event store + live state</h3><p>Blackboard shared by every agent; change feed triggers agents</p><div class="svc"><span>Azure Cosmos DB</span></div></div>
+      <div class="box"><h3>Real-time analytics <i style="color:var(--dim)">(stretch)</i></h3><p>Windowed KQL, history, ops dashboards</p><div class="svc"><span>Fabric Real-Time Intelligence</span></div></div>
+      <div class="box"><h3>Match-State MCP server</h3><p>Tools: state, window, metrics, history, counterfactual</p><div class="svc"><span>Functions MCP triggers</span></div></div>
+    </div>
+    <!-- 3 EXPLAIN -->
+    <div class="col" style="--c: var(--lime)">
+      <div class="stage"><span class="n">03</span><span class="t">Explain</span></div>
+      <div class="box agents"><h3>Agent Newsroom</h3><p>Graph workflow · Cosmos checkpoints · retries · template fallback</p>
+        <div class="agentgrid"><span>Scout</span><span>Analyst</span><span>Tactician</span><span>Historian</span><span>Storyteller</span><span>Editor</span></div>
+        <div class="svc"><span>Agent Framework</span><span>A2A</span></div></div>
+      <div class="box"><h3>Foundry hosted agent</h3><p>Runs the workflow; small models on the hot path, frontier for recaps</p><div class="svc"><span>Foundry Agent Service</span><span>Toolbox</span></div></div>
+      <div class="box"><h3>Grounding</h3><p>Season history, glossary, Laws of the Game</p><div class="svc"><span>Azure AI Search</span></div></div>
+    </div>
+    <!-- 4 RENDER -->
+    <div class="col" style="--c: var(--amber)">
+      <div class="stage"><span class="n">04</span><span class="t">Render</span></div>
+      <div class="box"><h3>Director agent</h3><p>Which cue, when, for whom, and why (logged)</p><div class="svc"><span>Agent Framework</span></div></div>
+      <div class="box"><h3>Overlay Cue Contract</h3><p>Timecoded JSON · priority · TTL · variants · evidence</p><div class="svc"><span>JSON Schema</span></div></div>
+      <div class="box"><h3>Real-time fan-out</h3><p>Groups per persona & language</p><div class="svc"><span>Azure Web PubSub</span></div></div>
+      <div class="box"><h3>Overlay player + Studio Copilot</h3><p>Browser overlay on the render; approval console</p><div class="svc"><span>Static Web Apps</span><span>Entra ID</span></div></div>
+    </div>
+    <!-- 5 PERSONALISE -->
+    <div class="col" style="--c: var(--coral)">
+      <div class="stage"><span class="n">05</span><span class="t">Personalise</span></div>
+      <div class="box"><h3>Personaliser + Localiser</h3><p>Persona variants pre-generated; glossary-safe names</p><div class="svc"><span>Foundry</span><span>AI Translator</span></div></div>
+      <div class="box"><h3>Fan profiles</h3><p>Club, player, mode, language, thresholds</p><div class="svc"><span>Cosmos DB</span></div></div>
+      <div class="box"><h3>Voice & audio description</h3><p>Neural TTS, SSML, spatial cues</p><div class="svc"><span>Azure AI Speech</span></div></div>
+      <div class="box"><h3>Ask the Match</h3><p>Grounded Q&A, text + real-time voice</p><div class="svc"><span>Foundry agent</span><span>Voice Live</span></div></div>
+      <div class="box"><h3>Recap agent</h3><p>HT/FT recaps, exposed over A2A</p><div class="svc"><span>A2A</span><span>Logic Apps</span></div></div>
+    </div>
+  </div>
+
+  <div class="ops">
+    <div class="t">Trust & Ops<small>Production-grade from day one: the Enterprise and Cloud-Native story</small></div>
+    <div class="chips">
+      <span><b>Identity</b> Entra ID · Managed Identity · Key Vault</span>
+      <span><b>AI safety</b> Content Safety · evidence gating · human approval</span>
+      <span><b>Gateway</b> API Management AI Gateway</span>
+      <span><b>Quality</b> Foundry Evaluations in CI</span>
+      <span><b>Observability</b> OpenTelemetry → Application Insights</span>
+      <span><b>Resilience</b> Chaos Studio · Load Testing</span>
+      <span><b>Delivery</b> Bicep + azd · GitHub Actions (OIDC)</span>
+      <span><b>Dev velocity</b> GitHub Copilot agent mode + coding agent</span>
+    </div>
+  </div>
+
+  <div class="mock-title">Concept 20 · Reference architecture</div>
+  <div class="mock-note">Draft for discussion · service choices to be validated in week 1</div>
+</div>
+<script src="assets/pitch.js"></script>
+<script>
+  // Flow arrows between stage columns (drawn after layout)
+  const svg = document.getElementById('flow');
+  const cols = [...document.querySelectorAll('.col')];
+  const defs = Pitch.el('defs', {}, svg);
+  defs.innerHTML = '<marker id="a" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#c8ff3d"/></marker>';
+  for (let i = 0; i < cols.length - 1; i++) {
+    const a = cols[i].getBoundingClientRect(), b = cols[i + 1].getBoundingClientRect();
+    const y = a.top + 22;
+    Pitch.el('line', { x1: a.right - 2, y1: y, x2: b.left - 4, y2: y, stroke: '#c8ff3d', 'stroke-width': 3, 'marker-end': 'url(#a)' }, svg);
+  }
+</script>
+</body>
+</html>

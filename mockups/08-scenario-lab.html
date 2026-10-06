@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Scenario Lab — synthetic match engine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .frame { background: radial-gradient(1200px 700px at 60% -10%, #12204a 0%, var(--ink) 60%); }
+  .topbar { position: absolute; left: 24px; right: 24px; top: 18px; height: 66px; display: flex; align-items: center; gap: 16px; padding: 0 16px 0 14px; background: rgba(15, 23, 46, .92); border: 1px solid var(--line); border-radius: 14px; }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand .mark { width: 38px; height: 38px; border-radius: 10px; background: var(--lime); display: grid; place-items: center; }
+  .brand .name { font-family: var(--font-display); font-weight: 800; font-size: 30px; letter-spacing: .05em; text-transform: uppercase; line-height: 1; white-space: nowrap; }
+  .brand .sub { font-size: 15px; color: var(--muted); font-weight: 600; letter-spacing: .04em; margin-top: 3px; }
+  .vsep { width: 1px; height: 36px; background: var(--line); }
+  .tag { font-size: 15px; font-weight: 600; color: var(--muted); padding: 5px 10px; border-radius: 8px; border: 1px solid var(--line); background: rgba(255,255,255,.04); white-space: nowrap; }
+  .tag b { color: var(--text); }
+
+  .panel { position: absolute; background: rgba(15, 23, 46, .86); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+  .ph { display: flex; align-items: center; gap: 12px; padding: 13px 18px 11px; border-bottom: 1px solid var(--line); }
+  .ph h3 { font-family: var(--font-display); font-weight: 700; font-size: 23px; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; }
+  .ph .meta { margin-left: auto; font-size: 15px; color: var(--muted); font-weight: 600; white-space: nowrap; }
+  .lbl { font-size: 15px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+
+  /* prompt */
+  .prompt { margin: 14px 18px 0; padding: 16px 18px; border-radius: 12px; background: #0b1226; border: 1px solid rgba(200,255,61,.45); box-shadow: 0 0 0 4px rgba(200,255,61,.06); }
+  .prompt p { font-size: 22px; line-height: 1.38; font-weight: 500; }
+  .prompt p .caret { display: inline-block; width: 2px; height: 24px; background: var(--lime); vertical-align: -4px; margin-left: 2px; }
+  .pbtns { display: flex; gap: 10px; align-items: center; margin: 12px 18px 0; }
+  .btn { font-size: 16px; font-weight: 800; padding: 9px 16px; border-radius: 10px; border: 1px solid var(--line-strong); background: rgba(255,255,255,.06); white-space: nowrap; }
+  .btn.ok { background: var(--lime); color: #0b1124; border-color: var(--lime); }
+
+  /* plan */
+  .beat { display: grid; grid-template-columns: 52px 1fr; gap: 12px; padding: 8px 18px; border-top: 1px solid var(--line); align-items: start; }
+  .beat:first-of-type { border-top: 0; }
+  .beat .m { font-family: var(--font-display); font-weight: 800; font-size: 24px; line-height: 1; color: var(--lime); padding-top: 2px; }
+  .beat .d { font-size: 18px; font-weight: 600; line-height: 1.25; }
+  .beat code { display: inline-block; margin-top: 4px; font-family: var(--font-mono); font-size: 15px; color: var(--violet); background: rgba(156,140,255,.1); padding: 1px 7px; border-radius: 5px; }
+  .beat .ok { color: var(--mint); font-weight: 800; font-size: 15px; margin-left: 6px; }
+
+  /* params */
+  .prm { padding: 10px 18px 0; }
+  .prm .top { display: flex; align-items: baseline; justify-content: space-between; }
+  .prm .nm { font-size: 17px; font-weight: 700; }
+  .prm .vl { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--lime); }
+  .prm .hint { font-size: 15px; color: var(--muted); font-weight: 500; margin-top: 3px; }
+  .slider { position: relative; height: 8px; border-radius: 5px; background: rgba(255,255,255,.1); margin-top: 9px; }
+  .slider i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 5px; background: linear-gradient(90deg, rgba(200,255,61,.5), var(--lime)); }
+  .slider b { position: absolute; top: 50%; width: 20px; height: 20px; margin: -10px 0 0 -10px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 4px rgba(200,255,61,.35); }
+  .seg { display: flex; margin-top: 8px; border-radius: 9px; overflow: hidden; border: 1px solid var(--line-strong); }
+  .seg span { flex: 1; text-align: center; font-size: 15px; font-weight: 700; padding: 6px 0; color: var(--muted); border-left: 1px solid var(--line); }
+  .seg span:first-child { border-left: 0; }
+  .seg span.on { background: var(--text); color: #0b1124; }
+
+  /* concept band */
+  .band { position: absolute; display: grid; grid-template-columns: 1fr 34px 1fr 34px 1fr; align-items: center; }
+  .stepc { display: flex; align-items: center; gap: 14px; padding: 10px 16px; border-radius: 12px; background: rgba(15,23,46,.9); border: 1px solid var(--line); height: 64px; }
+  .stepc .n { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-family: var(--font-display); font-weight: 800; font-size: 22px; color: #0b1124; flex: none; }
+  .stepc .t { font-size: 18px; font-weight: 800; white-space: nowrap; }
+  .stepc .s { font-size: 15px; color: var(--muted); font-weight: 600; white-space: nowrap; margin-top: 1px; }
+  .band .ar { text-align: center; color: var(--muted); font-size: 24px; font-weight: 700; }
+
+  /* preview */
+  .pv { position: absolute; border-radius: 12px; overflow: hidden; border: 1px solid var(--line-strong); background: #000; }
+  .pv svg { display: block; }
+  .pv .ov { position: absolute; left: 12px; top: 12px; display: flex; gap: 8px; }
+  .pv .ov2 { position: absolute; left: 12px; bottom: 12px; right: 12px; display: flex; justify-content: space-between; align-items: center; }
+  .dark { background: rgba(7,11,23,.85); border: 1px solid var(--line-strong); color: var(--text); }
+
+  /* dataset card */
+  .kvg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px 18px; padding: 14px 20px 0; }
+  .kvg div { font-size: 15px; color: var(--muted); font-weight: 600; }
+  .kvg b { display: block; font-size: 18px; color: var(--text); font-weight: 700; margin-top: 2px; white-space: nowrap; }
+  .kvg b.m { font-family: var(--font-mono); font-size: 17px; }
+  pre.json { margin: 14px 20px 0; padding: 10px 14px; border-radius: 10px; background: #0a1022; border: 1px solid var(--line); font-family: var(--font-mono); font-size: 15px; line-height: 1.45; color: #c9d3ea; white-space: pre; overflow: hidden; }
+  pre.json .k { color: var(--cyan); } pre.json .s { color: var(--lime); } pre.json .n { color: var(--amber); }
+
+  /* validation */
+  .realism { position: absolute; padding: 18px 20px; display: flex; flex-direction: column; gap: 8px; border-right: 1px solid var(--line); }
+  .realism .v { font-family: var(--font-display); font-weight: 800; font-size: 84px; line-height: .85; color: var(--lime); }
+  .realism .l { font-size: 15px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .chk { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 600; }
+  .chk i { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: 15px; font-weight: 900; background: var(--mint); color: #0b1124; flex: none; }
+  .chart { position: absolute; }
+  .chart h5 { font-size: 17px; font-weight: 700; }
+  .chart h5 small { font-size: 15px; color: var(--muted); font-weight: 600; margin-left: 6px; }
+  .ks { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 15px; font-weight: 700; padding: 3px 9px; border-radius: 7px; background: rgba(79,240,176,.12); border: 1px solid rgba(79,240,176,.45); color: var(--mint); white-space: nowrap; }
+  .ks.warn { background: rgba(255,182,72,.12); border-color: rgba(255,182,72,.5); color: var(--amber); }
+  .vlegend { display: flex; gap: 16px; font-size: 15px; color: var(--muted); font-weight: 600; align-items: center; }
+  .vlegend span { display: inline-flex; gap: 7px; align-items: center; }
+</style>
+</head>
+<body>
+<div class="frame" id="f">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="mark"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6l-5.5 9.5A2 2 0 0 0 6.2 21h11.6a2 2 0 0 0 1.7-2.5L14 9V3" fill="none" stroke="#0b1124" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M7.5 15h9" stroke="#0b1124" stroke-width="2.4"/></svg></div>
+      <div><div class="name">Scenario Lab</div><div class="sub">Synthetic match engine</div></div>
+    </div>
+    <div class="vsep"></div>
+    <span class="chip lime">Scenario S-0147 · v1.3.0</span>
+    <span class="chip" style="white-space:nowrap">HAR v KMA · rain · derby preset</span>
+    <div style="margin-left:auto;gap:10px" class="row">
+      <span class="tag">Microsoft Foundry · Planner agent</span>
+      <span class="tag">Physics sim · Azure Container Apps jobs</span>
+      <span class="tag">Export · Fabric OneLake</span>
+      <span class="chip" style="background:rgba(79,240,176,.12);border-color:rgba(79,240,176,.45);color:var(--mint);white-space:nowrap">✓ Generated in 41 s</span>
+    </div>
+  </div>
+
+  <!-- ===== left column ===== -->
+  <div class="panel" style="left:24px; top:100px; width:560px; height:252px">
+    <div class="ph"><h3>Scenario prompt</h3><span class="meta">natural language → match plan</span></div>
+    <div class="prompt"><p>“A rain-soaked derby: away side scores early, goes down to 10 men at 58', home side wins it late with a counter-attack.”<span class="caret"></span></p></div>
+    <div class="pbtns"><span class="btn ok">▶ Generate</span><span class="btn">↻ New variant</span><span class="btn">Batch ×500</span></div>
+  </div>
+
+  <div class="panel" style="left:24px; top:368px; width:560px; height:324px">
+    <div class="ph"><h3>Storyline plan</h3><span class="meta">Planner agent · <span class="mint">5 / 5 constraints met</span></span></div>
+    <div class="beat"><div class="m">11'</div><div><div class="d">Kingsmoor score early from a corner</div><code>goal(KMA, t ≤ 15)</code><span class="ok">✓</span></div></div>
+    <div class="beat"><div class="m">58'</div><div><div class="d">Second yellow for Roux · KMA down to 10</div><code>red(KMA, t = 58)</code><span class="ok">✓</span></div></div>
+    <div class="beat"><div class="m">71'</div><div><div class="d">Harbour City equalise after sustained pressure</div><code>goal(HAR, 65 ≤ t ≤ 80)</code><span class="ok">✓</span></div></div>
+    <div class="beat"><div class="m">88'</div><div><div class="d">Late winner on the counter-attack</div><code>goal(HAR, t ≥ 85, type = counter)</code><span class="ok">✓</span></div></div>
+  </div>
+
+  <div class="panel" style="left:24px; top:708px; width:560px; height:324px">
+    <div class="ph"><h3>Parameters</h3><span class="meta">simulator priors</span></div>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; column-gap: 0">
+      <div class="prm"><div class="top"><span class="nm">Tempo</span><span class="vl">0.72</span></div><div class="slider"><i style="width:72%"></i><b style="left:72%"></b></div><div class="hint">Derby: high</div></div>
+      <div class="prm"><div class="top"><span class="nm">Press intensity</span><span class="vl">0.64</span></div><div class="slider"><i style="width:64%"></i><b style="left:64%"></b></div><div class="hint">KMA drops to 0.35 at 10 men</div></div>
+      <div class="prm" style="padding-top:14px"><div class="top"><span class="nm">Referee strictness</span><span class="vl">0.68</span></div><div class="slider"><i style="width:68%"></i><b style="left:68%"></b></div><div class="hint">≈ 1 card per 4.8 fouls</div></div>
+      <div class="prm" style="padding-top:14px"><div class="top"><span class="nm">Weather</span><span class="vl" style="color:var(--cyan)">Heavy rain</span></div><div class="slider"><i style="width:85%;background:linear-gradient(90deg,rgba(58,215,255,.4),var(--cyan))"></i><b style="left:85%;box-shadow:0 0 0 4px rgba(58,215,255,.35)"></b></div><div class="hint">Ball roll −9% · slips ×1.8</div></div>
+      <div class="prm" style="padding-top:14px"><div class="top"><span class="nm">Possession style</span></div><div class="seg"><span>Direct</span><span>Balanced</span><span class="on">Patient</span></div><div class="hint">Home side · away: Direct</div></div>
+      <div class="prm" style="padding-top:14px"><div class="top"><span class="nm">Random seed</span><span class="vl" style="color:var(--muted);font-size:15px"><svg width="14" height="14" viewBox="0 0 24 24" style="vertical-align:-1px"><rect x="4" y="10" width="16" height="11" rx="2.5" fill="none" stroke="#a3afc9" stroke-width="2.6"/><path d="M8 10V7a4 4 0 0 1 8 0v3" fill="none" stroke="#a3afc9" stroke-width="2.6"/></svg> locked</span></div><div class="mono" style="margin-top:6px;font-size:22px;font-weight:700;padding:3px 12px;border-radius:8px;background:#0b1226;border:1px solid var(--line-strong);display:inline-block">73519</div><div class="hint">Same seed = same match</div></div>
+    </div>
+  </div>
+
+  <!-- ===== concept band ===== -->
+  <div class="band" style="left:608px; top:100px; width:1288px">
+    <div class="stepc"><div class="n" style="background:var(--violet)">1</div><div><div class="t">LLM writes the storyline</div><div class="s">Planner agent → beats + constraints</div></div></div>
+    <div class="ar">→</div>
+    <div class="stepc"><div class="n" style="background:var(--cyan)">2</div><div><div class="t">Simulator makes it plausible</div><div class="s">physics + player agents · 25 Hz</div></div></div>
+    <div class="ar">→</div>
+    <div class="stepc"><div class="n" style="background:var(--lime)">3</div><div><div class="t">Validators keep it realistic</div><div class="s">KS tests vs reference · physics checks</div></div></div>
+  </div>
+
+  <!-- ===== timeline ===== -->
+  <div class="panel" style="left:608px; top:180px; width:1288px; height:206px">
+    <svg id="tl" width="1288" height="206"></svg>
+  </div>
+
+  <!-- ===== preview ===== -->
+  <div class="pv" id="pv" style="left:608px; top:402px; width:532px; height:298px">
+    <svg id="pvsvg" class="noqa"></svg>
+    <div class="ov"><span class="chip dark">Preview · 88:12</span><span class="chip cyan dark" style="color:var(--cyan)">Rain · counter 4 v 3</span></div>
+    <div class="ov2"><span class="chip dark">Rendered from synthetic tracking</span><span class="chip dark" style="color:var(--coral)">KMA 10 men</span></div>
+  </div>
+
+  <!-- ===== dataset card ===== -->
+  <div class="panel" style="left:1156px; top:402px; width:740px; height:298px">
+    <div class="ph"><h3>Dataset card</h3><span class="chip" style="padding:3px 10px">syn-derby-rain</span><span class="meta">Download JSON · Push to OneLake</span></div>
+    <div class="kvg">
+      <div>Version · seed<b class="m">v1.3.0 · 73519</b></div>
+      <div>Events<b class="m">1,842</b></div>
+      <div>Tracking<b class="m">25 Hz · 23 objects</b></div>
+      <div>Schema<b>SPADL-compatible JSON</b></div>
+      <div>Licence<b>CC BY 4.0</b></div>
+      <div>Generated by<b>Planner agent + physics sim</b></div>
+    </div>
+    <pre class="json">{<span class="k">"game_id"</span>:<span class="s">"S-0147"</span>, <span class="k">"period_id"</span>:<span class="n">2</span>, <span class="k">"time_seconds"</span>:<span class="n">2892.4</span>,
+ <span class="k">"team"</span>:<span class="s">"HAR"</span>, <span class="k">"player"</span>:<span class="s">"HAR-10"</span>, <span class="k">"type_name"</span>:<span class="s">"dribble"</span>,
+ <span class="k">"start_x"</span>:<span class="n">61.8</span>, <span class="k">"start_y"</span>:<span class="n">31.0</span>, <span class="k">"end_x"</span>:<span class="n">74.0</span>, <span class="k">"end_y"</span>:<span class="n">30.5</span>}</pre>
+  </div>
+
+  <!-- ===== validation ===== -->
+  <div class="panel" style="left:608px; top:716px; width:1288px; height:316px">
+    <div class="ph"><h3>Validation</h3><span class="meta" style="margin-left:14px">Synthetic (500 runs of this preset) vs reference calibration set</span>
+      <div class="vlegend" style="margin-left:auto"><span><i style="width:14px;height:14px;border-radius:3px;background:var(--lime);display:inline-block"></i>Synthetic</span><span><i style="width:14px;height:14px;border-radius:3px;border:2px solid var(--cyan);display:inline-block"></i>Reference</span></div></div>
+    <div class="realism" style="left:0; top:56px; width:262px; height:260px">
+      <div class="l">Realism score</div>
+      <div class="v">0.93</div>
+      <div class="chk"><i>✓</i>Distributions 4 / 4</div>
+      <div class="chk"><i>✓</i>Physics checks 12 / 12</div>
+      <div class="chk"><i>✓</i>Storyline 5 / 5</div>
+      <div style="font-size:15px;color:var(--muted);line-height:1.35;margin-top:2px">Max sprint 34.9 km/h ≤ 36 · ball physics within limits</div>
+    </div>
+    <div id="charts"></div>
+  </div>
+
+  <div class="mock-title">Concept 08 · Scenario Lab</div>
+  <div class="mock-note">Concept mockup · synthetic data · fictional clubs and players</div>
+</div>
+
+<script src="assets/pitch.js"></script>
+<script>
+  const NS = 'http://www.w3.org/2000/svg';
+  function el(tag, attrs, parent, text) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; parent.appendChild(e); return e; }
+
+  // ---------- timeline (laid out after fonts load so measured widths are right) ----------
+  document.fonts.ready.then(() => {
+  const tl = document.getElementById('tl');
+  const X0 = 150, X1 = 1180, AX = 122, YH = 96, YK = 148;
+  const mx = (m) => X0 + (m / 90) * (X1 - X0);
+  const T = (x, y, txt, o) => el('text', Object.assign({ x, y, fill: '#f2f5fb', 'font-family': 'Inter', 'font-weight': 600, 'font-size': 15 }, o || {}), tl, txt);
+  const title = T(20, 36, 'GENERATED TIMELINE', { 'font-family': 'Barlow Condensed', 'font-weight': 700, 'font-size': 23, 'letter-spacing': 2.3 });
+  let cx = 20 + title.getBBox().width + 18;
+  const sub = T(cx, 35, '1,842 events · final score', { fill: '#a3afc9' });
+  cx += sub.getBBox().width + 12;
+  el('rect', { x: cx, y: 16, width: 128, height: 27, rx: 6, fill: '#f2f5fb' }, tl);
+  T(cx + 64, 37, 'HAR 2–1 KMA', { 'text-anchor': 'middle', fill: '#0b1124', 'font-family': 'Barlow Condensed', 'font-weight': 800, 'font-size': 22, 'letter-spacing': 1 });
+  function icon(kind, x, y, s) {
+    s = s || 1;
+    if (kind === 'goal') { el('circle', { cx: x, cy: y, r: 9 * s, fill: '#fff', stroke: '#c8ff3d', 'stroke-width': 3 }, tl); el('circle', { cx: x, cy: y, r: 3 * s, fill: '#0b1124' }, tl); }
+    if (kind === 'yellow') el('rect', { x: x - 6 * s, y: y - 9 * s, width: 12 * s, height: 17 * s, rx: 2, fill: '#ffd23f' }, tl);
+    if (kind === 'red') el('rect', { x: x - 6 * s, y: y - 9 * s, width: 12 * s, height: 17 * s, rx: 2, fill: '#ff5d6c' }, tl);
+    if (kind === 'sub') el('path', { d: `M${x - 7} ${y - 3} l7 -7 l7 7 M${x - 7} ${y + 3} l7 7 l7 -7`, fill: 'none', stroke: '#3ad7ff', 'stroke-width': 2.6, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, tl);
+  }
+  // legend, right-aligned with measured widths
+  let lx = 1268;
+  [['ten', 'KMA 10 men'], ['rain', 'rain'], ['sub', 'sub'], ['red', 'red'], ['yellow', 'yellow'], ['goal', 'goal']].forEach(([k, lab]) => {
+    const t = T(0, 35, lab, { fill: '#a3afc9' });
+    lx -= t.getBBox().width; t.setAttribute('x', lx);
+    if (k === 'rain') el('rect', { x: lx - 25, y: 27, width: 18, height: 6, rx: 3, fill: '#3ad7ff', opacity: 0.75 }, tl);
+    else if (k === 'ten') el('rect', { x: lx - 27, y: 22, width: 20, height: 16, rx: 3, fill: 'rgba(255,93,108,.12)', stroke: 'rgba(255,93,108,.6)', 'stroke-dasharray': '4 3' }, tl);
+    else icon(k, lx - 15, 30, 0.85);
+    lx -= 44;
+  });
+  // team labels
+  T(20, YH + 7, 'HAR', { fill: '#7fa2ff', 'font-family': 'Barlow Condensed', 'font-weight': 800, 'font-size': 22 });
+  T(20, YK + 7, 'KMA', { fill: '#ff8790', 'font-family': 'Barlow Condensed', 'font-weight': 800, 'font-size': 22 });
+  el('rect', { x: 64, y: YH - 10, width: 6, height: 20, rx: 2, fill: '#2f6bff' }, tl);
+  el('rect', { x: 64, y: YK - 10, width: 6, height: 20, rx: 2, fill: '#e8434f' }, tl);
+  T(20, 179, 'rain', { fill: '#3ad7ff' });
+  // 10-men band
+  el('rect', { x: mx(58), y: 54, width: mx(90) - mx(58), height: 110, rx: 6, fill: 'rgba(255,93,108,.08)', stroke: 'rgba(255,93,108,.3)', 'stroke-dasharray': '5 4' }, tl);
+  // axis
+  el('line', { x1: X0, y1: AX, x2: X1, y2: AX, stroke: 'rgba(255,255,255,.35)', 'stroke-width': 2 }, tl);
+  [0, 15, 30, 45, 60, 75, 90].forEach((m) => {
+    el('line', { x1: mx(m), y1: AX - 5, x2: mx(m), y2: AX + 5, stroke: 'rgba(255,255,255,.35)', 'stroke-width': 2 }, tl);
+    T(mx(m), 197, m + "'", { 'text-anchor': 'middle', fill: '#6c7896', 'font-family': 'JetBrains Mono', 'font-weight': 500 });
+  });
+  // rain band
+  const rg = el('defs', {}, tl);
+  rg.innerHTML = '<linearGradient id="rain" x1="0" x2="1"><stop offset="0" stop-color="#3ad7ff" stop-opacity=".25"/><stop offset=".45" stop-color="#3ad7ff" stop-opacity=".55"/><stop offset=".7" stop-color="#3ad7ff" stop-opacity=".85"/><stop offset="1" stop-color="#3ad7ff" stop-opacity=".6"/></linearGradient>';
+  el('rect', { x: X0, y: 172, width: X1 - X0, height: 6, rx: 3, fill: 'url(#rain)' }, tl);
+  // events: HAR labels above the icon, KMA labels beside it
+  const ev = [
+    ['KMA', 'goal', 11, "11' Castell"], ['KMA', 'yellow', 34], ['HAR', 'yellow', 41], ['KMA', 'red', 58, "58' Roux sent off", 'left'],
+    ['KMA', 'sub', 62], ['HAR', 'sub', 63], ['HAR', 'goal', 71, "71' Achterberg"], ['HAR', 'sub', 77], ['KMA', 'yellow', 82], ['HAR', 'goal', 88, "88' Calloway"]
+  ];
+  ev.forEach(([team, k, m, lab, side]) => {
+    const y = team === 'HAR' ? YH : YK;
+    el('line', { x1: mx(m), y1: AX, x2: mx(m), y2: y, stroke: 'rgba(255,255,255,.25)', 'stroke-width': 1.5 }, tl);
+    icon(k, mx(m), y, 1);
+    if (!lab) return;
+    if (team === 'HAR') T(mx(m), YH - 18, lab, { 'font-weight': 700, 'text-anchor': 'middle' });
+    else T(side === 'left' ? mx(m) - 15 : mx(m) + 15, y + 5, lab, { 'font-weight': 700, 'text-anchor': side === 'left' ? 'end' : 'start' });
+  });
+  });
+
+  // ---------- broadcast preview (custom counter-attack scene in the rain) ----------
+  const scene = {
+    ball: [74.6, 30.6, 0.11],
+    home: [{ n: 10, x: 73.8, y: 31.2 }, { n: 9, x: 83, y: 25 }, { n: 11, x: 81, y: 47 }, { n: 7, x: 79, y: 12 }, { n: 8, x: 63, y: 39 }, { n: 6, x: 55, y: 30 }],
+    away: [{ n: 1, x: 101.2, y: 34 }, { n: 6, x: 90, y: 31 }, { n: 2, x: 88, y: 42 }, { n: 3, x: 89, y: 19 }, { n: 4, x: 77, y: 36 }, { n: 8, x: 69, y: 27 }, { n: 7, x: 70, y: 46 }],
+    camera: { pos: [79, -21, 12], target: [81, 31, 0], fov: 21 }
+  };
+  const svg = document.getElementById('pvsvg');
+  const v = Pitch.broadcast(svg, { scene, seed: 21, boards: ['SCENARIO LAB', 'SYNTHETIC LEAGUE', 'S-0147 · RAIN DERBY'] });
+  v.arrow([74.6, 30.6], [84.5, 26], { color: '#c8ff3d', width: 0.7, bend: 0.08 });
+  v.arrow([81, 47], [92, 40], { color: '#3ad7ff', width: 0.55, bend: -0.1, opacity: 0.8 });
+  // rain grade: cool tint + streaks
+  el('rect', { x: 0, y: 0, width: 1920, height: 1080, fill: '#5d7393', opacity: 0.22 }, svg);
+  const r = Pitch.rng(5);
+  const g = el('g', { stroke: '#dce8ff', 'stroke-linecap': 'round' }, svg);
+  for (let i = 0; i < 420; i++) {
+    const x = r() * 2100 - 90, y = r() * 1100 - 20, l = 26 + r() * 30;
+    el('line', { x1: x, y1: y, x2: x - l * 0.28, y2: y + l, 'stroke-width': 1 + r() * 1.4, opacity: 0.12 + r() * 0.22 }, g);
+  }
+  svg.setAttribute('width', 530); svg.setAttribute('height', 296);
+  svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+
+  // ---------- validation charts ----------
+  const charts = [
+    { t: 'Pass length', u: 'm', ks: 'D=0.038 · p=0.41', ok: true,
+      ref: [9, 22, 25, 18, 11, 7, 4, 2.5, 1.5], syn: [10, 23, 24, 17, 12, 6.5, 4, 2, 1.5], ticks: ['0', '20', '40+'] },
+    { t: 'Shots per match', u: 'both teams', ks: 'D=0.061 · p=0.22', ok: true,
+      ref: [2, 6, 13, 21, 24, 17, 10, 5, 2], syn: [1.5, 5, 12, 20, 25, 19, 10, 5, 2.5], ticks: ['10', '25', '40'] },
+    { t: 'PPDA', u: 'passes per def. action', ks: 'D=0.094 · tol 0.10', ok: false,
+      ref: [3, 9, 18, 24, 20, 13, 7, 4, 2], syn: [5, 13, 22, 23, 17, 10, 5, 3, 2], ticks: ['5', '12', '20+'] },
+    { t: 'xG per shot', u: '', ks: 'D=0.029 · p=0.63', ok: true,
+      ref: [34, 22, 14, 9, 6, 4.5, 3.5, 3, 4], syn: [33, 23, 14, 9.5, 6, 4.5, 3.5, 2.5, 4], ticks: ['0', '0.4', '0.8+'] }
+  ];
+  const host = document.getElementById('charts');
+  const CW = 236, CH = 140;
+  charts.forEach((c, i) => {
+    const left = 290 + i * 248;
+    const d = document.createElement('div');
+    d.className = 'chart';
+    d.style.cssText = `left:${left}px; top:70px; width:${CW}px;`;
+    d.innerHTML = `<h5>${c.t}${c.u ? `<small>${c.u}</small>` : ''}</h5>`;
+    const s = document.createElementNS(NS, 'svg');
+    s.setAttribute('width', CW); s.setAttribute('height', CH + 30); s.style.marginTop = '8px';
+    const max = Math.max(...c.ref, ...c.syn) * 1.1;
+    const bw = CW / c.ref.length;
+    el('line', { x1: 0, y1: CH, x2: CW, y2: CH, stroke: 'rgba(255,255,255,.3)', 'stroke-width': 1.5 }, s);
+    c.syn.forEach((v2, k) => {
+      const h = (v2 / max) * (CH - 6);
+      el('rect', { x: k * bw + 3, y: CH - h, width: bw - 6, height: h, rx: 3, fill: '#c8ff3d', opacity: 0.85 }, s);
+    });
+    // reference as step outline
+    let dpath = `M0 ${CH}`;
+    c.ref.forEach((v2, k) => { const y = CH - (v2 / max) * (CH - 6); dpath += ` L${k * bw} ${y} L${(k + 1) * bw} ${y}`; });
+    dpath += ` L${CW} ${CH}`;
+    el('path', { d: dpath, fill: 'none', stroke: '#3ad7ff', 'stroke-width': 2.5, 'stroke-linejoin': 'round' }, s);
+    c.ticks.forEach((t, k) => el('text', { x: k === 0 ? 2 : k === 1 ? CW / 2 : CW - 2, y: CH + 22, 'text-anchor': k === 0 ? 'start' : k === 1 ? 'middle' : 'end', fill: '#6c7896', 'font-family': 'JetBrains Mono', 'font-size': 15 }, s, t));
+    d.appendChild(s);
+    const b = document.createElement('div');
+    b.style.marginTop = '6px';
+    b.innerHTML = `<span class="ks ${c.ok ? '' : 'warn'}">${c.ok ? '✓' : '⚠'} KS ${c.ks}</span>`;
+    d.appendChild(b);
+    host.appendChild(d);
+  });
+</script>
+</body>
+</html>

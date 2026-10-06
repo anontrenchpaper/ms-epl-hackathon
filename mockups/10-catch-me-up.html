@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Catch Me Up — late-joiner recap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .bg { position: absolute; inset: 0;
+    background:
+      radial-gradient(700px 700px at 8% 30%, rgba(200,255,61,.08), transparent 65%),
+      radial-gradient(1100px 700px at 70% 50%, rgba(47,107,255,.14), transparent 65%),
+      var(--ink); }
+  .grid-bg { position: absolute; inset: 0; opacity: .3;
+    background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+    background-size: 48px 48px; }
+
+  /* ---------- left story column ---------- */
+  .left { position: absolute; left: 64px; top: 96px; width: 450px; }
+  .left h1 { font-family: var(--font-display); font-weight: 800; font-size: 72px; line-height: .94; text-transform: uppercase; margin-top: 14px; }
+  .left h1 em { font-style: normal; color: var(--lime); }
+  .left .lead { font-size: 21px; line-height: 1.45; color: #dfe5f3; margin-top: 22px; }
+  .left .lead b { color: var(--text); }
+  .who { display: flex; align-items: center; gap: 12px; margin-top: 26px; padding: 12px 14px; border-radius: 14px; background: rgba(255,255,255,.04); border: 1px solid var(--line); }
+  .who .av { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg,#c8ff3d,#4ff0b0); color: #0b1124; display: grid; place-items: center; font-family: var(--font-display); font-weight: 800; font-size: 24px; flex: none; }
+  .who .n { font-weight: 800; font-size: 19px; }
+  .who .s { font-size: 16px; color: var(--muted); margin-top: 2px; }
+  .steps { margin-top: 26px; display: flex; flex-direction: column; gap: 16px; }
+  .step { display: grid; grid-template-columns: 38px 1fr; gap: 14px; align-items: start; }
+  .step i { font-style: normal; width: 38px; height: 38px; border-radius: 10px; background: var(--lime); color: #0b1124; display: grid; place-items: center; font-family: var(--font-display); font-weight: 800; font-size: 22px; }
+  .step .t { font-weight: 800; font-size: 19px; }
+  .step .d { font-size: 18px; color: var(--muted); line-height: 1.38; margin-top: 2px; }
+  .ev { margin-top: 26px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .ev .chip { font-size: 15px; }
+
+  /* ---------- phones ---------- */
+  .phone { top: 108px; }
+  .scr { position: absolute; inset: 0; background: #0b1020; display: flex; flex-direction: column; }
+  .status { height: 50px; flex: none; display: flex; align-items: center; justify-content: space-between; padding: 8px 32px 0; font-weight: 700; font-size: 15px; }
+  .status .ic { display: flex; gap: 6px; align-items: center; }
+  .nav { height: 46px; flex: none; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; font-size: 16px; font-weight: 700; color: var(--muted); }
+  .nav .mid { color: var(--text); font-weight: 800; }
+  .pad { padding: 0 20px; }
+  .cap { position: absolute; top: 966px; width: 400px; text-align: center; font-family: var(--font-display); font-weight: 700; font-size: 21px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  .cap b { color: var(--lime); margin-right: 8px; }
+
+  /* (a) welcome back */
+  .hello h2 { font-size: 28px; font-weight: 800; line-height: 1.15; letter-spacing: -.01em; }
+  .hello h2 span { color: var(--lime); }
+  .scoreline { display: flex; align-items: center; gap: 10px; margin-top: 12px; padding: 10px 12px; border-radius: 14px; background: rgba(255,255,255,.05); border: 1px solid var(--line); font-size: 16px; color: var(--muted); }
+  .scoreline .sc { font-family: var(--font-display); font-weight: 700; font-size: 24px; color: var(--text); letter-spacing: .03em; }
+  .scoreline .sc.now { background: #f2f5fb; color: #0b1124; padding: 0 8px; border-radius: 6px; }
+  .tl { position: relative; margin-top: 16px; padding-left: 34px; }
+  .tl::before { content: ""; position: absolute; left: 11px; top: 10px; bottom: 16px; width: 2px; background: linear-gradient(var(--lime), var(--amber) 55%, var(--coral)); opacity: .7; }
+  .beat { position: relative; padding-bottom: 14px; }
+  .beat .pin { position: absolute; left: -34px; top: 1px; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: #0b1020; border: 3px solid var(--lime); }
+  .beat .pin.goal { background: var(--lime); }
+  .beat .hd { display: flex; align-items: baseline; gap: 8px; }
+  .beat .min { font-family: var(--font-mono); font-weight: 700; font-size: 16px; color: var(--muted); flex: none; }
+  .beat .ti { font-weight: 800; font-size: 19px; line-height: 1.25; }
+  .beat .why { font-size: 16px; line-height: 1.38; color: #c3cce0; margin-top: 4px; }
+  .beat .why b { color: var(--text); font-weight: 700; }
+  .beat .tag { display: inline-block; font-size: 15px; font-weight: 800; letter-spacing: .06em; padding: 1px 7px; border-radius: 5px; margin-right: 2px; vertical-align: 1px; }
+  .cta { margin-top: auto; padding: 0 20px 22px; display: flex; flex-direction: column; gap: 10px; }
+  .btn { height: 52px; border-radius: 999px; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 800; font-size: 18px; border: 1px solid var(--line-strong); }
+  .btn.pri { background: var(--lime); color: #0b1124; border: none; }
+
+  /* (b) recap player */
+  .vid { position: relative; height: 214px; flex: none; overflow: hidden; }
+  .vid svg.bcv { position: absolute; left: 0; top: 0; }
+  .vid .ov { position: absolute; left: 12px; top: 12px; right: 12px; display: flex; justify-content: space-between; align-items: flex-start; }
+  .vid .ov .chip { background: rgba(7,11,23,.82); font-size: 15px; }
+  .chapters { display: grid; grid-template-columns: 1fr 0.6fr 1.2fr 1fr; gap: 5px; margin-top: 14px; }
+  .chapters div .b { height: 6px; border-radius: 4px; background: rgba(255,255,255,.14); position: relative; overflow: hidden; }
+  .chapters div .b i { position: absolute; inset: 0; background: var(--lime); }
+  .chapters div .l { font-family: var(--font-mono); font-size: 15px; color: var(--muted); margin-top: 6px; }
+  .chapters div.on .l { color: var(--lime); font-weight: 700; }
+  .langrow { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; }
+  .seg { display: flex; border-radius: 999px; border: 1px solid var(--line-strong); overflow: hidden; font-size: 16px; font-weight: 700; }
+  .seg span { padding: 6px 14px; }
+  .seg .on { background: var(--lime); color: #0b1124; }
+  .hi { font-family: "Noto Sans Devanagari", var(--font-ui); }
+  .capbox { margin-top: 12px; padding: 14px 16px; border-radius: 16px; background: rgba(255,255,255,.05); border: 1px solid var(--line); }
+  .capbox .h { font-size: 22px; line-height: 1.5; font-weight: 600; color: var(--text); }
+  .capbox .h mark { background: none; color: var(--lime); }
+  .capbox .e { font-size: 16px; line-height: 1.4; color: var(--muted); margin-top: 8px; }
+  .player { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
+  .pp { width: 52px; height: 52px; border-radius: 50%; background: var(--lime); display: grid; place-items: center; flex: none; }
+  .player svg.wave { flex: 1; height: 40px; }
+  .player .tm { font-family: var(--font-mono); font-size: 15px; color: var(--muted); white-space: nowrap; }
+  .toggle { display: flex; align-items: center; gap: 12px; margin-top: 14px; padding: 12px 14px; border-radius: 14px; background: rgba(255,255,255,.04); border: 1px solid var(--line); }
+  .toggle .t { font-weight: 800; font-size: 17px; }
+  .toggle .d { font-size: 15px; color: var(--muted); margin-top: 2px; line-height: 1.35; }
+  .sw { margin-left: auto; width: 52px; height: 30px; border-radius: 999px; background: var(--lime); position: relative; flex: none; }
+  .sw::after { content: ""; position: absolute; right: 3px; top: 3px; width: 24px; height: 24px; border-radius: 50%; background: #0b1124; }
+  .sw.off { background: rgba(255,255,255,.18); } .sw.off::after { left: 3px; right: auto; background: #fff; }
+  .meta { margin-top: 12px; font-size: 15px; color: var(--muted); display: flex; justify-content: space-between; }
+
+  /* (c) what to watch */
+  .live-row { display: flex; align-items: center; gap: 8px; }
+  .live-row .chip { font-size: 15px; white-space: nowrap; padding: 5px 11px; }
+  .watch h3 { font-size: 15px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--lime); margin-top: 12px; }
+  .watch .big { font-size: 23px; font-weight: 800; line-height: 1.22; margin-top: 6px; letter-spacing: -.005em; }
+  .watch .big span { color: var(--lime); }
+  .mini { margin-top: 12px; border-radius: 14px; overflow: hidden; background: #0c1830; border: 1px solid var(--line); }
+  .mini .lg { display: flex; gap: 12px; padding: 8px 12px; font-size: 15px; color: var(--muted); border-top: 1px solid var(--line); }
+  .mini .lg i { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
+  .whybox { margin-top: 12px; font-size: 16px; line-height: 1.42; color: #dfe5f3; }
+  .whybox b { color: var(--text); }
+  .evrow { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .evrow .chip { font-size: 15px; padding: 4px 9px; letter-spacing: 0; }
+</style>
+</head>
+<body>
+<div class="frame" id="f">
+  <div class="bg"></div><div class="grid-bg"></div>
+
+  <!-- left story -->
+  <div class="left">
+    <div class="eyebrow">Catch Me Up</div>
+    <h1>Late? Get the <em>story</em>, not the stats.</h1>
+    <div class="lead">Priya stepped away at <b>38'</b> and came back at <b>61'</b>. In under a minute the AI rebuilds what she missed as a story: the beats that mattered, why each one mattered, and what to watch now.</div>
+    <div class="who"><div class="av">P</div><div><div class="n">Priya · Mumbai</div><div class="s">Casual · <span class="hi">हिन्दी</span> / English · follows Harbour City &amp; Calloway</div></div></div>
+    <div class="steps">
+      <div class="step"><i>A</i><div><div class="t">Story so far</div><div class="d">23 minutes in four beats, each with its why.</div></div></div>
+      <div class="step"><i>B</i><div><div class="t">40-second voiced recap</div><div class="d">Voice and captions in Hindi or English, spoiler&#8209;safe.</div></div></div>
+      <div class="step"><i>C</i><div><div class="t">What to watch now</div><div class="d">The live pattern most likely to matter next.</div></div></div>
+    </div>
+    <div class="ev"><span class="chip">Built from 412 synthetic events</span><span class="chip">3 phase changes detected</span></div>
+  </div>
+
+  <!-- (a) Welcome back -->
+  <div class="phone" style="left:560px">
+    <div class="notch"></div>
+    <div class="scr">
+      <div class="status"><span>22:46</span><span class="ic"><svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1" fill="#fff"/><rect x="5" y="5" width="3" height="7" rx="1" fill="#fff"/><rect x="10" y="2" width="3" height="10" rx="1" fill="#fff"/><rect x="15" y="0" width="3" height="12" rx="1" fill="#fff" opacity=".4"/></svg><svg width="26" height="12" viewBox="0 0 26 12"><rect x=".5" y=".5" width="22" height="11" rx="3" fill="none" stroke="#fff" opacity=".6"/><rect x="2" y="2" width="12" height="8" rx="2" fill="#fff"/><rect x="23.5" y="4" width="2" height="4" rx="1" fill="#fff" opacity=".6"/></svg></span></div>
+      <div class="nav"><span>‹ Live</span><span class="mid">Catch me up</span><span class="chip coral" style="font-size:15px;padding:3px 10px"><span class="live-dot"></span> 61'</span></div>
+      <div class="pad hello">
+        <h2>Welcome back, Priya —<br><span>you missed 23 minutes</span></h2>
+        <div class="scoreline">You left at 38' <span class="sc">0–1</span> <span style="font-size:20px">→</span> now <span class="sc now">1–1</span></div>
+        <div class="tl">
+          <div class="beat"><span class="pin goal"></span>
+            <div class="hd"><span class="min">41'</span><span class="ti">Achterberg equalises</span></div>
+            <div class="why"><b>Why it matters:</b> Harbour City’s patience paid off. Calloway’s pass opened the defence for a close-range finish.</div></div>
+          <div class="beat"><span class="pin" style="border-color:var(--muted)"></span>
+            <div class="hd"><span class="min">HT</span><span class="ti">1–1 at the break</span></div>
+            <div class="why">Harbour City had most of the ball. Kingsmoor sat deep and waited.</div></div>
+          <div class="beat"><span class="pin" style="border-color:var(--amber)"></span>
+            <div class="hd"><span class="min">58'</span><span class="ti">Kingsmoor change plan</span></div>
+            <div class="why">Doyle-Akande on for Ferrante. <b>Why:</b> they stopped waiting and started chasing the ball high up the pitch.</div></div>
+          <div class="beat" style="padding-bottom:0"><span class="pin" style="border-color:var(--coral)"></span>
+            <div class="hd"><span class="min">58–61'</span><span class="ti">Chaos phase</span></div>
+            <div class="why">End-to-end football, chaos index <b>74</b>, the wildest spell so far. Expect mistakes and chances.</div></div>
+        </div>
+      </div>
+      <div class="cta">
+        <div class="btn pri">▶ Play 40-sec recap</div>
+        <div class="btn">Skip to live</div>
+      </div>
+    </div>
+  </div>
+  <div class="cap" style="left:560px"><b>A</b>Story so far</div>
+
+  <!-- (b) Recap player -->
+  <div class="phone" style="left:1008px">
+    <div class="notch"></div>
+    <div class="scr">
+      <div class="status"><span>22:47</span><span class="ic"><svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1" fill="#fff"/><rect x="5" y="5" width="3" height="7" rx="1" fill="#fff"/><rect x="10" y="2" width="3" height="10" rx="1" fill="#fff"/><rect x="15" y="0" width="3" height="12" rx="1" fill="#fff" opacity=".4"/></svg><svg width="26" height="12" viewBox="0 0 26 12"><rect x=".5" y=".5" width="22" height="11" rx="3" fill="none" stroke="#fff" opacity=".6"/><rect x="2" y="2" width="12" height="8" rx="2" fill="#fff"/><rect x="23.5" y="4" width="2" height="4" rx="1" fill="#fff" opacity=".6"/></svg></span></div>
+      <div class="nav"><span>✕</span><span class="mid">Your 40-sec recap</span><span>⋯</span></div>
+      <div class="vid"><svg class="bcv" id="bcb"></svg>
+        <div class="ov"><span class="chip amber">58' · Plan change</span><span class="chip">Synthetic replay</span></div>
+      </div>
+      <div class="pad">
+        <div class="chapters">
+          <div><div class="b"><i></i></div><div class="l">41'</div></div>
+          <div><div class="b"><i></i></div><div class="l">HT</div></div>
+          <div class="on"><div class="b"><i style="right:45%"></i></div><div class="l">58'</div></div>
+          <div><div class="b"></div><div class="l">61'</div></div>
+        </div>
+        <div class="langrow">
+          <span style="font-size:15px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase">Captions + voice</span>
+          <div class="seg"><span class="on hi">हिन्दी</span><span>EN</span></div>
+        </div>
+        <div class="capbox">
+          <div class="h hi" lang="hi">58वें मिनट में किंग्समूर ने अपनी रणनीति बदली — अब वे <mark>आगे बढ़कर दबाव</mark> बना रहे हैं।</div>
+          <div class="e">58' — Kingsmoor changed their plan: now they press high up the pitch.</div>
+        </div>
+        <div class="player">
+          <div class="pp"><svg width="18" height="20" viewBox="0 0 18 20"><rect x="2" y="1" width="5" height="18" rx="1.5" fill="#0b1124"/><rect x="11" y="1" width="5" height="18" rx="1.5" fill="#0b1124"/></svg></div>
+          <svg class="wave" id="wv"></svg>
+          <span class="tm">0:24 / 0:40</span>
+        </div>
+        <div class="toggle"><div><div class="t">Spoiler-safe</div><div class="d">Goals are revealed in order, never in thumbnails or alerts.</div></div><span class="sw"></span></div>
+        <div class="meta"><span class="mono">hi-IN-MadhurNeural</span><span>4 beats · 412 events</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="cap" style="left:1008px"><b>B</b>40-second voiced recap</div>
+
+  <!-- (c) What to watch now -->
+  <div class="phone" style="left:1456px">
+    <div class="notch"></div>
+    <div class="scr">
+      <div class="status"><span>22:48</span><span class="ic"><svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1" fill="#fff"/><rect x="5" y="5" width="3" height="7" rx="1" fill="#fff"/><rect x="10" y="2" width="3" height="10" rx="1" fill="#fff"/><rect x="15" y="0" width="3" height="12" rx="1" fill="#fff" opacity=".4"/></svg><svg width="26" height="12" viewBox="0 0 26 12"><rect x=".5" y=".5" width="22" height="11" rx="3" fill="none" stroke="#fff" opacity=".6"/><rect x="2" y="2" width="12" height="8" rx="2" fill="#fff"/><rect x="23.5" y="4" width="2" height="4" rx="1" fill="#fff" opacity=".6"/></svg></span></div>
+      <div class="nav"><span>‹ Recap</span><span class="mid">You’re live</span><span class="chip coral" style="font-size:15px;padding:3px 10px"><span class="live-dot"></span> 62'</span></div>
+      <div class="pad watch">
+        <div class="live-row"><span class="chip"><span class="dot" style="color:var(--home)"></span>HAR 1–1 KMA</span><span class="chip" style="color:#9fbaff;border-color:rgba(47,107,255,.6);background:rgba(47,107,255,.16)">For you · Calloway</span></div>
+        <h3>What to watch now</h3>
+        <div class="big">Calloway keeps finding space in the <span>left half-space</span> — watch for the through-ball.</div>
+        <div class="mini">
+          <svg id="mp" width="338" height="219" viewBox="0 0 338 219" style="display:block"></svg>
+          <div class="lg"><span><i style="background:#c8ff3d"></i>Calloway receptions</span><span><i style="background:#e8434f"></i>KMA press</span></div>
+        </div>
+        <div class="whybox"><b>Why:</b> Kingsmoor’s new high press leaves a gap behind their midfield. Calloway has received there <b>8 times</b> (league average 4.1).</div>
+        <div class="evrow"><span class="chip">8 receptions</span><span class="chip">3 of last 5 attacks</span><span class="chip cyan">Confidence: medium-high</span></div>
+      </div>
+      <div class="cta" style="padding-bottom:20px">
+        <div style="font-size:15px;color:var(--muted);text-align:center">One alert at most · respects your quiet hours</div>
+        <div class="btn pri"><svg width="18" height="20" viewBox="0 0 18 20"><path d="M9 1.5c-3.3 0-5.6 2.5-5.6 5.8v3.6L1.5 14.2h15l-1.9-3.3V7.3C14.6 4 12.3 1.5 9 1.5Z" fill="#0b1124"/><path d="M6.6 16.2a2.4 2.4 0 0 0 4.8 0" fill="#0b1124"/></svg>Ping me if it happens</div>
+      </div>
+    </div>
+  </div>
+  <div class="cap" style="left:1456px"><b>C</b>What to watch now</div>
+
+  <div class="mock-title">Concept 10 · Catch Me Up</div>
+  <div class="mock-note">Concept mockup · synthetic data · fictional clubs and players</div>
+</div>
+
+<script src="assets/pitch.js"></script>
+<script>
+  const NS = 'http://www.w3.org/2000/svg';
+  // (b) synthetic replay: the 58' high press
+  const b = document.getElementById('bcb');
+  const v = Pitch.broadcast(b, { scene: 'press' });
+  v.zone([[26, 12], [37, 12], [37, 27], [26, 27]], '#ff5d6c', 0.16);
+  v.arrow([33.5, 13.8], [31, 17.6], { color: '#ff5d6c', width: 0.6, bend: 0.1, head: 1.4 });
+  v.arrow([34, 21.5], [31.6, 18.6], { color: '#ff5d6c', width: 0.6, bend: -0.1, head: 1.4 });
+  v.arrow([28.5, 24], [30, 19.6], { color: '#ff5d6c', width: 0.6, bend: 0.1, head: 1.4 });
+  b.setAttribute('viewBox', '170 380 1080 608');
+  b.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+  b.setAttribute('width', 380); b.setAttribute('height', 214);
+
+  // waveform
+  (function () {
+    const svg = document.getElementById('wv'); const w = svg.getBoundingClientRect().width, h = 40; svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+    let s = 9; const r = () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
+    let out = ''; const n = Math.floor(w / 5);
+    for (let i = 0; i < n; i++) { const env = 0.5 + 0.5 * Math.abs(Math.sin(i / 5.3)); const bh = Math.max(4, (0.2 + 0.8 * r()) * env * (h - 2));
+      out += `<rect x="${i * 5 + 1}" y="${(h - bh) / 2}" width="3" height="${bh}" rx="1.5" fill="${i / n < 0.6 ? '#c8ff3d' : 'rgba(255,255,255,.28)'}"/>`; }
+    svg.innerHTML = out;
+  })();
+
+  // (c) mini pitch: left half-space for Harbour City (attacking left to right)
+  const mp = document.getElementById('mp');
+  const t = Pitch.tactical(mp, { x: 0, y: 0, w: 338, h: 219, grass: '#0c1830', lineColor: 'rgba(255,255,255,0.3)' });
+  t.zone([[56, 43.2], [92, 43.2], [92, 54.2], [56, 54.2]], '#c8ff3d', 0.16);
+  // KMA press line (pushed up after 58')
+  const [l1x, l1y] = t.P(58, 2), [l2x, l2y] = t.P(58, 66);
+  const ln = document.createElementNS(NS, 'line');
+  Object.entries({ x1: l1x, y1: l1y, x2: l2x, y2: l2y, stroke: '#ff5d6c', 'stroke-width': 2, 'stroke-dasharray': '6 5' }).forEach(([k, val]) => ln.setAttribute(k, val));
+  t.g.appendChild(ln);
+  [[62, 14], [61, 27], [60, 40], [63, 55]].forEach(([x, y]) => t.dot(x, y, '#e8434f', null, 6));
+  [[80, 22], [79, 34], [80, 46]].forEach(([x, y]) => t.dot(x, y, '#e8434f', null, 6));
+  // Calloway receptions in the half-space
+  [[66, 45], [70, 48.5], [72, 44.5], [75, 51], [77, 46], [80, 49.5], [69, 52], [74, 47.5]].forEach(([x, y]) => t.dot(x, y, '#c8ff3d', null, 5));
+  t.arrow([50, 33], [70.5, 46.8], '#ffffff', 2.5, '5 4', -0.1);
+  const lab = (x, y, txt, col, anchor) => { const [px, py] = t.P(x, y); const tx = document.createElementNS(NS, 'text');
+    Object.entries({ x: px, y: py, fill: col, 'font-family': 'Inter', 'font-weight': 700, 'font-size': 15, 'text-anchor': anchor || 'start', 'paint-order': 'stroke', stroke: '#0c1830', 'stroke-width': 4 }).forEach(([k, val]) => tx.setAttribute(k, val)); tx.textContent = txt; t.g.appendChild(tx); };
+  lab(74, 59, 'Left half-space', '#c8ff3d', 'middle');
+  lab(46, 28, 'Marchetti', '#ffffff', 'middle');
+  lab(98, 6, 'Attack →', '#a3afc9', 'end');
+</script>
+</body>
+</html>

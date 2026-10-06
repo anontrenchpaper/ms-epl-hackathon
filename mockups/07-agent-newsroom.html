@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The Agent Newsroom — live agent ops</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .frame { background: radial-gradient(1100px 700px at 40% 0%, #13214d 0%, var(--ink) 62%); }
+  .topbar { position: absolute; left: 24px; right: 24px; top: 18px; height: 66px; display: flex; align-items: center; gap: 16px; padding: 0 16px 0 14px; background: rgba(15, 23, 46, .92); border: 1px solid var(--line); border-radius: 14px; }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand .mark { width: 38px; height: 38px; border-radius: 10px; background: var(--lime); display: grid; place-items: center; }
+  .brand .name { font-family: var(--font-display); font-weight: 800; font-size: 30px; letter-spacing: .05em; text-transform: uppercase; line-height: 1; white-space: nowrap; }
+  .brand .sub { font-size: 15px; color: var(--muted); font-weight: 600; letter-spacing: .04em; margin-top: 3px; }
+  .vsep { width: 1px; height: 36px; background: var(--line); }
+  .bug { display: flex; align-items: stretch; height: 40px; border-radius: 8px; overflow: hidden; font-family: var(--font-display); font-weight: 700; font-size: 24px; letter-spacing: .04em; }
+  .bug > div { display: flex; align-items: center; padding: 0 12px; }
+  .bug .lg { background: #0b1124; color: var(--lime); font-size: 17px; letter-spacing: .18em; }
+  .bug .tm { background: #1a2547; gap: 8px; }
+  .bug .sw { width: 6px; height: 22px; border-radius: 2px; }
+  .bug .sc { background: #f2f5fb; color: #0b1124; min-width: 70px; justify-content: center; }
+  .bug .ck { background: #0b1124; font-family: var(--font-mono); font-size: 20px; font-weight: 700; }
+  .tag { font-size: 15px; font-weight: 600; color: var(--muted); padding: 5px 10px; border-radius: 8px; border: 1px solid var(--line); background: rgba(255,255,255,.04); white-space: nowrap; }
+  .tag b { color: var(--text); font-weight: 700; }
+
+  .panel { position: absolute; background: rgba(15, 23, 46, .86); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+  .ph { display: flex; align-items: center; gap: 12px; padding: 13px 18px 11px; border-bottom: 1px solid var(--line); }
+  .ph h3 { font-family: var(--font-display); font-weight: 700; font-size: 24px; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; }
+  .ph .meta { margin-left: auto; font-size: 15px; color: var(--muted); font-weight: 600; white-space: nowrap; }
+
+  .canvas { background-color: rgba(10, 16, 34, .78); background-image: radial-gradient(rgba(255,255,255,.07) 1.2px, transparent 1.3px); background-size: 22px 22px; }
+
+  /* agent nodes */
+  .node { position: absolute; width: 228px; height: 128px; border-radius: 14px; background: #121c3a; border: 1px solid var(--line-strong); box-shadow: 0 14px 34px rgba(0,0,0,.45); padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
+  .node .hd { display: flex; align-items: center; gap: 9px; }
+  .node .ix { font-family: var(--font-mono); font-size: 15px; color: var(--dim); font-weight: 700; }
+  .node .nm { font-family: var(--font-display); font-weight: 800; font-size: 26px; white-space: nowrap; letter-spacing: .05em; text-transform: uppercase; line-height: 1; }
+  .node .lat { margin-left: auto; font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--text); white-space: nowrap; align-self: center; }
+  .node .rl { font-size: 16px; color: var(--muted); font-weight: 500; white-space: nowrap; }
+  .node .tools { display: flex; gap: 6px; margin-top: auto; align-items: center; }
+  .mcp { display: inline-flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 600; padding: 3px 8px 3px 4px; border-radius: 7px; background: rgba(156,140,255,.12); border: 1px solid rgba(156,140,255,.45); color: #d9d3ff; white-space: nowrap; }
+  .mcp i { font-style: normal; font-family: var(--font-mono); font-size: 15px; font-weight: 700; background: var(--violet); color: #0b1124; border-radius: 4px; padding: 0 4px; }
+  .light { width: 12px; height: 12px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 0 4px rgba(79,240,176,.18), 0 0 12px rgba(79,240,176,.8); flex: none; }
+  .light.amber { background: var(--amber); box-shadow: 0 0 0 4px rgba(255,182,72,.2), 0 0 12px rgba(255,182,72,.9); }
+  .node.warn { border: 2px solid var(--amber); background: #231d1b; box-shadow: 0 0 0 6px rgba(255,182,72,.12), 0 14px 34px rgba(0,0,0,.45); }
+  .node .badge { position: absolute; top: -13px; left: 14px; font-size: 15px; font-weight: 800; letter-spacing: .06em; padding: 2px 9px; border-radius: 6px; background: var(--amber); color: #0b1124; }
+
+  .io { position: absolute; display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; padding: 6px 12px; border-radius: 9px; background: rgba(58,215,255,.1); border: 1px solid rgba(58,215,255,.45); color: var(--text); white-space: nowrap; }
+  .io b { color: var(--cyan); font-weight: 800; letter-spacing: .06em; }
+
+  /* blackboard */
+  .bb { position: absolute; border-radius: 16px; background: linear-gradient(180deg, rgba(200,255,61,.10), rgba(200,255,61,.03)); border: 2px solid rgba(200,255,61,.55); box-shadow: 0 0 40px rgba(200,255,61,.10); padding: 14px 20px; }
+  .bb .t { display: flex; align-items: baseline; gap: 14px; }
+  .bb .t .h { font-family: var(--font-display); font-weight: 800; font-size: 28px; letter-spacing: .1em; color: var(--lime); }
+  .bb .t .s { font-size: 15px; color: var(--muted); font-weight: 600; }
+  .bb .t .v { margin-left: auto; font-family: var(--font-mono); font-size: 15px; color: var(--muted); }
+  .kv { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px 22px; margin-top: 12px; }
+  .kv div { font-size: 15px; color: var(--muted); font-weight: 600; }
+  .kv b { display: block; font-family: var(--font-mono); font-size: 18px; color: var(--text); font-weight: 700; margin-top: 2px; white-space: nowrap; }
+
+  .legend { position: absolute; display: flex; gap: 16px; align-items: center; font-size: 15px; color: var(--muted); font-weight: 600; }
+  .legend span { display: inline-flex; align-items: center; gap: 7px; }
+
+  /* incident */
+  .inc-head { padding: 16px 20px 14px; border-bottom: 1px solid var(--line); background: linear-gradient(90deg, rgba(255,182,72,.14), transparent); }
+  .inc-head .k { display: flex; gap: 8px; align-items: center; }
+  .inc-head h2 { font-family: var(--font-display); font-weight: 800; font-size: 34px; line-height: 1; text-transform: uppercase; margin-top: 10px; letter-spacing: .02em; }
+  .inc-head p { font-size: 17px; color: var(--muted); margin-top: 6px; }
+  .steps { padding: 14px 20px 0 20px; position: relative; }
+  .step { display: grid; grid-template-columns: 34px 1fr auto; gap: 12px; position: relative; padding-bottom: 11px; }
+  .step:not(:last-child)::before { content: ''; position: absolute; left: 16px; top: 34px; bottom: 0; width: 2px; background: var(--line-strong); }
+  .step .ic { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-weight: 900; font-size: 16px; color: #0b1124; }
+  .step .tt { font-size: 18px; font-weight: 700; }
+  .step .dd { font-size: 15px; color: var(--muted); margin-top: 2px; line-height: 1.35; }
+  .step .ts { font-family: var(--font-mono); font-size: 15px; color: var(--muted); padding-top: 3px; }
+  .quote { margin: 0 20px 12px; padding: 10px 14px; border-radius: 10px; background: rgba(58,215,255,.07); border-left: 3px solid var(--cyan); }
+  .quote .ql { font-size: 15px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--cyan); }
+  .quote p { font-size: 17px; font-weight: 500; margin-top: 3px; line-height: 1.35; }
+  .result { margin: 0 20px 0; padding: 12px 16px; border-radius: 12px; background: rgba(79,240,176,.1); border: 1px solid rgba(79,240,176,.45); display: flex; align-items: center; gap: 14px; }
+  .result .big { font-family: var(--font-display); font-weight: 800; font-size: 46px; line-height: .9; color: var(--mint); }
+  .result .tx { font-size: 16px; font-weight: 600; line-height: 1.35; }
+
+  /* cost strip */
+  .kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 18px; padding: 12px 20px 2px; }
+  .kp .v { font-family: var(--font-display); font-weight: 700; font-size: 38px; line-height: 1; }
+  .kp .v small { font-size: 20px; color: var(--muted); font-weight: 600; }
+  .kp .l { font-size: 15px; color: var(--muted); font-weight: 600; margin-top: 3px; }
+  .share { padding: 4px 20px 0; }
+  .share .bar2 { display: flex; height: 14px; border-radius: 7px; overflow: hidden; margin-top: 8px; }
+  .share .lg2 { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 9px; font-size: 15px; color: var(--muted); font-weight: 600; }
+  .share .lg2 span { display: inline-flex; align-items: center; gap: 6px; }
+  .route { margin: 12px 20px 0; padding: 8px 14px; border-radius: 10px; background: rgba(255,255,255,.04); border: 1px solid var(--line); display: flex; align-items: center; gap: 14px; font-size: 15px; color: var(--muted); line-height: 1.35; }
+  .route b { color: var(--text); display: block; }
+  .route .save { margin-left: auto; font-family: var(--font-display); font-weight: 800; font-size: 32px; color: var(--lime); line-height: 1; text-align: right; white-space: nowrap; }
+  .route .save small { display: block; font-family: var(--font-ui); font-size: 15px; color: var(--muted); font-weight: 600; }
+  .share .lg2 i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
+  /* trace */
+  .trace { position: absolute; }
+  .tr-row { position: absolute; left: 0; right: 0; height: 22px; display: flex; align-items: center; }
+  .tr-row .lb { width: 196px; padding-left: 18px; font-size: 15px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+  .span { position: absolute; height: 17px; border-radius: 4px; }
+  .span-l { position: absolute; font-family: var(--font-mono); font-size: 15px; line-height: 19px; font-weight: 700; white-space: nowrap; padding: 0 4px; background: #111a33; border-radius: 4px; }
+  .span-l.in { background: none; color: #0b1124; line-height: 17px; }
+</style>
+</head>
+<body>
+<div class="frame" id="f">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="mark"><svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2" fill="#0b1124"/><circle cx="4.5" cy="6" r="2.2" fill="#0b1124"/><circle cx="19.5" cy="6" r="2.2" fill="#0b1124"/><circle cx="4.5" cy="18" r="2.2" fill="#0b1124"/><circle cx="19.5" cy="18" r="2.2" fill="#0b1124"/><path d="M6.3 7.2l3.2 3M17.7 7.2l-3.2 3M6.3 16.8l3.2-3M17.7 16.8l-3.2-3" stroke="#0b1124" stroke-width="1.8"/></svg></div>
+      <div><div class="name">The Agent Newsroom</div><div class="sub">Live agent ops · workflow v7</div></div>
+    </div>
+    <div class="vsep"></div>
+    <div class="bug">
+      <div class="lg">SYN</div>
+      <div class="tm"><span class="sw" style="background:var(--home)"></span>HAR</div>
+      <div class="sc">1 – 1</div>
+      <div class="tm">KMA<span class="sw" style="background:var(--away)"></span></div>
+      <div class="ck">67:12</div>
+    </div>
+    <div style="margin-left:auto" class="row">
+      <span class="tag">Microsoft Agent Framework workflow</span>
+      <span class="tag">Foundry Agent Service</span>
+      <span class="tag">Application Insights tracing</span>
+      <span class="chip" style="white-space:nowrap;background:rgba(79,240,176,.12);border-color:rgba(79,240,176,.45);color:var(--mint)"><span class="dot"></span> 9 healthy · <span class="amber">1 recovered</span></span>
+    </div>
+  </div>
+
+  <!-- ===== graph canvas ===== -->
+  <div class="panel canvas" style="left:24px; top:100px; width:1364px; height:594px"></div>
+  <svg class="abs" id="edges" width="1920" height="1080" style="left:0;top:0"></svg>
+
+  <div class="io" style="left:48px; top:112px"><b>IN</b> Synthetic match events · Azure Event Hubs · 412 / min</div>
+  <div class="legend" style="left:820px; top:118px">
+    <span><svg width="34" height="10"><line x1="0" y1="5" x2="26" y2="5" stroke="#c8ff3d" stroke-width="3"/><path d="M26 0 L34 5 L26 10z" fill="#c8ff3d"/></svg>A2A handoff</span>
+    <span><svg width="34" height="10"><line x1="0" y1="5" x2="34" y2="5" stroke="rgba(255,255,255,.45)" stroke-width="2" stroke-dasharray="5 4"/></svg>read / write state</span>
+    <span><span class="mcp" style="padding:1px 6px 1px 3px"><i>MCP</i>tool</span></span>
+    <span><span class="light"></span>healthy</span>
+  </div>
+
+  <div id="nodes"></div>
+
+  <div class="bb" style="left:150px; top:320px; width:1112px; height:142px">
+    <div class="t"><span class="h">Shared match state</span><span class="s">blackboard · every agent reads and writes here</span><span class="v">rev 18,442 · checkpoint ck-0193 · Cosmos DB</span></div>
+    <div class="kv">
+      <div>Clock · score<b>67:12 · HAR 1–1 KMA</b></div>
+      <div>Phase<b>HAR control (67'+)</b></div>
+      <div>Last event<b>E-1893 line-break</b></div>
+      <div>Narratives<b>2 live · 1 fallback</b></div>
+    </div>
+  </div>
+
+  <div class="io" style="left:556px; top:640px; background:rgba(200,255,61,.1); border-color:rgba(200,255,61,.45)"><b style="color:var(--lime)">OUT</b> Overlay renderer · Azure Web PubSub</div>
+  <div class="io" style="left:48px; top:640px; background:rgba(200,255,61,.1); border-color:rgba(200,255,61,.45)"><b style="color:var(--lime)">OUT</b> Fan apps · 6 modes · 6 languages</div>
+
+  <!-- ===== incident ===== -->
+  <div class="panel" style="left:1412px; top:100px; width:484px; height:594px">
+    <div class="inc-head">
+      <div class="k"><span class="chip amber">INCIDENT #214</span><span class="chip" style="background:rgba(79,240,176,.14);border-color:rgba(79,240,176,.45);color:var(--mint)">✓ RECOVERED</span><span class="mono muted" style="margin-left:auto;font-size:15px">67:04.71</span></div>
+      <h2>Storyteller timed out</h2>
+      <p>p95 latency budget (650 ms) breached on E-1893</p>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="ic" style="background:var(--coral)">✕</div><div><div class="tt">Attempt 1 timed out</div><div class="dd">No reply within 650 ms (throttled)</div></div><div class="ts">+0.30 s</div></div>
+      <div class="step"><div class="ic" style="background:var(--amber)">↻</div><div><div class="tt">Retry ×1</div><div class="dd">30 ms backoff · timed out again</div></div><div class="ts">+0.98 s</div></div>
+      <div class="step"><div class="ic" style="background:var(--cyan)">⇢</div><div><div class="tt">Fallback to template narrative</div><div class="dd">TPL-LINEBREAK-03 filled from match state</div></div><div class="ts">+1.63 s</div></div>
+      <div class="step"><div class="ic" style="background:var(--violet)">◆</div><div><div class="tt">Checkpoint restored</div><div class="dd">ck-0193 · upstream agents not re-run</div></div><div class="ts">+1.65 s</div></div>
+      <div class="step"><div class="ic" style="background:var(--mint)">✓</div><div><div class="tt">Editor approved · overlay sent</div><div class="dd">Fact-check 4 / 4 claims · style guard pass</div></div><div class="ts">+2.10 s</div></div>
+    </div>
+    <div class="quote"><div class="ql">Template narrative that shipped</div><p>“Marchetti breaks two lines to find Calloway. Six Kingsmoor players bypassed.”</p></div>
+    <div class="result"><div class="big" style="white-space:nowrap">1.8 s</div><div class="tx">Recovered in 1.8 s. Event-to-overlay still <span class="mint" style="white-space:nowrap">2.3 s</span>, inside the <span style="white-space:nowrap">3.0 s</span> SLO.</div></div>
+  </div>
+
+  <!-- ===== trace ===== -->
+  <div class="panel" style="left:24px; top:710px; width:1364px; height:322px">
+    <div class="ph"><h3>Live trace</h3><span class="chip" style="padding:3px 10px">E-1893 · line-breaking pass · 67:04</span><span class="meta">Application Insights · trace 7f3a…c21 · <b style="color:var(--lime)">2.3 s</b> event → overlay</span></div>
+    <div class="trace" id="trace" style="left:0; top:56px; width:1364px; height:262px"></div>
+  </div>
+
+  <!-- ===== cost ===== -->
+  <div class="panel" style="left:1412px; top:710px; width:484px; height:322px">
+    <div class="ph"><h3>Cost &amp; tokens</h3><span class="meta">this match · 67 min</span></div>
+    <div class="kpis">
+      <div class="kp"><div class="v">1.92<small> M in</small></div><div class="l">0.21 M out · 38% cached</div></div>
+      <div class="kp"><div class="v">$4.87</div><div class="l">est. so far · $0.011 / overlay</div></div>
+    </div>
+    <div class="share">
+      <div style="font-size:15px;color:var(--muted);font-weight:700;letter-spacing:.06em;text-transform:uppercase">Token share by agent</div>
+      <div class="bar2"><i style="width:41%;background:var(--amber)"></i><i style="width:18%;background:var(--cyan)"></i><i style="width:15%;background:var(--mint)"></i><i style="width:14%;background:var(--violet)"></i><i style="width:12%;background:#5a6788"></i></div>
+      <div class="lg2"><span><i style="background:var(--amber)"></i>Storyteller 41%</span><span><i style="background:var(--cyan)"></i>Analyst 18%</span><span><i style="background:var(--mint)"></i>Editor 15%</span><span><i style="background:var(--violet)"></i>Localiser 14%</span><span><i style="background:#5a6788"></i>Other 12%</span></div>
+    </div>
+    <div class="route"><div><b>Model routing</b>small models: Scout, Localiser<br>large models: Storyteller, Editor</div><div class="save">−46%<small>vs all-large</small></div></div>
+  </div>
+
+  <div class="mock-title">Concept 07 · The Agent Newsroom</div>
+  <div class="mock-note">Concept mockup · synthetic data · fictional clubs and players</div>
+</div>
+
+<script>
+  // ---------- nodes ----------
+  const XS = [48, 320, 592, 864, 1136];
+  const TOP = 166, BOT = 488, NW = 228, NH = 128;
+  const agents = [
+    { n: 'Ingest', r: 'validate · normalise', t: [['MCP', 'match-state']], lat: '40 ms', x: XS[0], y: TOP },
+    { n: 'Scout', r: 'event detection', t: [['MCP', 'tracking']], lat: '100 ms', x: XS[1], y: TOP },
+    { n: 'Analyst', r: 'stats · pass value v3', t: [['MCP', 'stats']], lat: '160 ms', x: XS[2], y: TOP },
+    { n: 'Tactician', r: 'patterns · phases', t: [['MCP', 'tracking']], lat: '120 ms', x: XS[3], y: TOP },
+    { n: 'Historian', r: 'milestones · records', t: [['MCP', 'records']], lat: '80 ms', x: XS[4], y: TOP },
+    { n: 'Storyteller', r: 'narrative', t: [['MCP', 'style']], lat: '1.80 s', x: XS[4], y: BOT, warn: true },
+    { n: 'Editor', r: 'fact-check · style', t: [['MCP', 'fact-check']], lat: '380 ms', x: XS[3], y: BOT },
+    { n: 'Producer', r: 'overlay timing', t: [['MCP', 'graphics']], lat: '80 ms', x: XS[2], y: BOT },
+    { n: 'Localiser', r: 'languages', t: [['MCP', 'glossary']], lat: '70 ms', x: XS[1], y: BOT },
+    { n: 'Personaliser', r: 'per-fan modes', t: [['MCP', 'fan-profile']], lat: '50 ms', x: XS[0], y: BOT }
+  ];
+  document.getElementById('nodes').innerHTML = agents.map((a, i) => `
+    <div class="node ${a.warn ? 'warn' : ''}" style="left:${a.x}px; top:${a.y}px">
+      ${a.warn ? '<span class="badge">RECOVERED</span>' : ''}
+      <div class="hd"><span class="light ${a.warn ? 'amber' : ''}"></span><span class="nm">${a.n}</span></div>
+      <div class="rl"><span class="ix">${String(i + 1).padStart(2, '0')}</span> · ${a.r}</div>
+      <div class="tools">${a.t.map(([k, v]) => `<span class="mcp"><i>${k}</i>${v}</span>`).join('')}<span class="lat" style="${a.warn ? 'color:var(--amber)' : ''}">${a.lat}</span></div>
+    </div>`).join('');
+
+  // ---------- edges ----------
+  const svg = document.getElementById('edges');
+  const NS = 'http://www.w3.org/2000/svg';
+  function mk(tag, attrs) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); svg.appendChild(e); return e; }
+  svg.innerHTML = `<defs>
+    <marker id="ah" markerWidth="10" markerHeight="10" refX="7" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#c8ff3d"/></marker>
+    <marker id="ahA" markerWidth="10" markerHeight="10" refX="7" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#ffb648"/></marker>
+    <marker id="ahC" markerWidth="10" markerHeight="10" refX="7" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#3ad7ff"/></marker>
+  </defs>`;
+  const BB = { x0: 150, x1: 1262, y0: 320, y1: 462 };
+  // spokes to blackboard
+  agents.forEach((a) => {
+    const cx = a.x + NW / 2;
+    const top = a.y === TOP;
+    const tx = Math.min(Math.max(cx, BB.x0 + 30), BB.x1 - 30);
+    mk('line', { x1: cx, y1: top ? a.y + NH : a.y, x2: tx, y2: top ? BB.y0 : BB.y1, stroke: a.warn ? 'rgba(255,182,72,.7)' : 'rgba(255,255,255,.4)', 'stroke-width': 2, 'stroke-dasharray': '5 4' });
+    mk('circle', { cx: tx, cy: top ? BB.y0 : BB.y1, r: 4, fill: a.warn ? '#ffb648' : '#c8ff3d' });
+  });
+  // A2A handoffs
+  const midT = TOP + NH / 2, midB = BOT + NH / 2;
+  for (let i = 0; i < 4; i++) mk('line', { x1: XS[i] + NW + 4, y1: midT, x2: XS[i + 1] - 6, y2: midT, stroke: '#c8ff3d', 'stroke-width': 3, 'marker-end': 'url(#ah)' });
+  mk('path', { d: `M ${XS[4] + NW - 30} ${TOP + NH + 2} L ${XS[4] + NW - 30} ${BOT - 6}`, stroke: '#ffb648', 'stroke-width': 3, fill: 'none', 'marker-end': 'url(#ahA)' });
+  for (let i = 4; i > 0; i--) mk('line', { x1: XS[i] - 4, y1: midB, x2: XS[i - 1] + NW + 6, y2: midB, stroke: i === 4 ? '#ffb648' : '#c8ff3d', 'stroke-width': 3, 'marker-end': i === 4 ? 'url(#ahA)' : 'url(#ah)' });
+  // A2A labels on a couple of edges
+  [[XS[0] + NW + 22, midT - 12], [XS[3] + NW + 22, midB - 12]].forEach(([x, y]) => {
+    const t = mk('text', { x, y, 'text-anchor': 'middle', fill: '#c8ff3d', 'font-family': 'JetBrains Mono, monospace', 'font-size': 15, 'font-weight': 700 }); t.textContent = 'A2A';
+  });
+  // input + outputs
+  mk('line', { x1: 110, y1: 148, x2: 110, y2: TOP - 6, stroke: '#3ad7ff', 'stroke-width': 3, 'marker-end': 'url(#ahC)' });
+  mk('line', { x1: XS[2] + NW / 2, y1: BOT + NH + 2, x2: XS[2] + NW / 2, y2: 634, stroke: '#c8ff3d', 'stroke-width': 3, 'marker-end': 'url(#ah)' });
+  mk('line', { x1: XS[0] + NW / 2, y1: BOT + NH + 2, x2: XS[0] + NW / 2, y2: 634, stroke: '#c8ff3d', 'stroke-width': 3, 'marker-end': 'url(#ah)' });
+
+  // ---------- trace timeline ----------
+  const tr = document.getElementById('trace');
+  const X0 = 200, X1 = 1330, TMAX = 3.0;
+  const tx = (t) => X0 + (t / TMAX) * (X1 - X0);
+  const rows = [
+    ['Ingest', [[0, 0.04, '#3ad7ff']], '40 ms'],
+    ['Scout', [[0.04, 0.14, '#3ad7ff']], '100 ms'],
+    ['Analyst', [[0.14, 0.30, '#3ad7ff']], '160 ms'],
+    ['Tactician', [[0.14, 0.26, '#3ad7ff']], '120 ms · parallel'],
+    ['Historian', [[0.14, 0.22, '#3ad7ff']], '80 ms · parallel'],
+    ['Storyteller', [[0.30, 0.95, '#ff5d6c', '✕ timeout'], [0.98, 1.63, '#ff5d6c', '✕ retry'], [1.63, 1.72, '#ffb648']], 'fallback'],
+    ['Editor', [[1.72, 2.10, '#4ff0b0']], '380 ms'],
+    ['Producer', [[2.10, 2.18, '#c8ff3d']], '80 ms'],
+    ['Renderer · Web PubSub', [[2.18, 2.30, '#c8ff3d']], 'on air'],
+    ['Localiser', [[2.18, 2.25, '#9c8cff']], '70 ms'],
+    ['Personaliser', [[2.25, 2.30, '#9c8cff']], '50 ms']
+  ];
+  const RH = 20.5;
+  let html = '';
+  // grid + axis
+  for (let t = 0; t <= TMAX + 1e-6; t += 0.5) {
+    html += `<div style="position:absolute;left:${tx(t)}px;top:0;height:${rows.length * RH + 4}px;width:1px;background:rgba(255,255,255,${t === 0 ? .25 : .08})"></div>`;
+    html += `<div class="mono" style="position:absolute;left:${tx(t) - 30}px;width:60px;text-align:center;top:${rows.length * RH + 8}px;font-size:15px;color:var(--dim)">${t.toFixed(1)} s</div>`;
+  }
+  // SLO + total markers
+  html += `<div style="position:absolute;left:${tx(2.3)}px;top:-4px;height:${rows.length * RH + 8}px;border-left:2px solid var(--lime)"></div>`;
+  html += `<div class="mono" style="position:absolute;left:${tx(2.3) + 8}px;top:-2px;font-size:15px;font-weight:700;color:var(--lime)">2.3 s overlay on air</div>`;
+  html += `<div style="position:absolute;left:${tx(3.0) - 1}px;top:-4px;height:${rows.length * RH + 8}px;border-left:2px dashed var(--coral)"></div>`;
+  html += `<div class="mono" style="position:absolute;left:${tx(3.0) - 96}px;top:${rows.length * RH - 22}px;font-size:15px;font-weight:700;color:var(--coral)">SLO 3.0 s</div>`;
+  // recovery bracket
+  html += `<div style="position:absolute;left:${tx(0.30)}px;width:${tx(2.10) - tx(0.30)}px;top:${5 * RH - 2}px;height:${3 * RH - 2}px;border:1px dashed rgba(255,182,72,.6);border-radius:6px;background:rgba(255,182,72,.05)"></div>`;
+  html += `<div class="mono" style="position:absolute;left:${tx(0.34)}px;top:${6 * RH + 1}px;font-size:15px;line-height:19px;font-weight:700;color:var(--amber)">↳ recovered in 1.8 s (retry ×1 → template)</div>`;
+  rows.forEach(([name, spans, label], r) => {
+    html += `<div class="tr-row" style="top:${r * RH}px"><div class="lb">${name}</div></div>`;
+    spans.forEach(([a, b, c, inl]) => {
+      html += `<div class="span" style="top:${r * RH + 2}px;left:${tx(a)}px;width:${Math.max(4, tx(b) - tx(a) - 2)}px;background:${c};${inl ? 'opacity:.85' : ''}"></div>`;
+      if (inl) html += `<div class="span-l in" style="top:${r * RH + 2}px;left:${tx(a) + 4}px">${inl}</div>`;
+    });
+    const end = spans[spans.length - 1][1];
+    html += `<div class="span-l" style="top:${r * RH + 1}px;left:${tx(end) + 4}px;color:${name === 'Storyteller' ? 'var(--amber)' : 'var(--muted)'}">${label}</div>`;
+  });
+  tr.innerHTML = html;
+</script>
+</body>
+</html>

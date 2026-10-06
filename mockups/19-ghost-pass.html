@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The Pass Not Played — broadcast overlay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .modes { position: absolute; right: 64px; top: 48px; display: flex; gap: 10px; align-items: center; }
+  .seg { display: inline-flex; padding: 4px; border-radius: 999px; background: rgba(7,11,23,.86); border: 1px solid var(--line-strong); font-size: 15px; font-weight: 700; }
+  .seg span { padding: 6px 14px; border-radius: 999px; color: var(--muted); letter-spacing: .02em; }
+  .seg span.on { background: var(--lime); color: #0b1124; }
+
+  .headline { position: absolute; left: 64px; top: 124px; }
+  .headline .eyebrow { display: flex; align-items: center; gap: 10px; }
+  .headline h1 { font-family: var(--font-display); font-weight: 800; font-size: 56px; line-height: 1; text-transform: uppercase; letter-spacing: .01em; margin-top: 6px; text-shadow: 0 4px 24px rgba(0,0,0,.6); }
+  .headline h1 em { font-style: normal; color: var(--lime); }
+
+  /* ---------- comparison band ---------- */
+  .band {
+    position: absolute; left: 64px; right: 64px; bottom: 50px; height: 272px;
+    display: grid; grid-template-columns: 448px 448px 1fr; overflow: hidden;
+    border-radius: 18px; background: rgba(7, 11, 23, 0.92); border: 1px solid var(--line-strong);
+    box-shadow: 0 24px 60px rgba(0,0,0,.55);
+  }
+  .opt { padding: 20px 26px; display: flex; flex-direction: column; gap: 10px; border-right: 1px solid var(--line); }
+  .opt.ghost { background: linear-gradient(180deg, rgba(200,255,61,.09), rgba(200,255,61,.03)); }
+  .opt .hd { display: flex; align-items: center; justify-content: space-between; }
+  .opt .ttl { font-size: 21px; font-weight: 700; }
+  .opt .ttl span { color: var(--muted); font-weight: 500; }
+  .opt .nums { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .opt .nums .v { font-family: var(--font-display); font-weight: 800; font-size: 58px; line-height: .9; }
+  .opt .nums .v small { font-size: 24px; margin-left: 4px; font-weight: 700; }
+  .opt .nums .l { font-size: 15px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+  .sim { display: flex; height: 14px; border-radius: 7px; overflow: hidden; gap: 2px; margin-top: 2px; }
+  .sim i { display: block; height: 100%; }
+  .simlab { display: flex; gap: 14px; font-size: 15px; color: var(--muted); }
+  .simlab span { display: inline-flex; align-items: center; gap: 6px; }
+  .simlab b { display: inline-block; width: 10px; height: 10px; border-radius: 3px; }
+  .chip.dash { border-style: dashed; }
+
+  .rr { padding: 20px 30px; display: flex; flex-direction: column; gap: 12px; }
+  .rr .t { font-family: var(--font-display); font-weight: 700; font-size: 24px; letter-spacing: .12em; text-transform: uppercase; color: var(--lime); }
+  .rr p { font-size: 20px; line-height: 1.4; }
+  .rr p b { color: var(--lime); }
+  .ev { display: flex; align-items: center; gap: 18px; padding: 10px 16px; border-radius: 12px; background: rgba(255,255,255,.05); border: 1px solid var(--line); }
+  .ev .k { font-size: 15px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .ev .m { font-family: var(--font-mono); font-weight: 700; font-size: 22px; }
+
+  .mini { position: absolute; font-family: var(--font-display); font-weight: 700; font-size: 19px; letter-spacing: .1em; text-transform: uppercase; padding: 4px 10px; border-radius: 6px; white-space: nowrap; }
+</style>
+</head>
+<body>
+<div class="frame" id="f">
+  <svg class="stage" id="stage"></svg>
+
+  <div class="scorebug">
+    <div class="league">SYN</div>
+    <div class="team"><span class="swatch" style="background:var(--home)"></span>HAR</div>
+    <div class="score">1 – 1</div>
+    <div class="team">KMA<span class="swatch" style="background:var(--away)"></span></div>
+    <div class="clock">74:18</div>
+  </div>
+
+  <div class="modes">
+    <span class="chip coral"><span class="live-dot"></span> REPLAY</span>
+    <span class="chip violet">COUNTERFACTUAL</span>
+    <div class="seg"><span>Casual</span><span class="on">Analyst</span></div>
+  </div>
+
+  <div class="headline">
+    <div class="eyebrow">Machine vision · 74' · Mensah on the ball</div>
+    <h1>What the machine saw <em>that the eye didn't</em></h1>
+  </div>
+
+  <!-- Comparison band -->
+  <div class="band">
+    <div class="opt">
+      <div class="hd"><span class="chip cyan">PLAYED</span><span class="chip">E-7118</span></div>
+      <div class="ttl">Sideways to #6 Marchetti <span>· 11 m</span></div>
+      <div class="nums">
+        <div><div class="v cyan">94<small>%</small></div><div class="l">Completion</div></div>
+        <div><div class="v">+0.01<small>xT</small></div><div class="l">Value added</div></div>
+      </div>
+      <div class="sim"><i style="width:94%;background:var(--cyan)"></i><i style="width:5%;background:var(--coral)"></i><i style="width:1%;background:var(--dim)"></i></div>
+      <div class="simlab"><span><b style="background:var(--cyan)"></b>Arrives 94%</span><span><b style="background:var(--coral)"></b>Cut out 5%</span><span><b style="background:var(--dim)"></b>Out 1%</span></div>
+    </div>
+    <div class="opt ghost">
+      <div class="hd"><span class="chip lime dash">MODEL'S PICK · NOT PLAYED</span><span class="chip">window 0.8 s</span></div>
+      <div class="ttl">Through-ball to #9 Achterberg <span>· 30 m</span></div>
+      <div class="nums">
+        <div><div class="v lime">46<small>%</small></div><div class="l">Completion</div></div>
+        <div><div class="v lime">+0.11<small>xT</small></div><div class="l">Value added</div></div>
+      </div>
+      <div class="sim"><i style="width:46%;background:var(--lime)"></i><i style="width:41%;background:var(--coral)"></i><i style="width:13%;background:var(--dim)"></i></div>
+      <div class="simlab"><span><b style="background:var(--lime)"></b>Arrives 46%</span><span><b style="background:var(--coral)"></b>Cut out 41%</span><span><b style="background:var(--dim)"></b>Keeper/out 13%</span></div>
+    </div>
+    <div class="rr">
+      <div class="t">Risk vs reward</div>
+      <p>The safe ball almost never fails, but it gains nothing. The through-ball fails more often than it works, yet when it arrives <b>Achterberg is clean through</b>, so it's worth about <b>5× more</b> per attempt, even after counting the turnovers.</p>
+      <div class="ev">
+        <span class="k">Net value per attempt</span>
+        <span class="m cyan">+0.009</span><span class="muted">vs</span><span class="m lime">+0.046</span>
+      </div>
+      <div class="row" style="gap:10px">
+        <span class="chip violet">Seen by: pitch-control model + pass-value model · 1,200 simulated outcomes</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="mock-title">Concept 19 · The Pass Not Played</div>
+  <div class="mock-note">Concept mockup · synthetic data · fictional clubs and players</div>
+</div>
+
+<script src="assets/pitch.js"></script>
+<script>
+  const el = Pitch.el;
+  const f = document.getElementById('f');
+
+  // ---------- custom scene (adapted from 'linebreak'): 74', Mensah on the ball ----------
+  const scene = {
+    ball: [66.6, 24.4, 0.11],
+    home: [
+      { n: 1, x: 20, y: 34 }, { n: 2, x: 63, y: 11 }, { n: 5, x: 48, y: 27 }, { n: 4, x: 49, y: 45 },
+      { n: 3, x: 63, y: 61 }, { n: 6, x: 60, y: 33.5 }, { n: 8, x: 66, y: 24 }, { n: 10, x: 76.5, y: 43 },
+      { n: 7, x: 85, y: 12.5 }, { n: 9, x: 88.6, y: 32.2 }, { n: 11, x: 85, y: 58 }
+    ],
+    away: [
+      { n: 1, x: 101.5, y: 34 }, { n: 2, x: 90, y: 53 }, { n: 5, x: 91, y: 41.5 }, { n: 6, x: 90.5, y: 31.2 },
+      { n: 3, x: 89.5, y: 19 }, { n: 7, x: 80, y: 51 }, { n: 8, x: 78.5, y: 38.5 }, { n: 4, x: 77.5, y: 31 },
+      { n: 11, x: 79.5, y: 16.5 }, { n: 9, x: 65, y: 32.5 }, { n: 14, x: 64, y: 44 }
+    ],
+    camera: { pos: [79.5, -34, 22], target: [79.5, 30, 0], fov: 25 }
+  };
+  const v = Pitch.broadcast(document.getElementById('stage'), { scene });
+  const cam = v.cam;
+  const P = (x, y, z) => cam.project(x, y, z || 0);
+  const pts = (list) => list.map((q) => { const p = P(q[0], q[1], q[2] || 0); return p.x.toFixed(1) + ',' + p.y.toFixed(1); }).join(' ');
+
+  // ---------- pitch-control field (machine vision) ----------
+  (function () {
+    const g = el('g', { opacity: 0.9 }, v.ground);
+    const home = scene.home.filter((p) => p.n !== 1), away = scene.away.filter((p) => p.n !== 1);
+    const tReach = (list, x, y, bonus) => Math.min(...list.map((p) => Math.hypot(p.x - x, p.y - y) / 7.2 - (bonus && bonus[p.n] || 0)));
+    const runBonus = { 9: 0.45 };   // Achterberg is already moving at speed
+    const S = 1.5;
+    for (let x = 83; x < 101; x += S) {
+      for (let y = 17; y < 40; y += S) {
+        const cx = x + S / 2, cy = y + S / 2;
+        const th = tReach(home, cx, cy, runBonus), ta = tReach(away, cx, cy);
+        const c = 1 / (1 + Math.exp(-(ta - th) * 3.2));   // P(Harbour City wins this square)
+        if (c > 0.55) {
+          const a = Math.min(0.42, (c - 0.55) * 0.9);
+          el('polygon', { points: pts([[x + .1, y + .1], [x + S - .1, y + .1], [x + S - .1, y + S - .1], [x + .1, y + S - .1]]), fill: '#c8ff3d', 'fill-opacity': a }, g);
+        } else if (c < 0.3) {
+          const a = Math.min(0.2, (0.3 - c) * 0.5);
+          el('polygon', { points: pts([[x + .1, y + .1], [x + S - .1, y + .1], [x + S - .1, y + S - .1], [x + .1, y + S - .1]]), fill: '#ff5d6c', 'fill-opacity': a }, g);
+        }
+      }
+    }
+  })();
+
+  // KMA back line
+  v.line([[89.5, 6], [89.5, 60]], 'rgba(255,93,108,.75)', 2.5, '12 10');
+
+  // ---------- actual pass: solid cyan ----------
+  const BALL = [66.6, 24.4];
+  v.arrow(BALL, [60.8, 32.6], { color: '#3ad7ff', width: 0.85, bend: 0.06, head: 2.2 });
+  v.ring(60, 33.5, 1.2, '#3ad7ff', 3);
+
+  // ---------- ghost pass: dashed translucent lime ----------
+  const GT = [96.5, 26.5];
+  v.arrow(BALL, GT, { color: '#c8ff3d', width: 1.7, bend: -0.04, head: 3.2, opacity: 0.26, glow: false });
+  (function () {
+    const N = 40, from = BALL, to = [GT[0] - 2.2, GT[1] - 0.1];
+    const dx = to[0] - from[0], dy = to[1] - from[1], len = Math.hypot(dx, dy);
+    const nx = -dy / len, ny = dx / len, bend = -0.04;
+    const mid = [(from[0] + to[0]) / 2 + nx * len * bend, (from[1] + to[1]) / 2 + ny * len * bend];
+    const path = [];
+    for (let i = 0; i <= N; i++) { const t = i / N; path.push([(1 - t) * (1 - t) * from[0] + 2 * (1 - t) * t * mid[0] + t * t * to[0], (1 - t) * (1 - t) * from[1] + 2 * (1 - t) * t * mid[1] + t * t * to[1]]); }
+    el('polyline', { points: pts(path), fill: 'none', stroke: '#c8ff3d', 'stroke-width': 3, 'stroke-dasharray': '14 10', 'stroke-linecap': 'round', filter: 'url(#glow)' }, v.ground);
+  })();
+  // ghost reception
+  v.ring(GT[0], GT[1], 1.5, '#c8ff3d', 2.5);
+  const gb = P(GT[0], GT[1], 0.11);
+  el('circle', { cx: gb.x, cy: gb.y - 4, r: 7, fill: '#f8f8f4', opacity: 0.45, stroke: '#c8ff3d', 'stroke-width': 1.5 }, v.ground);
+
+  // Achterberg's run in behind
+  v.line([[88.6, 32.2], [90.4, 30.2], [92.6, 28.6], [95.2, 27.1]], '#ffffff', 3, '3 9');
+  v.arrow([94.2, 27.6], [95.9, 26.8], { color: '#ffffff', width: 0.4, head: 1.2, bend: 0, opacity: 0.9, glow: false });
+
+  function tag(team, n, html, metric, lift, opts) {
+    const o = opts || {};
+    const pl = v.player(team, n);
+    const h = o.below ? v.at(pl.x, pl.y, -0.1) : v.head(team, n, lift || 0);
+    const d = document.createElement('div');
+    d.className = 'ptag';
+    d.style.left = h.x + 'px';
+    d.style.top = h.y + 'px';
+    const color = team === 'home' ? 'var(--home)' : 'var(--away)';
+    const card = `<div class="card" style="transform:translateX(${o.dx || 0}px)"><span class="num" style="background:${color}">${n}</span>${html}${metric ? `<span class="metric">${metric}</span>` : ''}</div>`;
+    if (o.below) { d.style.transform = 'translate(-50%, 0)'; d.innerHTML = `<div class="stem" style="height:22px;background:linear-gradient(transparent,var(--line-strong))"></div>${card}`; }
+    else d.innerHTML = `${card}<div class="stem"></div>`;
+    f.appendChild(d);
+    return d;
+  }
+  tag('home', 8, 'MENSAH', '<span class="muted">on the ball</span>', 0, { below: true, dx: -40 });
+  tag('home', 9, 'ACHTERBERG', 'run 30.1 km/h', 0.1, { dx: -150 });
+
+  function mini(x, y, text, style, transform) {
+    const p = P(x, y, 0);
+    const d = document.createElement('div');
+    d.className = 'mini';
+    d.innerHTML = text;
+    Object.assign(d.style, style, { left: p.x + 'px', top: p.y + 'px', transform: transform || 'none' });
+    f.appendChild(d);
+    return d;
+  }
+  mini(62.4, 29.4, 'Played · 94%', { background: 'rgba(7,11,23,.85)', color: '#3ad7ff', border: '1px solid rgba(58,215,255,.6)' }, 'translate(-112%, -50%)');
+  mini(79, 25.4, 'Model\'s pick · +0.11 xT', { background: 'rgba(7,11,23,.85)', color: '#c8ff3d', border: '1px dashed rgba(200,255,61,.8)' }, 'translate(-50%, -150%)');
+  mini(96.5, 24.6, 'HAR wins this space · 0.8 s', { background: 'rgba(200,255,61,.92)', color: '#0b1124' }, 'translate(-50%, 14px)');
+  mini(89.5, 63, 'KMA back line', { background: 'rgba(232,67,79,.9)', color: '#fff' }, 'translate(10px, -50%)');
+</script>
+</body>
+</html>

@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Studio Copilot — producer console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .frame { background: radial-gradient(1200px 700px at 50% -10%, #12204a 0%, var(--ink) 60%); }
+
+  /* ---------- top bar ---------- */
+  .topbar { position: absolute; left: 24px; right: 24px; top: 18px; height: 66px; display: flex; align-items: center; gap: 18px; padding: 0 14px 0 14px; background: rgba(15, 23, 46, .92); border: 1px solid var(--line); border-radius: 14px; }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand .mark { width: 38px; height: 38px; border-radius: 10px; background: var(--lime); display: grid; place-items: center; }
+  .brand .name { font-family: var(--font-display); font-weight: 800; font-size: 30px; letter-spacing: .05em; text-transform: uppercase; line-height: 1; }
+  .brand .sub { font-size: 15px; color: var(--muted); font-weight: 600; letter-spacing: .04em; margin-top: 3px; }
+  .vsep { width: 1px; height: 36px; background: var(--line); }
+  .bug { display: flex; align-items: stretch; height: 40px; border-radius: 8px; overflow: hidden; font-family: var(--font-display); font-weight: 700; font-size: 24px; letter-spacing: .04em; }
+  .bug > div { display: flex; align-items: center; padding: 0 12px; }
+  .bug .lg { background: #0b1124; color: var(--lime); font-size: 17px; letter-spacing: .18em; }
+  .bug .tm { background: #1a2547; gap: 8px; }
+  .bug .sw { width: 6px; height: 22px; border-radius: 2px; }
+  .bug .sc { background: #f2f5fb; color: #0b1124; min-width: 70px; justify-content: center; }
+  .bug .ck { background: #0b1124; font-family: var(--font-mono); font-size: 20px; font-weight: 700; }
+  .policy { display: flex; align-items: center; gap: 10px; padding: 8px 16px 8px 12px; border-radius: 10px; background: rgba(255, 182, 72, .14); border: 1px solid rgba(255, 182, 72, .55); color: var(--amber); font-weight: 700; font-size: 17px; }
+  .policy small { color: var(--text); opacity: .7; font-weight: 600; font-size: 15px; }
+  .avatar { width: 38px; height: 38px; border-radius: 50%; background: #24315c; display: grid; place-items: center; font-weight: 800; font-size: 15px; border: 2px solid var(--line-strong); }
+
+  /* ---------- panels ---------- */
+  .panel { position: absolute; background: rgba(15, 23, 46, .88); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+  .ph { display: flex; align-items: center; gap: 12px; padding: 14px 18px 12px; border-bottom: 1px solid var(--line); }
+  .ph h3 { font-family: var(--font-display); font-weight: 700; font-size: 24px; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; }
+  .ph .meta { margin-left: auto; font-size: 15px; color: var(--muted); font-weight: 600; white-space: nowrap; }
+  .label { font-size: 15px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+
+  /* ---------- story leads ---------- */
+  .tabs { display: flex; gap: 8px; padding: 12px 18px 4px; }
+  .tab { font-size: 15px; font-weight: 700; padding: 6px 12px; border-radius: 8px; color: var(--muted); background: rgba(255,255,255,.04); border: 1px solid var(--line); }
+  .tab.on { color: #0b1124; background: var(--text); border-color: var(--text); }
+  .leads { padding: 10px 14px; display: flex; flex-direction: column; gap: 10px; }
+  .lead { position: relative; display: grid; grid-template-columns: minmax(0,1fr) 60px; column-gap: 12px; row-gap: 0; padding: 12px 14px 12px 16px; border-radius: 12px; background: rgba(255,255,255,.035); border: 1px solid var(--line); }
+  .lead.air { background: rgba(255, 93, 108, .08); border-color: rgba(255, 93, 108, .55); }
+  .lead.pvw { background: rgba(79, 240, 176, .07); border-color: rgba(79, 240, 176, .5); }
+  .lead.held { opacity: .72; }
+  .ring { position: relative; width: 60px; height: 60px; grid-row: 1 / span 2; grid-column: 2; }
+  .ring svg { position: absolute; inset: 0; }
+  .ring b { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--font-mono); font-weight: 700; font-size: 21px; }
+  .ring-l { text-align: center; font-size: 15px; color: var(--dim); font-weight: 700; margin-top: 4px; letter-spacing: .04em; }
+  .lead h4 { font-size: 19px; line-height: 1.25; font-weight: 700; }
+  .lead h4 em { font-style: normal; color: var(--lime); }
+  .lm { display: flex; gap: 14px; align-items: center; margin-top: 6px; font-size: 15px; color: var(--muted); font-weight: 600; white-space: nowrap; }
+  .lm b { color: var(--text); font-weight: 700; }
+  .lm .minibar { flex: none; width: 54px; height: 6px; border-radius: 4px; background: rgba(255,255,255,.1); overflow: hidden; display: inline-block; vertical-align: middle; margin-left: 2px; }
+  .lm .minibar i { display: block; height: 100%; background: var(--cyan); }
+  .lf { grid-column: 1 / span 2; display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+  .prov { font-family: var(--font-mono); font-size: 15px; font-weight: 500; color: var(--cyan); padding: 4px 9px; border-radius: 7px; background: rgba(58,215,255,.1); border: 1px solid rgba(58,215,255,.35); white-space: nowrap; }
+  .btn { font-size: 15px; font-weight: 800; padding: 6px 13px; border-radius: 8px; border: 1px solid var(--line-strong); color: var(--text); background: rgba(255,255,255,.06); white-space: nowrap; letter-spacing: .02em; }
+  .btn.ok { background: var(--lime); color: #0b1124; border-color: var(--lime); }
+  .state { font-size: 15px; font-weight: 800; padding: 6px 11px; border-radius: 8px; letter-spacing: .04em; white-space: nowrap; }
+  .lf .push { margin-left: auto; display: flex; gap: 8px; }
+  .leadfoot { position: absolute; left: 0; right: 0; bottom: 0; display: flex; justify-content: space-between; padding: 12px 18px; border-top: 1px solid var(--line); font-size: 15px; color: var(--muted); font-weight: 600; background: rgba(7,11,23,.35); white-space: nowrap; }
+
+  /* ---------- monitors ---------- */
+  .mon-head { display: flex; align-items: center; gap: 12px; height: 40px; }
+  .tally { font-family: var(--font-display); font-weight: 800; font-size: 20px; letter-spacing: .14em; padding: 4px 12px; border-radius: 6px; }
+  .tally.pgm { background: var(--coral); color: #fff; }
+  .tally.pvw { background: var(--mint); color: #0b1124; }
+  .mon-head .t { font-size: 17px; font-weight: 700; }
+  .mon-head .tc { margin-left: auto; font-family: var(--font-mono); font-size: 17px; color: var(--muted); }
+  .monitor { position: relative; overflow: hidden; border-radius: 10px; background: #000; border: 3px solid #1d2747; }
+  .monitor.pgm { border-color: var(--coral); box-shadow: 0 0 0 1px rgba(255,93,108,.35), 0 20px 50px rgba(0,0,0,.5); }
+  .monitor.pvw { border-color: var(--mint); }
+  .monitor svg { display: block; }
+
+  /* lower third (program) */
+  .l3 { position: absolute; left: 34px; bottom: 30px; display: flex; align-items: stretch; box-shadow: 0 12px 30px rgba(0,0,0,.5); }
+  .l3 .n { width: 62px; background: var(--home); display: grid; place-items: center; font-family: var(--font-display); font-weight: 800; font-size: 38px; color: #fff; }
+  .l3 .body { background: rgba(7,11,23,.93); padding: 9px 18px 10px; border-top: 3px solid var(--lime); }
+  .l3 .who { font-family: var(--font-display); font-weight: 800; font-size: 30px; letter-spacing: .04em; line-height: 1; }
+  .l3 .what { font-size: 18px; font-weight: 600; margin-top: 5px; color: #dfe6f7; }
+  .l3 .what b { color: var(--lime); font-family: var(--font-mono); }
+  .l3 .stat { background: var(--lime); color: #0b1124; padding: 0 18px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+  .l3 .stat .v { font-family: var(--font-display); font-weight: 800; font-size: 44px; line-height: .9; }
+  .l3 .stat .k { font-size: 15px; font-weight: 800; letter-spacing: .06em; }
+  .monbug { position: absolute; left: 22px; top: 18px; transform-origin: 0 0; }
+  .monbug .bug { height: 32px; font-size: 19px; }
+  .monbug .bug .lg { font-size: 15px; }
+  .monbug .bug .ck { font-size: 16px; }
+  .onair { position: absolute; right: 18px; top: 16px; display: flex; gap: 8px; }
+
+  /* preview full-screen graphic */
+  .fsg { position: absolute; right: 16px; top: 16px; bottom: 16px; width: 290px; background: rgba(7,11,23,.92); border-radius: 10px; border-left: 4px solid var(--away); padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+  .fsg .k { font-family: var(--font-display); font-weight: 700; font-size: 17px; letter-spacing: .14em; color: var(--muted); }
+  .fsg .h { font-family: var(--font-display); font-weight: 800; font-size: 28px; line-height: .95; text-transform: uppercase; }
+  .fsg .v { font-family: var(--font-display); font-weight: 800; font-size: 64px; line-height: .9; color: var(--coral); }
+  .fsg .s { font-size: 15px; color: #dfe6f7; font-weight: 600; }
+
+  .take { position: absolute; display: flex; flex-direction: column; gap: 10px; }
+  .take .card { background: rgba(255,255,255,.04); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+  .chk { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 600; padding: 3px 0; }
+  .chk i { width: 21px; height: 21px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: 15px; font-weight: 800; background: var(--mint); color: #0b1124; flex: none; }
+  .bigbtn { display: flex; align-items: center; justify-content: center; gap: 10px; height: 54px; border-radius: 12px; background: var(--lime); color: #0b1124; font-family: var(--font-display); font-weight: 800; font-size: 26px; letter-spacing: .08em; text-transform: uppercase; box-shadow: 0 10px 30px rgba(200,255,61,.25); }
+  .rowbtns { display: flex; gap: 10px; }
+  .rowbtns .btn { flex: 1; text-align: center; padding: 10px 0; font-size: 16px; }
+
+  /* ---------- rundown ---------- */
+  .legend { display: flex; align-items: center; gap: 6px; padding: 10px 18px 8px; font-size: 15px; font-weight: 700; color: var(--muted); letter-spacing: .03em; }
+  .legend .arr { color: var(--dim); }
+  .rd { display: grid; grid-template-columns: 1fr 132px 74px; align-items: center; column-gap: 12px; padding: 10px 18px; border-top: 1px solid var(--line); }
+  .rd.air { background: rgba(255,93,108,.09); box-shadow: inset 4px 0 0 var(--coral); }
+  .rd.pvw { background: rgba(79,240,176,.06); box-shadow: inset 4px 0 0 var(--mint); }
+  .rd .tt { font-size: 18px; font-weight: 700; white-space: nowrap; }
+  .rd .tp { font-family: var(--font-mono); font-size: 15px; color: var(--dim); margin-top: 2px; }
+  .seg { display: flex; gap: 3px; }
+  .seg i { flex: 1; height: 7px; border-radius: 3px; background: rgba(255,255,255,.1); }
+  .rd .st { font-size: 15px; font-weight: 800; margin-top: 5px; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
+  .rd .tm { font-family: var(--font-mono); font-size: 16px; font-weight: 700; text-align: right; }
+  .rd .tm small { display: block; font-size: 15px; color: var(--dim); font-weight: 500; }
+
+  /* ---------- whisper ---------- */
+  .wh { display: grid; grid-template-columns: 64px 1fr; gap: 10px; padding: 11px 18px; border-top: 1px solid var(--line); }
+  .wh:first-of-type { border-top: 0; }
+  .wh .t { font-family: var(--font-mono); font-size: 15px; color: var(--muted); padding-top: 2px; }
+  .wh p { font-size: 18px; line-height: 1.3; font-weight: 500; }
+  .wh p b { color: var(--lime); font-weight: 700; }
+  .wh .f { display: flex; gap: 8px; align-items: center; margin-top: 6px; font-size: 15px; color: var(--muted); font-weight: 600; }
+  .wh .f .prov { padding: 2px 8px; }
+
+  /* ---------- compliance ---------- */
+  .comp { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 12px 14px 0; }
+  .ct { display: flex; align-items: center; gap: 10px; padding: 10px 11px; min-width: 0; border-radius: 10px; background: rgba(79,240,176,.07); border: 1px solid rgba(79,240,176,.35); }
+  .ct .ic { width: 30px; height: 30px; border-radius: 50%; background: var(--mint); color: #0b1124; display: grid; place-items: center; font-weight: 900; font-size: 17px; flex: none; }
+  .ct .k { font-size: 17px; font-weight: 800; }
+  .ct .d { font-size: 15px; color: var(--muted); font-weight: 600; margin-top: 1px; white-space: nowrap; }
+  .ct.lat { background: rgba(58,215,255,.08); border-color: rgba(58,215,255,.4); }
+  .ct.lat .ic { background: var(--cyan); font-family: var(--font-mono); font-size: 15px; }
+  .stack { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 14px 0; }
+  .stack span { font-size: 15px; color: var(--muted); font-weight: 600; padding: 3px 9px; border-radius: 6px; border: 1px solid var(--line); background: rgba(255,255,255,.03); }
+</style>
+</head>
+<body>
+<div class="frame" id="f">
+
+  <!-- ===== top bar ===== -->
+  <div class="topbar">
+    <div class="brand">
+      <div class="mark"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M3 5h18v11H3z M8 20h8 M12 16v4" fill="none" stroke="#0b1124" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div><div class="name">Studio Copilot</div><div class="sub">Gallery 2 · Producer console</div></div>
+    </div>
+    <div class="vsep"></div>
+    <div class="bug">
+      <div class="lg">SYN</div>
+      <div class="tm"><span class="sw" style="background:var(--home)"></span>HAR</div>
+      <div class="sc">1 – 1</div>
+      <div class="tm">KMA<span class="sw" style="background:var(--away)"></span></div>
+      <div class="ck">67:12</div>
+    </div>
+    <span class="chip coral"><span class="live-dot"></span> LIVE · 2nd half</span>
+    <span class="chip">Feed latency 0.9 s</span>
+    <div style="margin-left:auto" class="policy">
+      <svg width="20" height="20" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2.5" fill="none" stroke="#ffb648" stroke-width="2.4"/><path d="M8 10V7a4 4 0 0 1 8 0v3" fill="none" stroke="#ffb648" stroke-width="2.4"/></svg>
+      Human approval required for on-air graphics <small>· policy GFX-01</small>
+    </div>
+    <div class="row" style="gap:10px"><div class="avatar">RA</div><div style="font-size:15px;line-height:1.25"><b>R. Adeyemi</b><br><span class="muted">Producer on duty</span></div></div>
+  </div>
+
+  <!-- ===== left: story leads ===== -->
+  <div class="panel" style="left:24px; top:100px; width:480px; height:932px">
+    <div class="ph"><h3>Story leads</h3><span class="chip lime" style="padding:3px 10px">6 new</span><span class="meta">Ranked by newsworthiness</span></div>
+    <div class="tabs"><span class="tab on">All 6</span><span class="tab">Player 4</span><span class="tab">Team 1</span><span class="tab">Records 1</span></div>
+    <div class="leads" id="leads"></div>
+    <div class="leadfoot"><span>Score = novelty × relevance × confidence</span><span class="mono">ranker v2</span></div>
+  </div>
+
+  <!-- ===== centre: program ===== -->
+  <div class="abs" style="left:528px; top:100px; width:864px">
+    <div class="mon-head"><span class="tally pgm">PGM</span><span class="t">Program · Cam 1 wide</span><span class="chip coral" style="padding:3px 10px">ON AIR</span><span class="tc">TC 67:12:08</span></div>
+    <div class="monitor pgm" id="pgm" style="width:864px; height:486px; margin-top:6px">
+      <svg id="pgmsvg" class="noqa"></svg>
+      <div class="monbug"><div class="bug"><div class="lg">SYN</div><div class="tm"><span class="sw" style="background:var(--home)"></span>HAR</div><div class="sc">1 – 1</div><div class="tm">KMA<span class="sw" style="background:var(--away)"></span></div><div class="ck">67:12</div></div></div>
+      <div class="l3">
+        <div class="n">10</div>
+        <div class="body"><div class="who">EZRA CALLOWAY</div><div class="what">Receptions between the lines · league avg <b>4.1</b></div></div>
+        <div class="stat"><div class="v">9</div><div class="k">TODAY</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== centre: preview ===== -->
+  <div class="abs" style="left:528px; top:672px; width:864px">
+    <div class="mon-head"><span class="tally pvw">PVW</span><span class="t">Preview · next graphic</span><span class="tc">FS_PHASE_CHART_v2</span></div>
+  </div>
+  <div class="monitor pvw abs" id="pvw" style="left:528px; top:717px; width:560px; height:315px">
+    <svg id="pvwsvg" class="noqa"></svg>
+    <div class="fsg" style="width:236px">
+      <div class="k">KINGSMOOR PRESS</div>
+      <div class="h">Chaos index</div>
+      <div class="v">74</div>
+      <svg width="200" height="62" viewBox="0 0 200 62" id="chaos"></svg>
+      <div class="s">Peak at 61' · highest of their season</div>
+    </div>
+  </div>
+  <div class="take" style="left:1104px; top:717px; width:288px; height:315px">
+    <div class="card" style="padding:12px 14px">
+      <div class="label" style="margin-bottom:6px">Pre-flight · auto</div>
+      <div class="chk"><i>✓</i>Facts match match-state</div>
+      <div class="chk"><i>✓</i>Style guide · tone neutral</div>
+      <div class="chk"><i>✓</i>Source: 41 events, P-58→66</div>
+      <div class="chk"><i style="background:var(--amber)">!</i><span class="amber">Awaiting your approval</span></div>
+    </div>
+    <div class="bigbtn"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7" fill="none" stroke="#0b1124" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Approve &amp; take</div>
+    <div class="rowbtns"><span class="btn">Hold</span><span class="btn">Edit text</span><span class="btn">Reject</span></div>
+    <div style="font-size:15px;color:var(--muted);font-weight:600;text-align:center">Auto-expires in <b class="mono" style="color:var(--text)">0:45</b> if not taken</div>
+  </div>
+
+  <!-- ===== right: rundown ===== -->
+  <div class="panel" style="left:1416px; top:100px; width:480px; height:418px">
+    <div class="ph"><h3>Graphics rundown</h3><span class="meta">Next stoppage ~68:30</span></div>
+    <div class="legend"><span>Drafted</span><span class="arr">→</span><span>Fact-checked</span><span class="arr">→</span><span>Approved</span><span class="arr">→</span><span class="coral">On air</span></div>
+    <div id="rundown"></div>
+  </div>
+
+  <!-- ===== right: commentator whisper ===== -->
+  <div class="panel" style="left:1416px; top:534px; width:480px; height:288px">
+    <div class="ph"><h3>Commentator whisper</h3><span class="meta">→ Box 1 · lead voice</span></div>
+    <div class="wh"><div class="t">67:09</div><div><p>Marchetti's <b>3rd line-breaking pass</b> rated over 80 difficulty today. Nobody else has more than one.</p><div class="f"><span class="prov">E-1893</span><span class="mint">✓ read on air</span></div></div></div>
+    <div class="wh"><div class="t">66:41</div><div><p>Kingsmoor won the ball <b>7 times</b> in the final third since 58'. Only 2 before that.</p><div class="f"><span class="prov">P-58→66</span><span class="amber">● queued</span></div></div></div>
+  </div>
+
+  <!-- ===== right: compliance ===== -->
+  <div class="panel" style="left:1416px; top:838px; width:480px; height:194px">
+    <div class="comp">
+      <div class="ct"><div class="ic">✓</div><div><div class="k">Fact-check</div><div class="d">12 / 12 claims verified</div></div></div>
+      <div class="ct"><div class="ic">✓</div><div><div class="k">Bias check</div><div class="d">Balance 53 / 47</div></div></div>
+      <div class="ct"><div class="ic">✓</div><div><div class="k">Brand-safe</div><div class="d">0 flags · no odds</div></div></div>
+      <div class="ct lat"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8" fill="none" stroke="#0b1124" stroke-width="2.6"/><path d="M12 9v4l2.5 2M10 2.5h4" fill="none" stroke="#0b1124" stroke-width="2.6" stroke-linecap="round"/></svg></div><div><div class="k">Latency 1.4 s</div><div class="d">event → draft, p95 2.1</div></div></div>
+    </div>
+    <div class="stack"><span>Foundry Agent Service</span><span>Audit log · Cosmos DB</span></div>
+  </div>
+
+  <div class="mock-title">Concept 06 · Studio Copilot</div>
+  <div class="mock-note">Concept mockup · synthetic data · fictional clubs and players</div>
+</div>
+
+<script src="assets/pitch.js"></script>
+<script>
+  // ---------- story leads ----------
+  const leads = [
+    { s: 92, h: '<em>Calloway:</em> 9 receptions between the lines, league avg 4.1', nov: ['2.2× avg', 88], conf: 97, src: 'Analyst', prov: 'E-0412 +8', state: 'air' },
+    { s: 88, h: '<em>Kingsmoor press:</em> chaos index 74, highest of their season', nov: ['Season high', 82], conf: 91, src: 'Tactician', prov: 'P-58→66', state: 'pvw' },
+    { s: 81, h: '<em>Marchetti:</em> 3rd line-breaking pass with difficulty over 80', nov: ['1st this season', 76], conf: 94, src: 'Analyst', prov: 'E-0977 +2', state: 'new' },
+    { s: 74, h: '<em>Calloway:</em> top speed 33.4 km/h, a season best', nov: ['Personal best', 64], conf: 99, src: 'Tracking', prov: 'T-63:41', state: 'new' },
+    { s: 63, h: '<em>Doyle-Akande:</em> 6 pressures in 9 minutes since coming on', nov: ['Moderate', 45], conf: 86, src: 'Scout', prov: 'E-1544 +5', state: 'held' }
+  ];
+  const ringColor = (s) => (s >= 85 ? '#c8ff3d' : s >= 70 ? '#3ad7ff' : '#a3afc9');
+  document.getElementById('leads').innerHTML = leads.map((l, i) => {
+    const c = 2 * Math.PI * 25, col = ringColor(l.s);
+    let foot;
+    if (l.state === 'air') foot = `<span class="state" style="color:var(--muted);padding-right:0">66:58 · RA</span><span class="state" style="background:var(--coral);color:#fff">● ON AIR</span>`;
+    else if (l.state === 'pvw') foot = `<span class="btn ok">Approve</span><span class="btn">Hold</span>`;
+    else if (l.state === 'held') foot = `<span class="state" style="background:rgba(255,182,72,.14);color:var(--amber)">HELD</span><span class="btn ok">Approve</span>`;
+    else foot = `<span class="btn ok">Approve</span><span class="btn">Hold</span>`;
+    return `<div class="lead ${l.state}">
+      <h4>${l.h}</h4>
+      <div class="ring"><svg width="60" height="60"><circle cx="30" cy="30" r="25" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="6"/>
+        <circle cx="30" cy="30" r="25" fill="none" stroke="${col}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${(c * l.s / 100).toFixed(1)} ${c.toFixed(1)}" transform="rotate(-90 30 30)"/></svg><b style="color:${col}">${l.s}</b></div>
+      <div class="lm"><span>Novelty <b>${l.nov[0]}</b></span><span class="minibar"><i style="width:${l.nov[1]}%"></i></span><span>Conf. <b>${l.conf}%</b></span></div>
+      <div class="lf"><span class="prov">${l.src} · ${l.prov}</span><span class="push">${foot}</span></div>
+    </div>`;
+  }).join('');
+
+  // ---------- rundown ----------
+  const rd = [
+    { t: 'LT · Calloway receptions', tp: 'LT_PLAYER_STAT_v4', st: 4, lab: 'On air', col: 'var(--coral)', tm: '0:06', sub: 'of 0:10', cls: 'air' },
+    { t: 'FS · Kingsmoor press', tp: 'FS_PHASE_CHART_v2', st: 2, lab: 'Fact-checked', col: 'var(--mint)', tm: '0:12', sub: 'in PVW', cls: 'pvw' },
+    { t: 'LT · Marchetti line-breaks', tp: 'LT_PLAYER_STAT_v4', st: 2, lab: 'Fact-checked', col: 'var(--mint)', tm: '0:08', sub: 'est.', cls: '' },
+    { t: 'Bug · Calloway top speed', tp: 'BUG_SPEED_v1', st: 3, lab: 'Approved', col: 'var(--lime)', tm: '0:05', sub: '~68:30', cls: '' },
+    { t: 'FS · xG timeline 1.64–0.88', tp: 'FS_XG_FLOW_v3', st: 1, lab: 'Drafted', col: 'var(--cyan)', tm: '0:15', sub: 'HT+', cls: '' }
+  ];
+  const segCol = ['#3ad7ff', '#4ff0b0', '#c8ff3d', '#ff5d6c'];
+  document.getElementById('rundown').innerHTML = rd.map((r) => `
+    <div class="rd ${r.cls}">
+      <div><div class="tt">${r.t}</div><div class="tp">${r.tp}</div></div>
+      <div><div class="seg">${[0, 1, 2, 3].map((k) => `<i style="background:${k < r.st ? segCol[r.st - 1] : 'rgba(255,255,255,.1)'}"></i>`).join('')}</div><div class="st" style="color:${r.col}">${r.lab}</div></div>
+      <div class="tm">${r.tm}<small>${r.sub}</small></div>
+    </div>`).join('');
+
+  // ---------- monitors ----------
+  function embed(id, w, h, opts) {
+    const svg = document.getElementById(id);
+    const api = Pitch.broadcast(svg, opts);
+    svg.setAttribute('width', w);
+    svg.setAttribute('height', h);
+    return api;
+  }
+  const p = embed('pgmsvg', 858, 480, { scene: 'linebreak', seed: 11 });
+  p.ring(75.5, 41, 1.3, '#c8ff3d', 3);
+  p.ring(60.3, 32.1, 1.1, '#3ad7ff', 3);
+
+  const q = embed('pvwsvg', 554, 309, { scene: 'press', seed: 5 });
+  q.zone([[24, 8], [40, 8], [40, 30], [24, 30]], '#ff5d6c', 0.18);
+  [[9, 30.5, 18.2], [10, 30.5, 18.2], [7, 30.5, 18.2]].forEach(([n, bx, by]) => {
+    const pl = q.player('away', n);
+    q.arrow([pl.x, pl.y], [bx + (pl.x - bx) * 0.25, by + (pl.y - by) * 0.25], { color: '#ff5d6c', width: 0.6, bend: 0.05, head: 1.6 });
+  });
+
+  // chaos index sparkline in preview graphic
+  const ch = document.getElementById('chaos');
+  const pts = [22, 25, 24, 27, 23, 26, 28, 25, 31, 29, 33, 30, 52, 66, 74, 69, 61, 48, 41, 38];
+  const xs = (i) => 4 + (i * 192) / (pts.length - 1), ys = (v) => 58 - (v / 80) * 54;
+  ch.innerHTML = `<line x1="${xs(12)}" y1="2" x2="${xs(12)}" y2="60" stroke="rgba(255,255,255,.25)" stroke-dasharray="3 3"/>
+    <polygon points="${xs(0)},60 ${pts.map((v, i) => xs(i) + ',' + ys(v)).join(' ')} ${xs(pts.length - 1)},60" fill="rgba(255,93,108,.22)"/>
+    <polyline points="${pts.map((v, i) => xs(i) + ',' + ys(v)).join(' ')}" fill="none" stroke="#ff5d6c" stroke-width="3" stroke-linejoin="round"/>
+    <circle cx="${xs(14)}" cy="${ys(74)}" r="5" fill="#fff"/>`;
+</script>
+</body>
+</html>

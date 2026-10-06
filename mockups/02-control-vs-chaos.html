@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Match Pulse: Control vs Chaos — broadcast overlay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .modes { position: absolute; right: 64px; top: 48px; display: flex; gap: 10px; align-items: center; }
+
+  /* ---------- match state gauge card ---------- */
+  .state { position: absolute; right: 64px; top: 116px; width: 440px; padding: 18px 26px 20px; }
+  .state h4 { font-family: var(--font-display); font-size: 24px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+  .state h4 .chip { font-family: var(--font-ui); letter-spacing: .04em; }
+  .gauge { position: relative; width: 388px; height: 200px; margin-top: 6px; }
+  .gauge svg { position: absolute; left: 0; top: 0; }
+  .gauge .read { position: absolute; left: 0; right: 0; top: 80px; text-align: center; }
+  .gauge .read .v { font-family: var(--font-display); font-weight: 800; font-size: 96px; line-height: .8; color: var(--coral); }
+  .gauge .read .k { font-family: var(--font-display); font-weight: 700; font-size: 24px; letter-spacing: .24em; color: #fff; margin-top: 6px; padding-left: .24em; }
+  .gauge .end { position: absolute; top: 176px; width: 120px; text-align: center; font-family: var(--font-display); font-weight: 700; font-size: 19px; letter-spacing: .14em; text-transform: uppercase; }
+  .delta-line { text-align: center; font-size: 17px; color: var(--muted); margin-top: 6px; }
+  .delta-line b { color: var(--coral); font-family: var(--font-mono); }
+  .whyc { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 12px; }
+  .whyc .ttl { font-family: var(--font-display); font-weight: 700; font-size: 24px; letter-spacing: .06em; text-transform: uppercase; color: var(--lime); }
+  .whyc p { font-size: 18px; line-height: 1.38; color: var(--text); margin: 4px 0 8px; }
+  .whyc table { width: 100%; border-collapse: collapse; font-size: 18px; }
+  .whyc td { padding: 6px 0; border-top: 1px solid var(--line); vertical-align: baseline; }
+  .whyc td.v { text-align: right; font-family: var(--font-mono); font-weight: 700; white-space: nowrap; }
+  .whyc td .sm { display: block; font-size: 15px; color: var(--dim); margin-top: 2px; font-family: var(--font-ui); font-weight: 500; }
+  .whyc .evid { margin-top: 8px; padding: 8px 14px; border-radius: 10px; background: rgba(255,255,255,.06); border: 1px solid var(--line); font-size: 15px; line-height: 1.5; color: var(--muted); }
+  .whyc .evid b { color: var(--text); font-weight: 700; margin-right: 6px; }
+
+  /* ---------- bottom pulse ribbon ---------- */
+  .pulse {
+    position: absolute; left: 64px; right: 64px; bottom: 50px; height: 246px;
+    display: grid; grid-template-columns: 236px 1fr; overflow: hidden;
+    border-radius: 18px; background: rgba(7, 11, 23, 0.9); border: 1px solid var(--line-strong);
+    box-shadow: 0 24px 60px rgba(0,0,0,.55);
+  }
+  .pulse .tagcol { background: var(--coral); color: #0b1124; padding: 24px 24px 22px; display: flex; flex-direction: column; justify-content: space-between; }
+  .pulse .tagcol .t { font-family: var(--font-display); font-weight: 800; font-size: 46px; line-height: .92; text-transform: uppercase; }
+  .pulse .tagcol .s { font-weight: 700; font-size: 16px; letter-spacing: .08em; text-transform: uppercase; opacity: .85; line-height: 1.35; }
+  .pulse .chart { position: relative; }
+  .legend { position: absolute; right: 30px; top: 14px; display: flex; gap: 20px; font-size: 15px; font-weight: 600; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 8px; }
+  .legend i { display: inline-block; width: 18px; height: 10px; border-radius: 3px; }
+
+  .ptag.below { transform: translate(-50%, 0); }
+  .label-pill { position: absolute; font-family: var(--font-display); font-weight: 700; font-size: 20px; letter-spacing: .12em; color: #fff; padding: 4px 10px; border-radius: 6px; text-transform: uppercase; white-space: nowrap; }
+</style>
+</head>
+<body>
+<div class="frame" id="f">
+  <svg class="stage" id="stage"></svg>
+
+  <div class="scorebug">
+    <div class="league">SYN</div>
+    <div class="team"><span class="swatch" style="background:var(--home)"></span>HAR</div>
+    <div class="score">1 – 1</div>
+    <div class="team">KMA<span class="swatch" style="background:var(--away)"></span></div>
+    <div class="clock">61:05</div>
+  </div>
+
+  <div class="modes">
+    <span class="chip coral"><span class="live-dot"></span> LIVE</span>
+    <span class="chip lime">AI INSIGHT</span>
+    <span class="chip">Mode: Casual fan · EN</span>
+  </div>
+
+  <!-- Match state gauge + why -->
+  <div class="glass state">
+    <h4>Match state <span class="chip coral">Peak of the match</span></h4>
+    <div class="gauge">
+      <svg id="gauge" width="388" height="206" viewBox="0 0 388 206"></svg>
+      <div class="read"><div class="v">74</div><div class="k">CHAOS INDEX</div></div>
+      <div class="end mint" style="left:-6px">Control</div>
+      <div class="end coral" style="right:-6px">Chaos</div>
+    </div>
+    <div class="delta-line">Up <b>+41</b> since Kingsmoor's switch at 58'</div>
+    <div class="whyc">
+      <div class="ttl">Why chaos?</div>
+      <p>Kingsmoor's high press has turned this into a scramble: the ball keeps changing hands.</p>
+      <table>
+        <tr><td>Turnovers<span class="sm">match average: 1 per 90 s</span></td><td class="v coral">5 in 90 s</td></tr>
+        <tr><td>Average possession<span class="sm">match average: 14.2 s</span></td><td class="v coral">6.1 s</td></tr>
+        <tr><td>Fouls<span class="sm">0 in the previous 15 min</span></td><td class="v coral">3 in 4 min</td></tr>
+      </table>
+      <div class="evid"><b>Evidence</b> 41 events · E-5803 → E-5843<br><b>Model</b> match-state v2 · confidence 0.86</div>
+    </div>
+  </div>
+
+  <!-- Bottom pulse ribbon -->
+  <div class="pulse">
+    <div class="tagcol">
+      <div class="t">Match<br>pulse</div>
+      <div class="s">Control vs chaos<br>0'–61' · live</div>
+    </div>
+    <div class="chart">
+      <svg id="pulse" width="1554" height="246" viewBox="0 0 1554 246"></svg>
+      <div class="legend">
+        <span><i style="background:var(--home)"></i>HAR on top</span>
+        <span><i style="background:var(--away)"></i>KMA on top</span>
+        <span><i style="background:var(--amber);height:4px"></i>Chaos index</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="mock-title">Concept 02 · Match Pulse: Control vs Chaos</div>
+  <div class="mock-note">Concept mockup · synthetic data · fictional clubs and players</div>
+</div>
+
+<script src="assets/pitch.js"></script>
+<script>
+  const el = Pitch.el;
+  const f = document.getElementById('f');
+
+  // ---------- scene: Kingsmoor's high press (61') ----------
+  // Copy of the 'press' scene, moved 9 m infield so the trap sits above the pulse ribbon.
+  // Ferrante (#10) went off at 58', so the third presser is #14 Doyle-Akande.
+  const DY = 9;
+  const scene = JSON.parse(JSON.stringify(Pitch.SCENES.press));
+  scene.home.forEach((p) => { p.y += DY; });
+  scene.away.forEach((p) => { p.y += DY; if (p.n === 10) p.n = 14; });
+  scene.ball[1] += DY;
+  scene.camera = { pos: [38, -30, 17], target: [39, 31, 0], fov: 22 };
+  const v = Pitch.broadcast(document.getElementById('stage'), { scene });
+
+  const C = [31, 17.6 + DY];                       // ball carrier, Varela
+  const P14 = [33.5, 13.8 + DY], P7 = [34, 21.5 + DY], P9 = [28.5, 24 + DY];
+  // pressing cage between the three pressers
+  v.zone([P14, P7, P9], '#ff5d6c', 0.12, 'rgba(255,93,108,0.6)');
+  v.ring(C[0], C[1], 1.9, '#ff5d6c', 4);
+  // pressing runs: where each presser came from in the last second, through him, to the ring
+  function run(from, via) {
+    const dx = C[0] - via[0], dy = C[1] - via[1], l = Math.hypot(dx, dy);
+    const end = [C[0] - (dx / l) * 2.1, C[1] - (dy / l) * 2.1];
+    v.arrow(from, end, { color: '#ff5d6c', width: 0.55, bend: 0.04, head: 1.2, opacity: 0.95 });
+  }
+  run([35.2, 20.4], P14);
+  run([35.9, 32.4], P7);
+  run([27.6, 36.6], P9);
+
+  function tag(team, n, html, metric, lift, below) {
+    const p = v.player(team, n);
+    const h = below ? v.at(p.x, p.y, -0.15) : v.head(team, n, lift || 0);
+    const d = document.createElement('div');
+    d.className = 'ptag' + (below ? ' below' : '');
+    d.style.left = h.x + 'px';
+    d.style.top = h.y + 'px';
+    const color = team === 'home' ? 'var(--home)' : 'var(--away)';
+    const card = `<div class="card"><span class="num" style="background:${color}">${n}</span>${html}${metric ? `<span class="metric">${metric}</span>` : ''}</div>`;
+    d.innerHTML = below ? `<div class="stem" style="height:26px;background:linear-gradient(transparent,var(--line-strong))"></div>${card}` : `${card}<div class="stem"></div>`;
+    f.appendChild(d);
+    return d;
+  }
+  tag('home', 2, 'VARELA', '<span class="coral">1.1 s to decide</span>', 1.1);
+  tag('away', 14, 'DOYLE-AKANDE', 'ON 58\' · 29.6 km/h', 0, true);
+
+  function pill(x, y, text, bg, dx, dy) {
+    const p = v.at(x, y, 0);
+    const d = document.createElement('div');
+    d.className = 'label-pill';
+    d.textContent = text;
+    d.style.background = bg;
+    d.style.left = (p.x + (dx || 0)) + 'px';
+    d.style.top = (p.y + (dy || 0)) + 'px';
+    f.appendChild(d);
+    return d;
+  }
+  const tp = pill(C[0] - 1.9, C[1], '3 v 1 press trap', 'rgba(232,67,79,.92)', -16, 0);
+  tp.style.transform = 'translate(-100%, -50%)';
+
+  // ---------- gauge ----------
+  (function () {
+    const g = document.getElementById('gauge');
+    const cx = 194, cy = 168, r = 146;
+    const defs = el('defs', {}, g);
+    defs.innerHTML = `<linearGradient id="gg" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#4ff0b0"/><stop offset=".5" stop-color="#ffb648"/><stop offset="1" stop-color="#ff5d6c"/></linearGradient>`;
+    const pt = (val, rr) => { const a = Math.PI - (val / 100) * Math.PI; return [cx + rr * Math.cos(a), cy - rr * Math.sin(a)]; };
+    const arcPath = (a, b, rr) => { const p0 = pt(a, rr), p1 = pt(b, rr); return `M${p0[0]},${p0[1]} A${rr},${rr} 0 0 1 ${p1[0]},${p1[1]}`; };
+    el('path', { d: arcPath(0, 100, r), stroke: 'rgba(255,255,255,0.09)', 'stroke-width': 22, fill: 'none', 'stroke-linecap': 'round' }, g);
+    el('path', { d: arcPath(0, 74, r), stroke: 'url(#gg)', 'stroke-width': 22, fill: 'none', 'stroke-linecap': 'round' }, g);
+    for (let t = 0; t <= 100; t += 10) {
+      const a = pt(t, r - 20), b = pt(t, r - (t % 50 === 0 ? 32 : 27));
+      el('line', { x1: a[0], y1: a[1], x2: b[0], y2: b[1], stroke: t === 60 ? '#ffb648' : 'rgba(255,255,255,.35)', 'stroke-width': t === 60 ? 3 : 2 }, g);
+    }
+    // match average marker (31) just outside the arc
+    const m = pt(31, r + 20), m2 = pt(31, r + 6);
+    el('line', { x1: m[0], y1: m[1], x2: m2[0], y2: m2[1], stroke: '#fff', 'stroke-width': 3, 'stroke-linecap': 'round' }, g);
+    const mt = pt(31, r + 34);
+    const t = el('text', { x: mt[0] - 6, y: mt[1] - 2, 'text-anchor': 'middle', fill: '#a3afc9', 'font-size': 15, 'font-weight': 600, 'font-family': 'Inter' }, g);
+    t.textContent = 'match avg 31';
+    const n = pt(74, r);
+    el('circle', { cx: n[0], cy: n[1], r: 15, fill: '#070b17', stroke: '#fff', 'stroke-width': 4 }, g);
+    el('circle', { cx: n[0], cy: n[1], r: 6, fill: '#ff5d6c' }, g);
+  })();
+
+  // ---------- pulse timeline ----------
+  (function () {
+    const s = document.getElementById('pulse');
+    const X0 = 34, X1 = 1520;            // 0' .. 90'
+    const TOP = 52, BOT = 168, AX = 110;  // plot band, axis
+    const NOW = 61;
+    const xm = (m) => X0 + (m / 90) * (X1 - X0);
+    const ch = (val) => BOT - (val / 100) * (BOT - TOP);
+    const rand = Pitch.rng(11);
+
+    const mom = [[0, .2], [4, .45], [8, .35], [10, -.1], [12, -.7], [14, -.35], [17, .3], [22, .55], [27, .4], [31, .65], [36, .5], [39, .75], [41, .85], [43, .4], [45, .45],
+      [46, .3], [50, .5], [54, .42], [57, .35], [58, -.2], [58.7, .45], [59.3, -.65], [59.9, .35], [60.5, -.75], [61, .3]];
+    const chaos = [[0, 26], [6, 22], [11, 34], [12, 49], [14, 38], [20, 26], [28, 24], [35, 30], [40, 41], [41, 52], [43, 40], [45, 30], [46, 24], [52, 27], [57, 33], [58, 46], [59, 58], [60, 66], [61, 74]];
+    const forecast = [[61, 74], [62.5, 72], [64, 66], [66, 56], [68, 44], [70, 38]];
+    function interp(keys, m) {
+      for (let i = 0; i < keys.length - 1; i++) {
+        const [a, va] = keys[i], [b, vb] = keys[i + 1];
+        if (m >= a && m <= b) { const t = (m - a) / (b - a); const e = t * t * (3 - 2 * t); return va + (vb - va) * e; }
+      }
+      return keys[keys.length - 1][1];
+    }
+
+    const d = el('defs', {}, s);
+    d.innerHTML = `<pattern id="hatch" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="10" stroke="rgba(255,255,255,0.05)" stroke-width="4"/></pattern>
+      <linearGradient id="homeG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f6bff" stop-opacity=".95"/><stop offset="1" stop-color="#2f6bff" stop-opacity=".3"/></linearGradient>
+      <linearGradient id="awayG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e8434f" stop-opacity=".3"/><stop offset="1" stop-color="#e8434f" stop-opacity=".95"/></linearGradient>
+      <filter id="lg" x="-10%" y="-50%" width="120%" height="200%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
+
+    // phase backgrounds + future hatch
+    el('rect', { x: xm(0), y: TOP - 6, width: xm(57.5) - xm(0), height: BOT - TOP + 12, fill: '#4ff0b0', opacity: 0.05 }, s);
+    el('rect', { x: xm(57.5), y: TOP - 6, width: xm(NOW) - xm(57.5), height: BOT - TOP + 12, fill: '#ff5d6c', opacity: 0.22 }, s);
+    el('rect', { x: xm(NOW), y: TOP - 6, width: xm(90) - xm(NOW), height: BOT - TOP + 12, fill: 'url(#hatch)' }, s);
+    el('line', { x1: xm(45), y1: TOP - 6, x2: xm(45), y2: BOT + 6, stroke: 'rgba(255,255,255,.2)', 'stroke-width': 2, 'stroke-dasharray': '4 5' }, s);
+
+    // momentum river
+    const step = 0.25, above = [], below = [];
+    for (let m = 0; m <= NOW + 1e-6; m += step) {
+      let val = Math.max(-1, Math.min(1, interp(mom, m) + (rand() - 0.5) * 0.12));
+      const y = AX - val * 54;
+      above.push([xm(m), Math.min(y, AX)]);
+      below.push([xm(m), Math.max(y, AX)]);
+    }
+    const area = (list) => `M${xm(0)},${AX} ` + list.map((p) => `L${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ') + ` L${xm(NOW)},${AX} Z`;
+    el('path', { d: area(above), fill: 'url(#homeG)' }, s);
+    el('path', { d: area(below), fill: 'url(#awayG)' }, s);
+    el('line', { x1: xm(0), y1: AX, x2: xm(90), y2: AX, stroke: 'rgba(255,255,255,.3)', 'stroke-width': 1.5 }, s);
+
+    // chaos threshold
+    el('line', { x1: xm(0), y1: ch(60), x2: xm(90), y2: ch(60), stroke: '#ffb648', 'stroke-opacity': .5, 'stroke-width': 1.5, 'stroke-dasharray': '6 6' }, s);
+    const tt = el('text', { x: xm(90), y: ch(60) - 8, 'text-anchor': 'end', fill: '#ffb648', 'font-size': 15, 'font-weight': 600, 'font-family': 'Inter' }, s);
+    tt.textContent = 'Chaos threshold 60';
+
+    // chaos index line + forecast
+    const cl = [];
+    for (let m = 0; m <= NOW + 1e-6; m += step) cl.push([xm(m), ch(interp(chaos, m) + (rand() - 0.5) * 2.5)]);
+    el('polyline', { points: cl.map((p) => p.join(',')).join(' '), fill: 'none', stroke: '#ffb648', 'stroke-width': 3.5, 'stroke-linejoin': 'round', filter: 'url(#lg)' }, s);
+    const fl = [];
+    for (let m = NOW; m <= 70; m += step) fl.push([xm(m), ch(interp(forecast, m))]);
+    el('polyline', { points: fl.map((p) => p.join(',')).join(' '), fill: 'none', stroke: '#ffb648', 'stroke-opacity': .65, 'stroke-width': 2.5, 'stroke-dasharray': '5 6' }, s);
+    const ft = el('text', { x: xm(70) + 12, y: ch(38) + 5, fill: '#a3afc9', 'font-size': 15, 'font-weight': 500, 'font-family': 'Inter' }, s);
+    ft.innerHTML = '<tspan fill="#ffb648" font-weight="700">Forecast</tspan> · press fades by ~66\' (7 in 10 similar)';
+
+    // pins (label row above the plot)
+    function pin(m, label, color, side) {
+      const x = xm(m), y = 30;
+      el('line', { x1: x, y1: y, x2: x, y2: BOT + 6, stroke: color, 'stroke-width': 2, 'stroke-opacity': .85 }, s);
+      el('circle', { cx: x, cy: y, r: 5, fill: color }, s);
+      const t = el('text', { x: side === 'left' ? x - 12 : x + 12, y: y + 6, 'text-anchor': side === 'left' ? 'end' : 'start', fill: '#f2f5fb', 'font-size': 17, 'font-weight': 700, 'font-family': 'Inter' }, s);
+      t.innerHTML = label;
+    }
+    pin(12, `<tspan fill="#ff7a84">12'</tspan> Castell goal · 0–1`, '#e8434f', 'right');
+    pin(41, `<tspan fill="#7da2ff">41'</tspan> Achterberg goal · 1–1`, '#5b8cff', 'left');
+    pin(57.6, `<tspan fill="#ff5d6c">58'</tspan> KMA sub + high press`, '#ff5d6c', 'left');
+
+    // now marker
+    el('line', { x1: xm(NOW), y1: 18, x2: xm(NOW), y2: BOT + 6, stroke: '#fff', 'stroke-width': 2.5 }, s);
+    el('rect', { x: xm(NOW) - 2, y: 18, width: 86, height: 26, rx: 5, fill: '#fff' }, s);
+    const nowT = el('text', { x: xm(NOW) + 8, y: 37, fill: '#0b1124', 'font-size': 16, 'font-weight': 700, 'font-family': 'JetBrains Mono' }, s);
+    nowT.textContent = 'NOW 61\'';
+    el('circle', { cx: xm(NOW), cy: ch(74), r: 8, fill: '#070b17', stroke: '#ff5d6c', 'stroke-width': 4 }, s);
+
+    // phase strip with labels
+    const SY = BOT + 16;
+    el('rect', { x: xm(0), y: SY, width: xm(57.5) - xm(0) - 3, height: 22, rx: 5, fill: '#4ff0b0' }, s);
+    el('rect', { x: xm(57.5), y: SY, width: xm(NOW) - xm(57.5), height: 22, rx: 5, fill: '#ff5d6c' }, s);
+    const lab = (x, txt, col, anchor) => { const t = el('text', { x, y: SY + 17, fill: col, 'font-size': 17, 'font-weight': 700, 'font-family': 'Barlow Condensed', 'letter-spacing': 1.5, 'text-anchor': anchor || 'start' }, s); t.textContent = txt; };
+    lab(xm(0) + 12, 'CONTROL · HARBOUR CITY DICTATE 0\'–57\'', '#06261a');
+    lab(xm(NOW) + 12, 'CHAOS · 58\' → NOW', '#ff5d6c');
+    // minute axis
+    [0, 15, 30, 45, 60, 75, 90].forEach((m) => {
+      const t = el('text', { x: xm(m), y: SY + 46, fill: '#8591ad', 'font-size': 15, 'font-family': 'JetBrains Mono', 'text-anchor': m === 0 ? 'start' : m === 90 ? 'end' : 'middle' }, s);
+      t.textContent = m === 45 ? 'HT' : m + '\'';
+    });
+  })();
+</script>
+</body>
+</html>
