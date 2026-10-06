@@ -147,8 +147,8 @@
   });
 
   // ---------- detections ----------
-  const ids = { home: { 4: 3, 3: 21, 6: 7, 8: 12, 10: 9, 11: 16, 9: 4, 7: 18, 2: 22, 5: 25 }, away: { 9: 5, 10: 11, 7: 14, 8: 2, 4: 19, 11: 8, 2: 13, 5: 6, 6: 17, 3: 20, 1: 1 } };
-  const conf = { home: { 4: .97, 3: .95, 6: .99, 8: .98, 10: .99, 11: .94, 9: .97, 7: .98, 2: .99, 5: .93 }, away: { 9: .98, 10: .97, 7: .95, 8: .96, 4: .71, 11: .99, 2: .94, 5: .96, 6: .97, 3: .98, 1: .96 } };
+  const ids = { home: { 4: 3, 3: 21, 6: 7, 8: 12, 10: 9, 11: 16, 9: 4, 7: 18, 2: 22, 5: 25 }, away: { 9: 5, 14: 11, 7: 14, 8: 2, 4: 19, 11: 8, 2: 13, 5: 6, 6: 17, 3: 20, 1: 1 } };
+  const conf = { home: { 4: .97, 3: .95, 6: .99, 8: .98, 10: .99, 11: .94, 9: .97, 7: .98, 2: .99, 5: .93 }, away: { 9: .98, 14: .97, 7: .95, 8: .96, 4: .71, 11: .99, 2: .94, 5: .96, 6: .97, 3: .98, 1: .96 } };
   const COL = { home: '#5b8dff', away: '#ff5d6c' };
   const scene = v.scene;
   const all = scene.home.map((p) => ['home', p]).concat(scene.away.map((p) => ['away', p]));
@@ -178,15 +178,15 @@
     el('rect', { x, y, width: 178, height: 22 + lines.length * 20, rx: 8, fill: 'rgba(7,11,23,.9)', stroke: 'rgba(255,255,255,.28)' }, cv);
     lines.forEach((ln, i) => { const t = el('text', { x: x + 12, y: y + 26 + i * 20, fill: i === 0 ? '#f2f5fb' : '#a3afc9', 'font-family': 'JetBrains Mono', 'font-size': 15, 'font-weight': 700 }, cv); t.textContent = ln; });
   }
-  callout('home', 10, ['ID 9 · HAR #10', 'speed 28.4 km/h', 'GT    28.9 km/h'], -238, -104);
+  callout('home', 10, ['ID 9 · HAR #10', 'speed 27.9 km/h', 'GT    28.4 km/h'], -238, -104);
 
   // ball box
   const b = v.at(61.2, 32.4, 0.11);
   el('rect', { x: b.x - 11, y: b.y - 13, width: 22, height: 22, fill: 'none', stroke: '#c8ff3d', 'stroke-width': 2.5 }, cv);
-  const bx = b.x - 246, by = b.y + 46;
-  el('line', { x1: b.x - 11, y1: b.y + 9, x2: bx + 214, y2: by + 10, stroke: '#c8ff3d', 'stroke-width': 1.5 }, cv);
-  el('rect', { x: bx, y: by, width: 214, height: 48, rx: 8, fill: 'rgba(7,11,23,.9)', stroke: 'rgba(200,255,61,.6)' }, cv);
-  [['BALL · 0.88 · 61 km/h', '#c8ff3d'], ['GT 62.3 km/h · err 1.3', '#a3afc9']].forEach(([s, c], i) => { const t = el('text', { x: bx + 12, y: by + 20 + i * 19, fill: c, 'font-family': 'JetBrains Mono', 'font-size': 15, 'font-weight': 700 }, cv); t.textContent = s; });
+  const bx = b.x - 266, by = b.y + 46;
+  el('line', { x1: b.x - 11, y1: b.y + 9, x2: bx + 234, y2: by + 10, stroke: '#c8ff3d', 'stroke-width': 1.5 }, cv);
+  el('rect', { x: bx, y: by, width: 234, height: 48, rx: 8, fill: 'rgba(7,11,23,.9)', stroke: 'rgba(200,255,61,.6)' }, cv);
+  [['BALL · 0.88 · 59.8 km/h', '#c8ff3d'], ['GT 61.0 km/h · err 1.2', '#a3afc9']].forEach(([s, c], i) => { const t = el('text', { x: bx + 12, y: by + 20 + i * 19, fill: c, 'font-family': 'JetBrains Mono', 'font-size': 15, 'font-weight': 700 }, cv); t.textContent = s; });
 
   // ---------- event track (GT vs detected) ----------
   const trk = document.getElementById('trk');

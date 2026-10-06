@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Recap Factory — full-time outputs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@500;700&family=Noto+Sans+Devanagari:wght@500;700&family=Noto+Sans+JP:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .frame { background: radial-gradient(1200px 700px at 50% -10%, #12204a 0%, var(--ink) 60%); }
+  .topbar { position: absolute; left: 24px; right: 24px; top: 18px; height: 66px; display: flex; align-items: center; gap: 16px; padding: 0 12px 0 14px; background: rgba(15, 23, 46, .92); border: 1px solid var(--line); border-radius: 14px; }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand .mark { width: 38px; height: 38px; border-radius: 10px; background: var(--lime); display: grid; place-items: center; }
+  .brand .name { font-family: var(--font-display); font-weight: 800; font-size: 30px; letter-spacing: .05em; text-transform: uppercase; line-height: 1; white-space: nowrap; }
+  .brand .sub { font-size: 15px; color: var(--muted); font-weight: 600; letter-spacing: .04em; margin-top: 3px; white-space: nowrap; }
+  .vsep { width: 1px; height: 36px; background: var(--line); }
+  .bug { display: flex; align-items: stretch; height: 40px; border-radius: 8px; overflow: hidden; font-family: var(--font-display); font-weight: 700; font-size: 24px; letter-spacing: .04em; }
+  .bug > div { display: flex; align-items: center; padding: 0 12px; }
+  .bug .lg { background: #0b1124; color: var(--lime); font-size: 17px; letter-spacing: .18em; }
+  .bug .tm { background: #1a2547; gap: 8px; }
+  .bug .sw { width: 6px; height: 22px; border-radius: 2px; }
+  .bug .sc { background: #f2f5fb; color: #0b1124; min-width: 70px; justify-content: center; }
+  .bug .ck { background: #0b1124; font-size: 22px; letter-spacing: .1em; }
+  .ready { margin-left: auto; display: flex; align-items: center; gap: 12px; height: 48px; padding: 0 18px 0 12px; border-radius: 10px; background: var(--lime); color: #0b1124; white-space: nowrap; }
+  .ready .t { font-family: var(--font-display); font-weight: 800; font-size: 27px; letter-spacing: .04em; text-transform: uppercase; }
+  .ready .t small { font-family: var(--font-ui); font-size: 16px; font-weight: 700; letter-spacing: 0; text-transform: none; margin-left: 4px; }
+
+  /* pipeline */
+  .pipe { position: absolute; left: 24px; right: 24px; top: 100px; height: 84px; display: grid; grid-template-columns: 1fr 28px 1fr 28px 1.25fr 28px 1fr; align-items: center; }
+  .stg { height: 84px; display: flex; align-items: center; gap: 14px; padding: 0 16px; border-radius: 14px; background: rgba(15,23,46,.9); border: 1px solid var(--line); }
+  .stg .ic { width: 34px; height: 34px; border-radius: 50%; background: var(--mint); color: #0b1124; display: grid; place-items: center; font-weight: 900; font-size: 18px; flex: none; }
+  .stg .n { font-family: var(--font-display); font-weight: 800; font-size: 24px; letter-spacing: .08em; text-transform: uppercase; line-height: 1; }
+  .stg .d { font-size: 15px; color: var(--muted); font-weight: 600; margin-top: 4px; white-space: nowrap; }
+  .stg .tm { margin-left: auto; font-family: var(--font-mono); font-weight: 700; font-size: 22px; color: var(--mint); }
+  .stg.last { border-color: rgba(200,255,61,.55); background: rgba(200,255,61,.08); }
+  .stg.last .ic { background: var(--lime); }
+  .stg.last .tm { color: var(--lime); }
+  .pipe .ar { text-align: center; color: var(--muted); font-size: 22px; font-weight: 700; }
+  .langs { display: flex; gap: 5px; margin-top: 6px; }
+  .langs span { font-family: var(--font-mono); font-size: 15px; font-weight: 700; padding: 1px 7px; border-radius: 5px; background: rgba(255,255,255,.08); border: 1px solid var(--line-strong); }
+
+  .panel { position: absolute; background: rgba(15, 23, 46, .9); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+  .ph { display: flex; align-items: center; gap: 10px; padding: 13px 18px 0; }
+  .ph h3 { font-family: var(--font-display); font-weight: 700; font-size: 21px; letter-spacing: .12em; text-transform: uppercase; white-space: nowrap; color: var(--muted); }
+  .ph .meta { margin-left: auto; font-size: 15px; color: var(--muted); font-weight: 600; white-space: nowrap; }
+  .ok { color: var(--mint); font-weight: 700; }
+  .prov { font-family: var(--font-mono); font-size: 15px; font-weight: 500; color: var(--cyan); padding: 3px 8px; border-radius: 6px; background: rgba(58,215,255,.1); border: 1px solid rgba(58,215,255,.35); white-space: nowrap; }
+
+  /* report */
+  .tabs { display: flex; gap: 4px; margin-left: auto; }
+  .tabs span { font-family: var(--font-mono); font-size: 15px; font-weight: 700; padding: 2px 8px; border-radius: 6px; color: var(--muted); border: 1px solid var(--line); }
+  .tabs span.on { background: var(--text); color: #0b1124; border-color: var(--text); }
+  .rep { padding: 10px 20px 0; }
+  .rep h1 { font-family: var(--font-display); font-weight: 800; font-size: 40px; line-height: .98; text-transform: uppercase; letter-spacing: .01em; }
+  .rep .lede { font-size: 18px; line-height: 1.42; margin-top: 10px; color: #dfe6f7; }
+  .km { display: grid; grid-template-columns: 50px 1fr; gap: 10px; align-items: baseline; padding: 7px 0; border-top: 1px solid var(--line); font-size: 18px; }
+  .km .m { font-family: var(--font-display); font-weight: 800; font-size: 24px; color: var(--lime); }
+  .km b { font-weight: 700; }
+  .foot { display: flex; gap: 8px; align-items: center; margin-top: 8px; font-size: 15px; color: var(--muted); font-weight: 600; }
+
+  /* localised */
+  .loc { display: grid; grid-template-columns: 46px 1fr; gap: 12px; align-items: center; height: 35px; padding: 0 20px; border-top: 1px solid var(--line); }
+  .loc:first-of-type { border-top: 0; }
+  .loc .lc { font-family: var(--font-mono); font-size: 15px; font-weight: 700; padding: 2px 0; text-align: center; border-radius: 5px; background: rgba(255,255,255,.08); border: 1px solid var(--line-strong); }
+  .loc .tx { font-size: 18px; font-weight: 700; white-space: nowrap; overflow: hidden; line-height: 34px; }
+
+  /* audio */
+  .play { width: 52px; height: 52px; border-radius: 50%; background: var(--lime); display: grid; place-items: center; flex: none; }
+  .trans { font-size: 17px; line-height: 1.4; color: #dfe6f7; font-style: italic; }
+
+  /* phone */
+  .phone2 { position: absolute; width: 340px; height: 720px; border-radius: 48px; background: #05070d; border: 10px solid #1b2340; box-shadow: 0 40px 80px rgba(0,0,0,.6), inset 0 0 0 2px #2a3456; overflow: hidden; }
+  .phone2 .notch { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 96px; height: 26px; border-radius: 16px; background: #000; z-index: 5; }
+  .phone2 svg { position: absolute; inset: 0; }
+  .vs-top { position: absolute; left: 18px; right: 18px; top: 50px; display: flex; justify-content: space-between; align-items: center; z-index: 3; }
+  .vs-cap { position: absolute; left: 18px; right: 18px; top: 106px; z-index: 3; }
+  .vs-cap .min { display: inline-block; font-family: var(--font-display); font-weight: 800; font-size: 26px; background: var(--lime); color: #0b1124; padding: 0 10px; border-radius: 6px; }
+  .vs-cap .big { font-family: var(--font-display); font-weight: 800; font-size: 54px; line-height: .9; text-transform: uppercase; margin-top: 8px; text-shadow: 0 4px 18px rgba(0,0,0,.6); }
+  .vs-sub { position: absolute; left: 18px; right: 18px; bottom: 74px; z-index: 3; text-align: center; }
+  .vs-sub span { display: inline; font-size: 21px; font-weight: 800; line-height: 1.5; background: rgba(0,0,0,.72); padding: 3px 8px; border-radius: 6px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+  .vs-sub span em { font-style: normal; color: var(--lime); }
+  .vs-prog { position: absolute; left: 18px; right: 18px; bottom: 40px; height: 5px; border-radius: 3px; background: rgba(255,255,255,.25); z-index: 3; }
+  .vs-prog i { display: block; width: 62%; height: 100%; border-radius: 3px; background: #fff; }
+
+  /* carousel */
+  .cards { display: flex; gap: 14px; padding: 12px 20px 0; }
+  .sq { position: relative; width: 262px; height: 262px; border-radius: 14px; overflow: hidden; flex: none; }
+  .cap { padding: 10px 20px 0; font-size: 17px; line-height: 1.35; }
+  .cap .h { color: var(--cyan); font-weight: 600; }
+
+  /* spin */
+  .spins { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 12px 20px 0; }
+  .spin { border-radius: 12px; padding: 14px 16px; background: rgba(255,255,255,.035); border: 1px solid var(--line); }
+  .spin .who { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+  .spin .who i { width: 10px; height: 22px; border-radius: 3px; display: inline-block; }
+  .spin h4 { font-family: var(--font-display); font-weight: 800; font-size: 30px; line-height: 1; text-transform: uppercase; margin-top: 10px; }
+  .spin p { font-size: 17px; line-height: 1.4; margin-top: 8px; color: #dfe6f7; }
+  .spin .tone { margin-top: 10px; display: flex; gap: 8px; align-items: center; font-size: 15px; color: var(--muted); font-weight: 600; }
+  .fair { margin: 12px 20px 0; padding: 10px 14px; border-radius: 10px; background: rgba(79,240,176,.08); border: 1px solid rgba(79,240,176,.4); display: flex; align-items: center; gap: 12px; font-size: 16px; font-weight: 600; }
+  .fair .ic { width: 30px; height: 30px; border-radius: 50%; background: var(--mint); color: #0b1124; display: grid; place-items: center; font-weight: 900; font-size: 17px; flex: none; }
+</style>
+</head>
+<body>
+<div class="frame" id="f">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="mark"><svg width="24" height="24" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1.5" fill="#0b1124"/><rect x="13" y="3" width="8" height="8" rx="1.5" fill="none" stroke="#0b1124" stroke-width="2.2"/><rect x="3" y="13" width="8" height="8" rx="1.5" fill="none" stroke="#0b1124" stroke-width="2.2"/><rect x="13" y="13" width="8" height="8" rx="1.5" fill="#0b1124"/></svg></div>
+      <div><div class="name">Recap Factory</div><div class="sub">One match in · 42 assets out</div></div>
+    </div>
+    <div class="vsep"></div>
+    <div class="bug">
+      <div class="lg">SYN</div>
+      <div class="tm"><span class="sw" style="background:var(--home)"></span>HAR</div>
+      <div class="sc">2 – 1</div>
+      <div class="tm">KMA<span class="sw" style="background:var(--away)"></span></div>
+      <div class="ck">FT</div>
+    </div>
+    <span class="chip">12' Castell · 41' Achterberg · 84' Calloway</span>
+    <div class="ready">
+      <svg width="26" height="26" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5" fill="none" stroke="#0b1124" stroke-width="2.6"/><path d="M7.5 12.5l3 3 6-6.5" fill="none" stroke="#0b1124" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="t">All 42 assets ready<small>3 min 10 s after the final whistle</small></div>
+    </div>
+  </div>
+
+  <!-- ===== pipeline ===== -->
+  <div class="pipe">
+    <div class="stg"><div class="ic">✓</div><div><div class="n">Generated</div><div class="d">7 formats · Storyteller agent</div></div><div class="tm">0:52</div></div>
+    <div class="ar">→</div>
+    <div class="stg"><div class="ic">✓</div><div><div class="n">Fact-checked</div><div class="d">118 claims ✓ · 2 rewrites</div></div><div class="tm">1:41</div></div>
+    <div class="ar">→</div>
+    <div class="stg"><div class="ic">✓</div><div><div class="n">Localised</div><div class="langs"><span>EN</span><span>ES</span><span>FR</span><span>HI</span><span>JA</span><span>AR</span></div></div><div class="tm">2:38</div></div>
+    <div class="ar">→</div>
+    <div class="stg last"><div class="ic">✓</div><div><div class="n">Published</div><div class="d">web · app · social · audio</div></div><div class="tm">3:10</div></div>
+  </div>
+
+  <!-- ===== col A: report ===== -->
+  <div class="panel" style="left:24px; top:200px; width:616px; height:406px">
+    <div class="ph"><h3>Written report</h3><div class="tabs"><span class="on">EN</span><span>ES</span><span>FR</span><span>HI</span><span>JA</span><span>AR</span></div></div>
+    <div class="rep">
+      <h1>Calloway strikes late as Harbour City turn the tide</h1>
+      <div class="lede">Harbour City came from behind to beat Kingsmoor Athletic 2–1. Ezra Calloway settled it in the 84th minute, after Kingsmoor's bold switch to a high press had briefly tilted the game their way.</div>
+      <div style="margin-top:10px">
+        <div class="km"><span class="m">12'</span><span><b>Castell</b> gives Kingsmoor an early lead</span></div>
+        <div class="km"><span class="m">67'</span><span><b>Marchetti</b> breaks two lines: goal chance 3% → 17%</span></div>
+        <div class="km"><span class="m">84'</span><span><b>Calloway</b> curls in the winner · xG 0.38</span></div>
+      </div>
+      <div class="foot"><span>412 words · Storyteller</span><span class="ok">✓ Editor 14 / 14 claims</span><span class="prov" style="margin-left:auto">E-0118 · E-1893 · E-2271</span></div>
+    </div>
+  </div>
+
+  <!-- ===== col A: localised ===== -->
+  <div class="panel" style="left:24px; top:622px; width:616px; height:196px">
+    <div class="ph" style="padding-bottom:6px"><h3>Localised headlines</h3><span class="meta">glossary-locked names · 6 languages</span></div>
+    <div class="loc"><span class="lc">ES</span><span class="tx">Calloway lo decide al final y Harbour City remonta</span></div>
+    <div class="loc"><span class="lc">HI</span><span class="tx" style="font-family:'Noto Sans Devanagari',sans-serif">कैलोवे के देर से आए गोल से हार्बर सिटी जीती</span></div>
+    <div class="loc"><span class="lc">JA</span><span class="tx" style="font-family:'Noto Sans JP',sans-serif">カロウェイが終盤に決勝点、ハーバー・シティが逆転勝利</span></div>
+    <div class="loc"><span class="lc">AR</span><span class="tx" dir="rtl" style="font-family:'Noto Sans Arabic',sans-serif;text-align:right">هدف متأخر من كالواي يمنح هاربر سيتي الفوز</span></div>
+  </div>
+
+  <!-- ===== col A: audio ===== -->
+  <div class="panel" style="left:24px; top:834px; width:616px; height:198px">
+    <div class="ph"><h3>60-second audio recap</h3><span class="meta">Azure AI Speech · neural voice · EN-GB</span></div>
+    <div class="row" style="padding:12px 20px 0; gap:14px">
+      <div class="play"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5z" fill="#0b1124"/></svg></div>
+      <svg id="wave" width="460" height="82"></svg>
+      <span class="mono" style="font-size:15px;color:var(--muted);white-space:nowrap">0:38<br>1:00</span>
+    </div>
+    <div class="trans" style="padding:8px 20px 0">“…with six minutes left, Calloway curls it into the far corner.”</div>
+  </div>
+
+  <!-- ===== col B: vertical short ===== -->
+  <div class="phone2" style="left:664px; top:200px">
+    <div class="notch"></div>
+    <svg id="vs" class="noqa"></svg>
+    <div style="position:absolute;left:0;right:0;top:0;height:270px;background:linear-gradient(rgba(5,7,13,.8),rgba(5,7,13,.45) 65%,transparent);z-index:2"></div>
+    <div style="position:absolute;left:0;right:0;bottom:0;height:200px;background:linear-gradient(transparent,rgba(5,7,13,.7));z-index:2"></div>
+    <div class="vs-top"><span class="chip" style="background:rgba(0,0,0,.6)">Recap · 0:24</span><span class="chip" style="background:rgba(0,0,0,.6)">SYN</span></div>
+    <div class="vs-cap"><span class="min">84'</span><div class="big">Calloway.<br><span class="lime">The winner.</span></div></div>
+    <div class="vs-sub"><span>…and <em>Calloway</em> curls it into the far corner!</span></div>
+    <div class="vs-prog"><i></i></div>
+  </div>
+  <div class="abs" style="left:664px; top:934px; width:340px">
+    <div style="font-family:var(--font-display);font-weight:700;font-size:21px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Vertical short · 9:16</div>
+    <div style="font-size:16px;margin-top:4px;line-height:1.4">Auto-cut from 3 key moments, captions burned in</div>
+    <div class="row" style="gap:8px;margin-top:8px"><span class="prov">E-2271</span><span class="ok" style="font-size:15px">✓ captions checked</span></div>
+  </div>
+
+  <!-- ===== col C: social carousel ===== -->
+  <div class="panel" style="left:1028px; top:200px; width:868px; height:400px">
+    <div class="ph"><h3>Social carousel</h3><span class="meta">3 of 5 cards · 1:1 · alt text ✓</span></div>
+    <div class="cards">
+      <div class="sq" style="background:linear-gradient(135deg,#1d47c4 0%,#2f6bff 48%,#b52d39 52%,#e8434f 100%)">
+        <div style="position:absolute;inset:0;background:radial-gradient(circle at 50% 45%,rgba(7,11,23,.15),rgba(7,11,23,.55))"></div>
+        <div style="position:absolute;left:18px;top:16px;font-family:var(--font-display);font-weight:800;font-size:22px;letter-spacing:.14em">FULL TIME</div>
+        <div style="position:absolute;left:0;right:0;top:66px;text-align:center;font-family:var(--font-display);font-weight:800;font-size:96px;line-height:1">2–1</div>
+        <div style="position:absolute;left:18px;right:18px;top:170px;display:flex;justify-content:space-between;font-family:var(--font-display);font-weight:800;font-size:28px"><span>HAR</span><span>KMA</span></div>
+        <div style="position:absolute;left:18px;right:18px;bottom:16px;font-size:15px;font-weight:700;display:flex;justify-content:space-between"><span>Achterberg 41'<br>Calloway 84'</span><span style="text-align:right">Castell 12'</span></div>
+      </div>
+      <div class="sq" style="background:#0e1a33;border:1px solid var(--line)">
+        <div style="position:absolute;left:18px;top:16px;font-family:var(--font-display);font-weight:800;font-size:22px;letter-spacing:.14em;color:var(--lime)">THE WINNER</div>
+        <svg id="shotmap" width="226" height="128" style="position:absolute;left:18px;top:54px"></svg>
+        <div style="position:absolute;left:18px;top:192px;font-family:var(--font-display);font-weight:800;font-size:30px;line-height:1">CALLOWAY 84'</div>
+        <div style="position:absolute;left:18px;bottom:14px;font-size:15px;font-weight:700;color:var(--muted)">xG <span class="lime mono">0.38</span> · shot <span class="mono" style="color:var(--text)">96 km/h</span></div>
+      </div>
+      <div class="sq" style="background:#0e1a33;border:1px solid var(--line)">
+        <div style="position:absolute;left:18px;top:16px;font-family:var(--font-display);font-weight:800;font-size:22px;letter-spacing:.14em;color:var(--cyan)">TURNING POINT</div>
+        <div style="position:absolute;left:18px;top:52px;font-size:17px;font-weight:600;line-height:1.3">67' · Marchetti's pass cuts out six Kingsmoor players</div>
+        <div style="position:absolute;left:18px;top:120px;display:flex;align-items:baseline;gap:10px;font-family:var(--font-display);font-weight:800"><span style="font-size:44px;color:var(--muted)">3%</span><span style="font-size:30px;color:var(--muted)">→</span><span style="font-size:84px;color:var(--lime);line-height:.9">17%</span></div>
+        <div style="position:absolute;left:18px;bottom:14px;font-size:15px;font-weight:700;color:var(--muted)">chance the move ends in a goal</div>
+      </div>
+    </div>
+    <div class="cap">Down early, level at the break, winners at the end. Swipe for the moment it turned → <span class="h">#HARKMA #SynLeague</span></div>
+  </div>
+
+  <!-- ===== col C: club spin ===== -->
+  <div class="panel" style="left:1028px; top:616px; width:868px; height:416px">
+    <div class="ph"><h3>Per-club versions</h3><span class="meta">same facts · different voice</span></div>
+    <div class="spins">
+      <div class="spin" style="border-top:4px solid var(--home)">
+        <div class="who"><i style="background:var(--home)"></i>Harbour City fans</div>
+        <h4>Calloway completes the comeback at the death</h4>
+        <p>Behind early, level by the break, winners at the end. Patience paid off when Calloway struck in the 84th minute.</p>
+        <div class="tone">Tone <span class="chip" style="padding:2px 9px">celebratory</span></div>
+      </div>
+      <div class="spin" style="border-top:4px solid var(--away)">
+        <div class="who"><i style="background:var(--away)"></i>Kingsmoor fans</div>
+        <h4>Brave Kingsmoor undone by a late Calloway strike</h4>
+        <p>Castell's early goal and a fierce spell of pressing after 58' weren't enough. The back five finally gave way at 84'.</p>
+        <div class="tone">Tone <span class="chip" style="padding:2px 9px">proud, consoling</span></div>
+      </div>
+    </div>
+    <div class="fair"><div class="ic">✓</div><div>Fairness check: <b>same 6 facts</b> in both · 0 disputed claims · no disparaging language · sentiment gap within policy</div></div>
+    <div class="row" style="gap:8px;padding:12px 20px 0"><span class="prov">12' Castell</span><span class="prov">41' Achterberg</span><span class="prov">58' press</span><span class="prov">67' line-break</span><span class="prov">79' back five</span><span class="prov">84' Calloway</span></div>
+  </div>
+
+  <div class="mock-title">Concept 17 · Recap Factory</div>
+  <div class="mock-note">Concept mockup · synthetic data · fictional clubs and players</div>
+</div>
+
+<script src="assets/pitch.js"></script>
+<script>
+  const NS = 'http://www.w3.org/2000/svg';
+  const el = Pitch.el;
+
+  // ---------- waveform with chapter markers ----------
+  const wv = document.getElementById('wave');
+  const r = Pitch.rng(17);
+  const N = 92, W = 460, H = 60;
+  for (let i = 0; i < N; i++) {
+    const x = (i / N) * W;
+    const env = 0.35 + 0.65 * Math.abs(Math.sin(i * 0.17)) * (0.6 + 0.4 * r());
+    const h = Math.max(4, env * (H - 16));
+    el('rect', { x: x.toFixed(1), y: ((H - 8 - h) / 2 + 4).toFixed(1), width: 3, height: h.toFixed(1), rx: 1.5, fill: i / N < 0.633 ? '#c8ff3d' : 'rgba(255,255,255,.28)' }, wv);
+  }
+  [[0.13, "12'"], [0.32, "41'"], [0.55, "67'"], [0.78, "84'"]].forEach(([p, lab]) => {
+    el('line', { x1: p * W, y1: 0, x2: p * W, y2: H, stroke: '#3ad7ff', 'stroke-width': 1.5, 'stroke-dasharray': '3 3' }, wv);
+    const t = el('text', { x: p * W, y: 79, 'text-anchor': 'middle', fill: '#3ad7ff', 'font-family': 'JetBrains Mono', 'font-size': 15, 'font-weight': 700 }, wv); t.textContent = lab;
+  });
+
+  // ---------- shot map on the winner card ----------
+  const sm = Pitch.tactical(document.getElementById('shotmap'), { x: 0, y: 0, w: 226, h: 128, grass: '#13244a', lineColor: 'rgba(255,255,255,.35)', stripes: false });
+  // show only the attacking half by clipping: draw a dim veil over the left half
+  // shot from the left half-space to the far corner
+  const [sx, sy] = sm.P(90, 42), [gx, gy] = sm.P(105, 31);
+  el('line', { x1: sx, y1: sy, x2: gx, y2: gy, stroke: '#c8ff3d', 'stroke-width': 3, 'stroke-dasharray': '5 4' }, sm.g);
+  el('circle', { cx: sx, cy: sy, r: 9, fill: '#c8ff3d', stroke: '#0b1124', 'stroke-width': 2 }, sm.g);
+
+  // ---------- vertical short: crop of a synthetic broadcast frame ----------
+  const shot = JSON.parse(JSON.stringify(Pitch.SCENES.shot));
+  shot.home.forEach((p) => { if (p.n === 9) { p.x = 84; p.y = 40; } else if (p.n === 10) { p.x = 89.6; p.y = 31; } });
+  const vs = document.getElementById('vs');
+  // reverse angle from behind the goal, so shooter, keeper and shot path fit a 9:16 slice
+  const v = Pitch.broadcast(vs, { scene: shot, seed: 4, camera: { pos: [118, 36, 6.5], target: [90, 32.5, 0], fov: 34 } });
+  const c = v.at(90.5, 31, 0);
+  v.arrow([90.5, 30.5], [104.6, 36.6], { color: '#c8ff3d', width: 0.45, bend: -0.06, head: 1.4 });
+  const vbW = 1080 * (320 / 700);
+  vs.setAttribute('viewBox', `${(c.x - vbW * 0.45).toFixed(0)} 0 ${vbW.toFixed(0)} 1080`);
+  vs.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+  vs.setAttribute('width', 320); vs.setAttribute('height', 700);
+</script>
+</body>
+</html>
