@@ -143,8 +143,11 @@
   const f = document.getElementById('f');
 
   // ---------- broadcast view, virtual camera following #10 ----------
+  // 67' frame from the 'linebreak' scene; Ferrante (#10) went off at 58', so KMA's second striker is #14 Doyle-Akande
+  const scene = JSON.parse(JSON.stringify(Pitch.SCENES.linebreak));
+  scene.away.forEach((p) => { if (p.n === 10) p.n = 14; });
   const v = Pitch.broadcast(document.getElementById('stage'), {
-    scene: 'linebreak',
+    scene,
     dim: ['home10'],
     camera: { pos: [76, -26, 17], target: [76, 36, 0], fov: 19 }
   });
@@ -201,7 +204,7 @@
     // half-space guides (team attacks left to right, so their left is the top of the board)
     t.zone([[52.5, 43.2], [105, 43.2], [105, 54.2], [52.5, 54.2]], '#c8ff3d', 0.06);
     t.heat([[78, 49, 10], [72, 47, 10], [84, 46, 8], [66, 50, 7], [75, 41, 7], [88, 44, 5], [62, 40, 5], [70, 33, 4], [58, 46, 4], [80, 36, 3], [48, 38, 2], [91, 52, 3]], '#c8ff3d', 5);
-    t.dot(75.5, 41, '#2f6bff', '10', 11);
+    t.dot(75.5, 41, '#2f6bff', '10', 15);
     const [lx, ly] = t.P(103.5, 56.2);
     const tx = el('text', { x: lx, y: ly, 'text-anchor': 'end', fill: '#c8ff3d', 'font-size': 15, 'font-weight': 700, 'font-family': 'Inter' }, t.g);
     tx.textContent = 'Left half-space · 41% of touches';

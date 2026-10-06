@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Half-time Pack — studio pundits</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .frame { background: radial-gradient(1200px 700px at 30% -10%, #12204a 0%, var(--ink) 60%); }
+  .topbar { position: absolute; left: 24px; right: 24px; top: 18px; height: 66px; display: flex; align-items: center; gap: 16px; padding: 0 12px 0 14px; background: rgba(15, 23, 46, .92); border: 1px solid var(--line); border-radius: 14px; }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand .mark { width: 38px; height: 38px; border-radius: 10px; background: var(--lime); display: grid; place-items: center; }
+  .brand .name { font-family: var(--font-display); font-weight: 800; font-size: 30px; letter-spacing: .05em; text-transform: uppercase; line-height: 1; white-space: nowrap; }
+  .brand .sub { font-size: 15px; color: var(--muted); font-weight: 600; letter-spacing: .04em; margin-top: 3px; white-space: nowrap; }
+  .vsep { width: 1px; height: 36px; background: var(--line); }
+  .bug { display: flex; align-items: stretch; height: 40px; border-radius: 8px; overflow: hidden; font-family: var(--font-display); font-weight: 700; font-size: 24px; letter-spacing: .04em; }
+  .bug > div { display: flex; align-items: center; padding: 0 12px; }
+  .bug .lg { background: #0b1124; color: var(--lime); font-size: 17px; letter-spacing: .18em; }
+  .bug .tm { background: #1a2547; gap: 8px; }
+  .bug .sw { width: 6px; height: 22px; border-radius: 2px; }
+  .bug .sc { background: #f2f5fb; color: #0b1124; min-width: 70px; justify-content: center; }
+  .bug .ck { background: var(--amber); color: #0b1124; font-size: 22px; letter-spacing: .1em; }
+  .ready { margin-left: auto; display: flex; align-items: center; gap: 12px; height: 48px; padding: 0 18px 0 12px; border-radius: 10px; background: var(--lime); color: #0b1124; }
+  .ready .t { font-family: var(--font-display); font-weight: 800; font-size: 28px; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+  .ready .t small { font-family: var(--font-ui); font-size: 16px; font-weight: 700; letter-spacing: 0; text-transform: none; margin-left: 6px; }
+
+  .panel { position: absolute; background: rgba(15, 23, 46, .86); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+  .bh { display: flex; align-items: center; gap: 14px; padding: 14px 24px 0; }
+  .bh h2 { font-family: var(--font-display); font-weight: 800; font-size: 34px; letter-spacing: .02em; text-transform: uppercase; line-height: 1; white-space: nowrap; }
+  .bh .meta { margin-left: auto; font-size: 15px; color: var(--muted); font-weight: 600; white-space: nowrap; }
+  .blegend { position: absolute; left: 24px; right: 24px; bottom: 14px; display: flex; gap: 20px; align-items: center; font-size: 15px; color: var(--muted); font-weight: 600; }
+  .blegend span { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+
+  /* cards */
+  .tp { position: absolute; left: 1200px; width: 696px; height: 300px; padding: 18px 22px; display: flex; flex-direction: column; background: rgba(15, 23, 46, .9); border: 1px solid var(--line); border-radius: 16px; }
+  .tp .top { display: flex; align-items: center; gap: 10px; }
+  .tp .no { width: 34px; height: 34px; border-radius: 9px; background: var(--lime); color: #0b1124; display: grid; place-items: center; font-family: var(--font-display); font-weight: 800; font-size: 24px; }
+  .tp .cat { font-family: var(--font-display); font-weight: 700; font-size: 18px; letter-spacing: .16em; color: var(--muted); text-transform: uppercase; }
+  .tp .conf { margin-left: auto; font-size: 15px; color: var(--muted); font-weight: 600; }
+  .tp .conf b { color: var(--mint); }
+  .tp h3 { font-family: var(--font-display); font-weight: 800; font-size: 34px; line-height: 1; text-transform: uppercase; margin-top: 12px; letter-spacing: .01em; }
+  .tp .stat { display: flex; align-items: center; gap: 16px; margin-top: 10px; }
+  .tp .stat .v { font-family: var(--font-display); font-weight: 800; font-size: 60px; line-height: .85; color: var(--lime); white-space: nowrap; }
+  .tp .stat .l { font-size: 18px; line-height: 1.3; font-weight: 500; }
+  .tp .stat .l b { font-weight: 700; }
+  .tp .ev { display: flex; gap: 8px; margin-top: 10px; }
+  .prov { font-family: var(--font-mono); font-size: 15px; font-weight: 500; color: var(--cyan); padding: 4px 9px; border-radius: 7px; background: rgba(58,215,255,.1); border: 1px solid rgba(58,215,255,.35); white-space: nowrap; }
+  .tp .cp { margin-top: auto; padding: 9px 14px; border-radius: 10px; background: rgba(156,140,255,.1); border-left: 3px solid var(--violet); }
+  .tp .cp .k { font-size: 15px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--violet); }
+  .tp .cp p { font-size: 18px; line-height: 1.3; margin-top: 2px; }
+
+  /* bottom actions */
+  .actions { position: absolute; left: 24px; top: 948px; width: 1152px; height: 84px; display: flex; align-items: center; gap: 12px; padding: 0 18px; }
+  .btn { display: inline-flex; align-items: center; gap: 10px; height: 52px; padding: 0 18px; border-radius: 12px; font-size: 18px; font-weight: 800; border: 1px solid var(--line-strong); background: rgba(255,255,255,.06); white-space: nowrap; }
+  .btn.ok { background: var(--lime); color: #0b1124; border-color: var(--lime); box-shadow: 0 10px 28px rgba(200,255,61,.22); }
+  .chain { margin-left: auto; display: flex; align-items: flex-start; }
+  .chain .st { display: flex; flex-direction: column; align-items: center; width: 72px; position: relative; }
+  .chain .st i { width: 12px; height: 12px; border-radius: 50%; background: var(--mint); position: relative; z-index: 1; }
+  .chain .st:not(:last-child)::after { content: ''; position: absolute; left: 50%; top: 5px; width: 72px; height: 2px; background: rgba(79,240,176,.5); }
+  .chain .st b { font-family: var(--font-mono); font-size: 15px; margin-top: 5px; }
+  .chain .st span { font-size: 15px; color: var(--muted); font-weight: 600; white-space: nowrap; }
+</style>
+</head>
+<body>
+<div class="frame" id="f">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="mark"><svg width="24" height="24" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="#0b1124" stroke-width="2.4"/><path d="M12 5v14M3 12h3M18 12h3" stroke="#0b1124" stroke-width="2.4"/><circle cx="12" cy="12" r="2.6" fill="none" stroke="#0b1124" stroke-width="2.2"/></svg></div>
+      <div><div class="name">Half-time Pack</div><div class="sub">Auto-generated for the studio pundits</div></div>
+    </div>
+    <div class="vsep"></div>
+    <div class="bug">
+      <div class="lg">SYN</div>
+      <div class="tm"><span class="sw" style="background:var(--home)"></span>HAR</div>
+      <div class="sc">1 – 1</div>
+      <div class="tm">KMA<span class="sw" style="background:var(--away)"></span></div>
+      <div class="ck">HT</div>
+    </div>
+    <span class="chip">12' Castell · 41' Achterberg</span>
+    <span class="chip">Possession 60–40 · xG 0.92–0.51</span>
+    <div class="ready">
+      <svg width="28" height="28" viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="8" fill="none" stroke="#0b1124" stroke-width="2.6"/><path d="M12 9.5v4l2.8 2M9.5 2.5h5M12 2.5v3" fill="none" stroke="#0b1124" stroke-width="2.6" stroke-linecap="round"/></svg>
+      <div class="t">Ready 38 s<small>after the half-time whistle</small></div>
+    </div>
+  </div>
+
+  <!-- ===== tactical board ===== -->
+  <div class="panel" style="left:24px; top:100px; width:1152px; height:832px">
+    <div class="bh"><span class="eyebrow" style="font-size:18px">Board 1 of 3</span><h2>Harbour City overload the left half-space</h2><span class="meta">0–45' · HAR attacking →</span></div>
+    <svg id="board" class="abs" style="left:24px; top:62px" width="1104" height="715"></svg>
+    <div class="blegend">
+      <span><svg width="26" height="26"><circle cx="13" cy="13" r="11" fill="#2f6bff" stroke="#c8ff3d" stroke-width="2.5"/></svg>HAR avg. position · size = touches</span>
+      <span><svg width="34" height="10"><line x1="0" y1="5" x2="34" y2="5" stroke="#c8ff3d" stroke-width="6" stroke-linecap="round"/></svg>passes ≥ 4 · width = count</span>
+      <span><svg width="20" height="20"><circle cx="10" cy="10" r="8" fill="#e8434f"/></svg>KMA</span>
+      <span><svg width="26" height="16"><rect x="1" y="1" width="24" height="14" rx="2" fill="rgba(200,255,61,.2)" stroke="#c8ff3d" stroke-dasharray="4 3"/></svg>left half-space</span>
+      <span><svg width="26" height="26"><circle cx="13" cy="13" r="12" fill="#c8ff3d"/><text x="13" y="18" text-anchor="middle" font-family="Barlow Condensed" font-weight="800" font-size="15" fill="#0b1124">41'</text></svg>Achterberg's equaliser</span>
+    </div>
+  </div>
+
+  <!-- ===== actions ===== -->
+  <div class="actions glass">
+    <span class="btn ok"><svg width="22" height="22" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2" fill="none" stroke="#0b1124" stroke-width="2.4"/><path d="M8 20h8M12 16v4M10 8l4 2-4 2z" fill="#0b1124" stroke="#0b1124" stroke-width="1.6" stroke-linejoin="round"/></svg>Send to touchscreen</span>
+    <span class="btn"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M8 4H6a2 2 0 0 0-2 2v4l-2 2 2 2v4a2 2 0 0 0 2 2h2M16 4h2a2 2 0 0 1 2 2v4l2 2-2 2v4a2 2 0 0 1-2 2h-2" fill="none" stroke="#f2f5fb" stroke-width="2.2"/></svg>Export graphics template JSON</span>
+    <span class="btn"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6z M14 2v6h6" fill="none" stroke="#f2f5fb" stroke-width="2.2" stroke-linejoin="round"/></svg>PDF briefing</span>
+    <div class="chain">
+      <div class="st"><i></i><b>6 s</b><span>frozen</span></div>
+      <div class="st"><i></i><b>19 s</b><span>drafted</span></div>
+      <div class="st"><i></i><b>31 s</b><span>checked</span></div>
+      <div class="st"><i style="background:var(--lime);box-shadow:0 0 0 4px rgba(200,255,61,.25)"></i><b class="lime">38 s</b><span class="lime">ready</span></div>
+    </div>
+  </div>
+
+  <!-- ===== talking points ===== -->
+  <div class="tp" style="top:100px">
+    <div class="top"><span class="no">1</span><span class="cat">Tactical</span><span class="conf">Confidence <b>0.92</b> · zone-entry model v2</span></div>
+    <h3>They're winning it down the left</h3>
+    <div class="stat"><div class="v">38%</div><div class="l">of Harbour City's final-third entries came through the <b>left half-space</b>. League average: 21%.</div></div>
+    <div class="ev"><span class="prov">18 of 47 entries</span><span class="prov">E-0041 → E-0998</span></div>
+    <div class="cp"><div class="k">Counter-point · Sceptic agent</div><p>Only 2 of those 18 entries ended in a shot. Kingsmoor may be happy to let them have it.</p></div>
+  </div>
+
+  <div class="tp" style="top:416px">
+    <div class="top"><span class="no">2</span><span class="cat">Player</span><span class="conf">Confidence <b>0.96</b> · tracking + events</span></div>
+    <h3>Calloway keeps finding the pocket</h3>
+    <div class="stat"><div class="v">6</div><div class="l">receptions between the lines in one half. League average is <b>4.1 per match</b>.</div></div>
+    <div class="ev"><span class="prov">6 events</span><span class="prov">E-0212, E-0387 +4</span></div>
+    <div class="cp"><div class="k">Counter-point · Sceptic agent</div><p>4 of the 6 came with his back to goal. Kalem has stopped him turning.</p></div>
+  </div>
+
+  <div class="tp" style="top:732px">
+    <div class="top"><span class="no">3</span><span class="cat">Moment</span><span class="conf">Confidence <b>0.81</b> · small sample</span></div>
+    <h3>Kingsmoor scored from their one real press</h3>
+    <div class="stat"><div class="v">6.1</div><div class="l">PPDA in the 10 minutes before Castell's 12' goal. <b>14.2</b> for the half.</div></div>
+    <div class="ev"><span class="prov">1 sequence</span><span class="prov">E-0096 → E-0118</span></div>
+    <div class="cp"><div class="k">Counter-point · Sceptic agent</div><p>One sequence after a throw-in is a tiny sample. Don't build the half-time story on it.</p></div>
+  </div>
+
+  <div class="mock-title">Concept 13 · Half-time Pack</div>
+  <div class="mock-note">Concept mockup · synthetic data · fictional clubs and players</div>
+</div>
+
+<script src="assets/pitch.js"></script>
+<script>
+  const svg = document.getElementById('board');
+  const t = Pitch.tactical(svg, { x: 0, y: 0, w: 1104, h: 715, grass: '#0e1a33', lineColor: 'rgba(255,255,255,0.32)' });
+  const el = Pitch.el, P = t.P;
+  const g = t.g;
+
+  // lanes (5-lane model): faint guides
+  [13.6, 27.2, 40.8, 54.4].forEach((y) => {
+    const [x1, y1] = P(0, y), [x2] = P(105, y);
+    el('line', { x1, y1, x2, y2: y1, stroke: 'rgba(255,255,255,.10)', 'stroke-width': 1.5, 'stroke-dasharray': '8 8' }, g);
+  });
+  // left half-space zone
+  t.zone([[50, 40.8], [88.5, 40.8], [88.5, 54.4], [50, 54.4]], '#c8ff3d', 0.14);
+  const zl = P(52.5, 54.4);
+  const zt = el('text', { x: zl[0] + 10, y: zl[1] - 8, fill: '#c8ff3d', 'font-family': 'Barlow Condensed', 'font-weight': 700, 'font-size': 22, 'letter-spacing': 2 }, g); zt.textContent = 'LEFT HALF-SPACE';
+  // light heat in the zone
+  t.heat([[66, 47, 8], [74, 50, 7], [58, 46, 6], [80, 52, 5]], '#c8ff3d', 4);
+
+  // HAR average positions (attacking right) + touches
+  const har = {
+    1: [8, 34, 22], 2: [41, 9, 38], 5: [26, 23, 44], 4: [27, 44, 47], 3: [50, 59, 55], 6: [40, 34, 61],
+    8: [57, 46, 52], 10: [67, 44, 49], 7: [76, 11, 30], 9: [83, 33, 27], 11: [78, 58, 41]
+  };
+  const edges = [[6, 8, 14], [8, 10, 11], [3, 11, 12], [3, 8, 9], [10, 11, 8], [4, 3, 10], [6, 4, 9], [5, 6, 8], [5, 2, 7], [2, 7, 6], [10, 9, 6], [6, 10, 5], [8, 11, 5], [1, 5, 5], [1, 4, 4]];
+  const hot = new Set(['6-8', '8-10', '3-11', '3-8', '10-11', '8-11']);
+  edges.forEach(([a, b, n]) => {
+    const [x1, y1] = P(har[a][0], har[a][1]), [x2, y2] = P(har[b][0], har[b][1]);
+    const h = hot.has(a + '-' + b);
+    el('line', { x1, y1, x2, y2, stroke: h ? '#c8ff3d' : 'rgba(150,180,255,.55)', 'stroke-width': 1.2 + n * 0.75, 'stroke-linecap': 'round', opacity: h ? 0.9 : 0.75 }, g);
+  });
+
+  // runs / arrows
+  t.arrow([50, 61], [73, 63.6], '#c8ff3d', 4, '10 8', 0.06);           // Rook overlap
+  t.arrow([70, 35], [67.5, 42], '#3ad7ff', 4, '', 0.25);               // Calloway drift
+  t.arrow([86, 52], [88.5, 37], '#ffffff', 3.5, '6 6', -0.15);           // 41' cut-back
+  const gp = P(89, 35.5);
+  el('circle', { cx: gp[0], cy: gp[1], r: 15, fill: '#c8ff3d' }, g);
+  const gt = el('text', { x: gp[0], y: gp[1] + 6, 'text-anchor': 'middle', fill: '#0b1124', 'font-family': 'Barlow Condensed', 'font-weight': 800, 'font-size': 18 }, g); gt.textContent = '41\'';
+
+  // KMA mid-block (defending right goal)
+  const kma = { 1: [100, 34], 2: [88, 55], 5: [90, 40], 6: [90, 27], 3: [88, 13], 7: [75, 52], 8: [76, 39], 4: [75, 27], 11: [74, 15], 9: [61, 38], 10: [60, 25] };
+  Object.entries(kma).forEach(([n, [x, y]]) => t.dot(x, y, n === '1' ? '#9c8cff' : '#e8434f', n, 15, '#fff'));
+  // HAR nodes on top
+  Object.entries(har).forEach(([n, [x, y, touches]]) => {
+    const r = 12 + touches * 0.22;
+    const c = t.dot(x, y, n === '1' ? '#c8ff3d' : '#2f6bff', n, r, n === '1' ? '#0b1124' : '#fff');
+    if (['3', '8', '10', '11'].includes(n)) c.querySelector('circle').setAttribute('stroke', '#c8ff3d'), c.querySelector('circle').setAttribute('stroke-width', 3);
+  });
+
+  // annotations
+  function tag(x, y, text, color, w) {
+    const [px, py] = P(x, y);
+    el('rect', { x: px, y: py, width: w, height: 32, rx: 8, fill: 'rgba(7,11,23,.88)', stroke: color, 'stroke-width': 1.5 }, g);
+    const tt = el('text', { x: px + 12, y: py + 22, fill: color, 'font-family': 'Inter', 'font-weight': 700, 'font-size': 17 }, g); tt.textContent = text;
+  }
+  // 4 v 2 badge
+  const b = P(80.5, 66.2);
+  el('rect', { x: b[0] - 20, y: b[1], width: 212, height: 46, rx: 10, fill: '#c8ff3d' }, g);
+  const bt = el('text', { x: b[0] + 86, y: b[1] + 34, 'text-anchor': 'middle', fill: '#0b1124', 'font-family': 'Barlow Condensed', 'font-weight': 800, 'font-size': 32 }, g); bt.textContent = '4 v 2 OVERLOAD';
+  tag(31.5, 63.8, 'Rook overlaps: 11 runs', '#c8ff3d', 214);
+  tag(53, 31.5, 'Calloway drifts inside', '#3ad7ff', 210);
+  // direction
+  const d1 = P(4, 3.2);
+  const dt = el('text', { x: d1[0], y: d1[1], fill: 'rgba(255,255,255,.55)', 'font-family': 'Barlow Condensed', 'font-weight': 700, 'font-size': 20, 'letter-spacing': 2 }, g); dt.textContent = 'HARBOUR CITY ATTACK →';
+</script>
+</body>
+</html>

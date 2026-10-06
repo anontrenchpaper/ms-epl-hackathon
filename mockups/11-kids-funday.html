@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Funday Cast — kids mode</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  :root {
+    --k-ink: #1d1452;
+    --k-sun: #ffd84d;
+    --k-pink: #ff6fb1;
+    --k-mint: #5fe3a1;
+    --k-sky: #57c7ff;
+    --k-card: #fffaf0;
+  }
+  .frame.kids { background: radial-gradient(1200px 700px at 30% 10%, #5a46e0 0%, rgba(90,70,224,0) 70%), linear-gradient(160deg, #3a2aa8 0%, #24166e 55%, #1a0f52 100%); }
+
+  /* ---------- fun score bug ---------- */
+  .kbug { position: absolute; left: 48px; top: 36px; display: flex; align-items: center; gap: 0; height: 84px; padding: 0 10px 0 10px; border-radius: 999px; background: #fff; box-shadow: 0 9px 0 rgba(15,8,60,.45); color: var(--k-ink); }
+  .kbug .tm { display: flex; align-items: center; gap: 12px; padding: 0 16px 0 6px; font-family: var(--font-display); font-weight: 800; font-size: 32px; letter-spacing: .02em; text-transform: uppercase; }
+  .kbug .tm.r { padding: 0 6px 0 16px; }
+  .kbug .crest { width: 60px; height: 60px; border-radius: 50%; display: grid; place-items: center; font-family: var(--font-display); font-weight: 800; font-size: 26px; color: #fff; box-shadow: inset 0 -5px 0 rgba(0,0,0,.18); }
+  .kbug .sc { background: var(--k-sun); border-radius: 22px; padding: 2px 22px; font-family: var(--font-display); font-weight: 800; font-size: 56px; line-height: 1.1; box-shadow: inset 0 -5px 0 rgba(0,0,0,.12); }
+  .kbug .time { margin-left: 14px; background: var(--k-ink); color: #fff; border-radius: 999px; padding: 8px 18px; font-family: var(--font-display); font-weight: 800; font-size: 30px; letter-spacing: .04em; }
+  .kbug .time small { font-size: 18px; color: var(--k-sun); margin-left: 6px; letter-spacing: .08em; }
+
+  /* ---------- wordmark ---------- */
+  .brand { position: absolute; right: 56px; top: 30px; display: flex; align-items: center; gap: 16px; }
+  .brand .wm { transform: rotate(-4deg); display: flex; align-items: center; gap: 8px; }
+  .brand .wm .a { font-family: var(--font-display); font-weight: 800; font-size: 58px; line-height: 1; color: var(--k-sun); text-shadow: 0 5px 0 #c2410c, 0 10px 18px rgba(0,0,0,.35); letter-spacing: .02em; }
+  .brand .wm .b { font-family: var(--font-display); font-weight: 800; font-size: 34px; color: #fff; background: var(--k-pink); padding: 2px 14px; border-radius: 12px; box-shadow: 0 5px 0 #b8326f; letter-spacing: .08em; }
+  .brand .who { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+  .kchip { display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 999px; font-size: 16px; font-weight: 800; background: rgba(255,255,255,.14); border: 2px solid rgba(255,255,255,.3); color: #fff; }
+  .kchip.live { background: #ff4d6d; border-color: #ff4d6d; }
+  .kchip.live i { width: 10px; height: 10px; border-radius: 50%; background: #fff; display: inline-block; }
+
+  /* ---------- Pip + speech bubble ---------- */
+  .pip { position: absolute; left: 44px; top: 150px; width: 128px; text-align: center; }
+  .pip .nm { margin-top: 2px; display: inline-block; font-family: var(--font-display); font-weight: 800; font-size: 18px; letter-spacing: .12em; color: #1d1452; background: #c8ff3d; padding: 2px 10px; border-radius: 999px; }
+  .bubble { position: absolute; left: 196px; top: 146px; width: 720px; padding: 20px 28px 18px; border-radius: 30px; background: #fff; color: var(--k-ink); box-shadow: 0 10px 0 rgba(15,8,60,.4); }
+  .bubble p { font-size: 30px; line-height: 1.22; font-weight: 800; letter-spacing: -.005em; }
+  .bubble p em { font-style: normal; color: #2f6bff; }
+  .bubble p mark { background: linear-gradient(transparent 55%, #ffe46b 55%); color: inherit; padding: 0 2px; }
+  .bubble .how { margin-top: 10px; font-size: 16px; font-weight: 600; color: #5b5490; display: flex; align-items: center; gap: 8px; }
+  .bubble .how i { font-style: normal; background: #efeaff; color: #7a3ff2; font-weight: 800; padding: 2px 10px; border-radius: 999px; }
+  .bubble .tail { position: absolute; left: -26px; top: 46px; width: 0; height: 0; border-top: 16px solid transparent; border-bottom: 16px solid transparent; border-right: 30px solid #fff; }
+
+  /* ---------- right column cards ---------- */
+  .kcard { position: absolute; right: 48px; width: 500px; border-radius: 28px; background: var(--k-card); color: var(--k-ink); box-shadow: 0 10px 0 rgba(15,8,60,.45); overflow: hidden; }
+  .kcard .hd { padding: 16px 24px 12px; display: flex; align-items: center; gap: 12px; font-family: var(--font-display); font-weight: 800; font-size: 30px; letter-spacing: .02em; text-transform: uppercase; }
+  .kcard .hd .q { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-size: 28px; }
+  .kcard .bd { padding: 0 24px 20px; }
+  .kcard p { font-size: 19px; line-height: 1.38; font-weight: 600; color: #3b3470; }
+  .kcard p b { color: var(--k-ink); font-weight: 800; }
+  .gloss { top: 150px; }
+  .gloss .hd { background: var(--k-sun); }
+  .gloss .hd .q { background: var(--k-ink); }
+  .energy { top: 586px; }
+  .energy .hd { background: var(--k-mint); }
+  .meter { display: grid; grid-template-columns: 136px 1fr 52px; align-items: center; gap: 12px; margin-top: 12px; }
+  .meter .tn { font-weight: 800; font-size: 18px; display: flex; align-items: center; gap: 8px; }
+  .meter .tn i { width: 18px; height: 18px; border-radius: 50%; display: inline-block; }
+  .bat { position: relative; display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; padding: 5px; border-radius: 10px; border: 3px solid var(--k-ink); height: 36px; }
+  .bat::after { content: ""; position: absolute; right: -9px; top: 9px; width: 6px; height: 12px; border-radius: 0 3px 3px 0; background: var(--k-ink); }
+  .bat b { border-radius: 4px; background: #e6e1f5; }
+  .meter .pc { font-family: var(--font-display); font-weight: 800; font-size: 28px; text-align: right; }
+  .meter .say { grid-column: 2 / 4; font-size: 16px; font-weight: 600; color: #5b5490; margin-top: -4px; }
+  .fact { top: 844px; }
+  .fact .hd { background: var(--k-sky); }
+  .fact .row2 { display: flex; align-items: center; gap: 16px; }
+  .fact .big { font-family: var(--font-display); font-weight: 800; font-size: 64px; line-height: .9; color: #7a3ff2; white-space: nowrap; }
+
+  .tagk { position: absolute; transform: translate(-50%, -100%); font-family: var(--font-display); font-weight: 800; font-size: 22px; letter-spacing: .06em; padding: 4px 14px; border-radius: 999px; white-space: nowrap; box-shadow: 0 5px 0 rgba(15,8,60,.35); }
+  .mock-title, .mock-note { color: rgba(255,255,255,.6); }
+</style>
+</head>
+<body>
+<div class="frame kids" id="f">
+  <svg class="stage" id="stage" viewBox="0 0 1920 1080" width="1920" height="1080"></svg>
+
+  <!-- fun score bug -->
+  <div class="kbug">
+    <div class="tm"><span class="crest" style="background:#2f6bff">HC</span>Harbour</div>
+    <div class="sc">1 – 1</div>
+    <div class="tm r">Kingsmoor<span class="crest" style="background:#e8434f">KA</span></div>
+    <div class="time">67'<small>2ND HALF</small></div>
+  </div>
+
+  <!-- wordmark -->
+  <div class="brand">
+    <div class="who">
+      <span class="kchip live"><i></i>LIVE</span>
+      <span class="kchip">Made for Leo, 9 · Harbour fan</span>
+    </div>
+    <div class="wm"><span class="a">FUNDAY</span><span class="b">CAST</span></div>
+  </div>
+
+  <!-- Pip, the (original) Funday Cast host -->
+  <div class="pip">
+    <svg width="128" height="128" viewBox="0 0 84 84">
+      <circle cx="42" cy="44" r="34" fill="#c8ff3d" stroke="#1d1452" stroke-width="4"/>
+      <path d="M14 40 A28 28 0 0 1 70 40" fill="none" stroke="#1d1452" stroke-width="5" stroke-linecap="round"/>
+      <rect x="6" y="36" width="12" height="20" rx="6" fill="#7a3ff2" stroke="#1d1452" stroke-width="3"/>
+      <rect x="66" y="36" width="12" height="20" rx="6" fill="#7a3ff2" stroke="#1d1452" stroke-width="3"/>
+      <path d="M18 54 Q24 66 36 64" fill="none" stroke="#1d1452" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="38" cy="64" r="4" fill="#1d1452"/>
+      <ellipse cx="33" cy="42" rx="5" ry="7" fill="#1d1452"/><ellipse cx="51" cy="42" rx="5" ry="7" fill="#1d1452"/>
+      <circle cx="35" cy="39" r="2" fill="#fff"/><circle cx="53" cy="39" r="2" fill="#fff"/>
+      <path d="M33 54 Q42 62 51 54" fill="none" stroke="#1d1452" stroke-width="4" stroke-linecap="round"/>
+    </svg>
+    <div class="nm">PIP</div>
+  </div>
+  <div class="bubble">
+    <div class="tail"></div>
+    <p><em>Calloway</em> is sneaking into a <mark>secret space</mark> between the red team's lines! Nobody in red knows who should catch him.</p>
+    <div class="how"><i>How we know</i>Our computer watches all 22 players 25 times every second.</div>
+  </div>
+
+  <!-- glossary -->
+  <div class="kcard gloss">
+    <div class="hd"><span class="q">?</span>What's a half-space?</div>
+    <div class="bd">
+      <svg id="lanes" width="452" height="196" viewBox="0 0 452 196" style="display:block;margin:6px 0 12px"></svg>
+      <p>Cut the pitch into <b>5 lanes</b>. The two next to the middle are the <b>half-spaces</b>: tricky spots where defenders aren't sure who should mark you!</p>
+    </div>
+  </div>
+
+  <!-- energy -->
+  <div class="kcard energy">
+    <div class="hd"><span class="q" style="background:var(--k-ink)"><svg width="22" height="26" viewBox="0 0 22 26"><path d="M13 1 L2 15 H10 L8 25 L20 10 H12 Z" fill="#ffd84d" stroke="#ffd84d" stroke-width="1.5" stroke-linejoin="round"/></svg></span>Team energy</div>
+    <div class="bd">
+      <div class="meter">
+        <div class="tn"><i style="background:#2f6bff"></i>Harbour</div>
+        <div class="bat" id="batH"></div>
+        <div class="pc">72%</div>
+        <div class="say">Still bouncy!</div>
+      </div>
+      <div class="meter">
+        <div class="tn"><i style="background:#e8434f"></i>Kingsmoor</div>
+        <div class="bat" id="batK"></div>
+        <div class="pc">54%</div>
+        <div class="say">Puffed out after all that chasing!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- fun fact -->
+  <div class="kcard fact">
+    <div class="hd"><span class="q" style="background:var(--k-ink)"><svg width="26" height="26" viewBox="0 0 26 26"><path d="M13 2 L16.2 9.4 L24.2 10.1 L18.1 15.4 L19.9 23.3 L13 19.1 L6.1 23.3 L7.9 15.4 L1.8 10.1 L9.8 9.4 Z" fill="#fff" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg></span>Wow fact</div>
+    <div class="bd">
+      <div class="row2">
+        <div class="big">8.9 km</div>
+        <p>Calloway has run about <b>85 pitches</b> end to end today!</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="mock-title">Concept 11 · Funday Cast (kids mode)</div>
+  <div class="mock-note">Concept mockup · synthetic data · fictional clubs and players</div>
+</div>
+
+<script src="assets/pitch.js"></script>
+<script>
+  const el = Pitch.el;
+  const f = document.getElementById('f');
+  const svg = document.getElementById('stage');
+
+  // ---------- tracking frame (67', same moment as the line-breaking pass) ----------
+  const sc = JSON.parse(JSON.stringify(Pitch.SCENES.linebreak));
+  sc.away.forEach((p) => { if (p.n === 10) p.n = 14; });   // Doyle-Akande is on since 58'
+  Object.assign(sc.home.find((p) => p.n === 10), { x: 73.6, y: 42 });   // frame a beat earlier: Calloway still arriving in the gap
+  const BALL = [68.6, 36.6];
+
+  // ---------- toy-table projection: view from behind the play, Harbour City attack up the screen ----------
+  const XN = 50.5, XF = 109.5, YL = 71.5, YR = -3.5;      // board extents (world metres)
+  const YNs = 978, YFs = 352, CX = 702, HWN = 640, HWF = 400, KP = 0.3;
+  function T(x, y, z) {
+    const u = (x - XN) / (XF - XN);
+    const g = u * (1 + KP) / (1 + KP * u);
+    const hw = HWN + (HWF - HWN) * g;
+    const sc = hw / HWN;
+    const lat = (y - 34) / 37.5;
+    return { x: CX - lat * hw, y: YNs - (YNs - YFs) * g - (z || 0) * 15 * sc, s: sc };
+  }
+  const pts = (list) => list.map((q) => { const p = T(q[0], q[1], q[2] || 0); return p.x.toFixed(1) + ',' + p.y.toFixed(1); }).join(' ');
+  const arc = (cx, cy, r, a0, a1, n) => { const o = []; for (let i = 0; i <= n; i++) { const a = a0 + (a1 - a0) * i / n; o.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]); } return o; };
+
+  const defs = el('defs', {}, svg);
+  defs.innerHTML = `
+    <radialGradient id="tokH" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#7aa3ff"/><stop offset=".55" stop-color="#2f6bff"/><stop offset="1" stop-color="#1c46c9"/></radialGradient>
+    <radialGradient id="tokA" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#ff8f98"/><stop offset=".55" stop-color="#e8434f"/><stop offset="1" stop-color="#b52d39"/></radialGradient>
+    <radialGradient id="tokG" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#d4ccff"/><stop offset=".55" stop-color="#9c8cff"/><stop offset="1" stop-color="#6f5ee0"/></radialGradient>
+    <radialGradient id="halo" cx="50%" cy="50%" r="50%"><stop offset=".35" stop-color="#ffe14d" stop-opacity=".9"/><stop offset="1" stop-color="#ffe14d" stop-opacity="0"/></radialGradient>
+    <radialGradient id="secret" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#fff3a6" stop-opacity=".9"/><stop offset=".7" stop-color="#ffd84d" stop-opacity=".5"/><stop offset="1" stop-color="#ffd84d" stop-opacity=".2"/></radialGradient>
+    <linearGradient id="trail" gradientUnits="userSpaceOnUse" x1="${T(61.2, 32.4).x}" y1="${T(61.2, 32.4).y}" x2="${T(...BALL).x}" y2="${T(...BALL).y}">
+      <stop offset="0" stop-color="#ff6fb1" stop-opacity="0"/><stop offset=".5" stop-color="#ffd84d" stop-opacity=".85"/><stop offset="1" stop-color="#ffffff" stop-opacity="1"/></linearGradient>
+    <filter id="kglow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="kshadow" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="18" stdDeviation="14" flood-color="#0b0630" flood-opacity=".55"/></filter>`;
+
+  // ---------- background confetti ----------
+  (function () {
+    const r = Pitch.rng(9);
+    const g = el('g', {}, svg);
+    el('circle', { cx: 1720, cy: 1000, r: 260, fill: '#ff6fb1', opacity: .12 }, g);
+    el('circle', { cx: 160, cy: 980, r: 220, fill: '#57c7ff', opacity: .1 }, g);
+    const cols = ['#ffd84d', '#ff6fb1', '#57c7ff', '#c8ff3d', '#ffffff'];
+    for (let i = 0; i < 70; i++) {
+      const x = r() * 1920, y = r() * 1080, w = 6 + r() * 8;
+      el('rect', { x, y, width: w, height: w * .45, rx: 2, fill: cols[i % cols.length], opacity: .22 + r() * .25, transform: `rotate(${(r() * 180).toFixed(0)} ${x} ${y})` }, g);
+    }
+  })();
+
+  // ---------- toy pitch board ----------
+  const L = 105, W = 68;
+  const board = el('g', { filter: 'url(#kshadow)' }, svg);
+  const nl = T(XN, YL), nr = T(XN, YR), fr = T(XF, YR), fl = T(XF, YL), D = 34;
+  el('polygon', { points: `${nl.x},${nl.y} ${nr.x},${nr.y} ${nr.x},${nr.y + D} ${nl.x},${nl.y + D}`, fill: '#2b9464' }, board);
+  el('polygon', { points: `${nr.x},${nr.y} ${fr.x},${fr.y} ${fr.x},${fr.y + D * .55} ${nr.x},${nr.y + D}`, fill: '#1f7a51' }, board);
+  el('polygon', { points: `${nl.x},${nl.y} ${fl.x},${fl.y} ${fl.x},${fl.y + D * .55} ${nl.x},${nl.y + D}`, fill: '#1f7a51' }, board);
+  el('polygon', { points: pts([[XN, YR], [XF, YR], [XF, YL], [XN, YL]]), fill: '#55c98a', stroke: '#ffffff', 'stroke-width': 9, 'stroke-linejoin': 'round' }, board);
+  // candy stripes (across the pitch, like mowing rows)
+  const sg = el('g', {}, svg);
+  const NS = 9;
+  for (let i = 0; i < NS; i++) {
+    const a = 52.5 + (52.5 / NS) * i, b = 52.5 + (52.5 / NS) * (i + 1);
+    el('polygon', { points: pts([[a, 0], [b, 0], [b, W], [a, W]]), fill: i % 2 ? '#79e0a7' : '#6ad79a' }, sg);
+  }
+  for (let x = 54; x < 104; x += 3.2) for (let y = 2; y < 67; y += 3.2) {
+    const p = T(x + ((Math.round(x / 3.2)) % 2) * 1.6, y);
+    el('circle', { cx: p.x, cy: p.y, r: 1.7 * p.s, fill: '#ffffff', opacity: .13 }, sg);
+  }
+  // markings
+  const lines = el('g', { fill: 'none', stroke: '#ffffff', 'stroke-width': 4.5, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', opacity: .95 }, svg);
+  const poly = (list, closed) => el(closed ? 'polygon' : 'polyline', { points: pts(list) }, lines);
+  poly([[52.5, 0], [L, 0], [L, W], [52.5, W]], true);
+  poly(arc(52.5, W / 2, 9.15, -Math.PI / 2, Math.PI / 2, 40));
+  poly([[L, W / 2 - 20.16], [L - 16.5, W / 2 - 20.16], [L - 16.5, W / 2 + 20.16], [L, W / 2 + 20.16]]);
+  poly([[L, W / 2 - 9.16], [L - 5.5, W / 2 - 9.16], [L - 5.5, W / 2 + 9.16], [L, W / 2 + 9.16]]);
+  const aa = Math.acos(5.5 / 9.15);
+  poly(arc(L - 11, W / 2, 9.15, Math.PI - aa, Math.PI + aa, 24));
+  const spot = T(L - 11, W / 2); el('circle', { cx: spot.x, cy: spot.y, r: 4, fill: '#fff' }, svg);
+  // chunky toy goal
+  const goal = el('g', {}, svg);
+  el('polygon', { points: pts([[L + 2, 30.34, 0], [L + 2, 37.66, 0], [L + 2, 37.66, 2.2], [L + 2, 30.34, 2.2]]), fill: '#ffffff', opacity: .3 }, goal);
+  for (let k = 1; k < 8; k++) { const yy = 30.34 + k * (7.32 / 8); el('polyline', { points: pts([[L + 2, yy, 0], [L + 2, yy, 2.2]]), stroke: '#fff', 'stroke-opacity': .5, 'stroke-width': 1.5, fill: 'none' }, goal); }
+  el('polyline', { points: pts([[L, 30.34, 0], [L, 30.34, 2.44], [L, 37.66, 2.44], [L, 37.66, 0]]), fill: 'none', stroke: '#ffffff', 'stroke-width': 9, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }, goal);
+  // corner flags
+  [[L, 0], [L, W]].forEach(([x, y]) => {
+    const b = T(x, y), t = T(x, y, 2.6);
+    el('line', { x1: b.x, y1: b.y, x2: t.x, y2: t.y, stroke: '#fff', 'stroke-width': 4, 'stroke-linecap': 'round' }, svg);
+    el('polygon', { points: `${t.x},${t.y} ${t.x + (x === L && y === 0 ? 22 : -22)},${t.y + 7} ${t.x},${t.y + 15}`, fill: '#ff6fb1' }, svg);
+  });
+
+  // ---------- the red team's lines ----------
+  function redLine(x, label, ly) {
+    el('polyline', { points: pts([[x, 1.5], [x, 66.5]]), fill: 'none', stroke: '#ff4d6d', 'stroke-width': 6, 'stroke-dasharray': '2 14', 'stroke-linecap': 'round' }, svg);
+    const p = T(x, ly);
+    const d = document.createElement('div');
+    d.className = 'tagk';
+    d.style.cssText = `left:${p.x}px;top:${p.y + 17}px;background:#ff4d6d;color:#fff;font-size:20px`;
+    d.textContent = label;
+    f.appendChild(d);
+  }
+  redLine(64.1, 'Red line 1', 15.5);
+  redLine(79, 'Red line 2', 3.5);
+
+  // ---------- secret space ----------
+  const zone = arc(71.4, 41.6, 6.3, 0, Math.PI * 2, 64);
+  el('polygon', { points: pts(zone), fill: 'url(#secret)', stroke: '#fff7c2', 'stroke-width': 4, 'stroke-dasharray': '3 11', 'stroke-linecap': 'round' }, svg);
+  function sparkle(x, y, s, col, op) {
+    const d = `M${x},${y - s} Q${x},${y} ${x + s},${y} Q${x},${y} ${x},${y + s} Q${x},${y} ${x - s},${y} Q${x},${y} ${x},${y - s} Z`;
+    el('path', { d, fill: col || '#fff', opacity: op == null ? 1 : op }, svg);
+  }
+  [[66.4, 46.8, 13], [77.2, 36.4, 10], [67.6, 36.2, 9], [74.8, 47.6, 11], [76.6, 44.6, 7]].forEach(([x, y, s]) => { const p = T(x, y); sparkle(p.x, p.y, s, '#fffbe0'); });
+  (function () {
+    const p = T(71.4, 48.6);
+    const d = document.createElement('div');
+    d.className = 'tagk';
+    d.style.cssText = `left:${p.x}px;top:${p.y + 16}px;background:#ffd84d;color:#1d1452;transform:translate(-50%,-50%) rotate(-4deg)`;
+    d.textContent = 'Secret space!';
+    f.appendChild(d);
+  })();
+
+  // ---------- sparkly ball trail ----------
+  const t0 = T(61.2, 32.4), t1 = T(...BALL);
+  el('line', { x1: t0.x, y1: t0.y, x2: t1.x, y2: t1.y, stroke: 'url(#trail)', 'stroke-width': 13, 'stroke-linecap': 'round', filter: 'url(#kglow)' }, svg);
+  const ahead = T(72.8, 41.3);
+  el('line', { x1: t1.x, y1: t1.y, x2: ahead.x, y2: ahead.y, stroke: '#ffffff', 'stroke-width': 5, 'stroke-dasharray': '1 13', 'stroke-linecap': 'round', opacity: .95 }, svg);
+  const rs = Pitch.rng(4);
+  for (let i = 1; i < 9; i++) {
+    const t = i / 9, x = t0.x + (t1.x - t0.x) * t, y = t0.y + (t1.y - t0.y) * t;
+    sparkle(x + (rs() - .5) * 30, y + (rs() - .5) * 30, 4 + t * 9, i % 2 ? '#ffd84d' : '#ffffff', .5 + t * .5);
+  }
+
+  // ---------- player tokens ----------
+  const tokens = [];
+  sc.home.forEach((p) => { if (p.x >= 51) tokens.push(Object.assign({ team: 'home' }, p)); });
+  sc.away.forEach((p) => { if (p.x >= 51) tokens.push(Object.assign({ team: 'away' }, p)); });
+  tokens.forEach((p) => { p.s = T(p.x, p.y); });
+  tokens.sort((a, b) => a.s.y - b.s.y);
+  const tg = el('g', {}, svg);
+  function face(g, x, y, r, mood) {
+    el('ellipse', { cx: x - r * .32, cy: y - r * .12, rx: r * .15, ry: r * .2, fill: '#fff' }, g);
+    el('ellipse', { cx: x + r * .32, cy: y - r * .12, rx: r * .15, ry: r * .2, fill: '#fff' }, g);
+    el('circle', { cx: x - r * .3, cy: y - r * .16, r: r * .08, fill: '#1d1452' }, g);
+    el('circle', { cx: x + r * .34, cy: y - r * .16, r: r * .08, fill: '#1d1452' }, g);
+    const big = mood === 'big', w = big ? .42 : .3;
+    el('path', { d: `M${x - r * w},${y + r * .2} Q${x},${y + r * (big ? .68 : .5)} ${x + r * w},${y + r * .2}`, fill: big ? '#1d1452' : 'none', stroke: '#1d1452', 'stroke-width': Math.max(2.5, r * .1), 'stroke-linecap': 'round' }, g);
+    el('ellipse', { cx: x - r * .56, cy: y + r * .2, rx: r * .12, ry: r * .07, fill: '#ff9cc7', opacity: .75 }, g);
+    el('ellipse', { cx: x + r * .56, cy: y + r * .2, rx: r * .12, ry: r * .07, fill: '#ff9cc7', opacity: .75 }, g);
+  }
+  tokens.forEach((p) => {
+    const star = p.team === 'home' && p.n === 10;
+    const r = (star ? 1.32 : 1) * (17 + 10 * p.s.s);
+    const x = p.s.x, y = p.s.y - r * 0.55;
+    const g = el('g', {}, tg);
+    el('ellipse', { cx: x + 5, cy: p.s.y + 4, rx: r * .9, ry: r * .34, fill: '#0b3b25', opacity: .32 }, g);
+    if (star) {
+      el('circle', { cx: x, cy: y, r: r * 2.1, fill: 'url(#halo)' }, g);
+      for (let k = 0; k < 10; k++) {
+        const a = k * Math.PI / 5 + .3;
+        el('line', { x1: x + Math.cos(a) * r * 1.28, y1: y + Math.sin(a) * r * 1.28, x2: x + Math.cos(a) * r * 1.62, y2: y + Math.sin(a) * r * 1.62, stroke: '#fff7c2', 'stroke-width': 5, 'stroke-linecap': 'round' }, g);
+      }
+    }
+    const fill = p.n === 1 ? 'url(#tokG)' : p.team === 'home' ? 'url(#tokH)' : 'url(#tokA)';
+    el('circle', { cx: x, cy: y, r, fill, stroke: star ? '#ffd84d' : '#ffffff', 'stroke-width': star ? 6 : 4 }, g);
+    face(g, x, y - r * .05, r, star ? 'big' : 'smile');
+    const bx = x + r * .74, by = y + r * .64, br = Math.max(14, r * .46);
+    el('circle', { cx: bx, cy: by, r: br, fill: '#fff', stroke: '#1d1452', 'stroke-width': 2.5 }, g);
+    const t = el('text', { x: bx, y: by + br * .37, 'text-anchor': 'middle', 'font-family': 'Barlow Condensed', 'font-weight': 800, 'font-size': br * 1.12, fill: p.n === 1 ? '#6f5ee0' : p.team === 'home' ? '#2f6bff' : '#e8434f' }, g);
+    t.textContent = p.n;
+    p.top = y - r; p.r = r; p.cy = y;
+  });
+
+  // ---------- ball ----------
+  (function () {
+    const b = T(...BALL), bz = T(BALL[0], BALL[1], 1.1);
+    el('ellipse', { cx: b.x + 3, cy: b.y + 2, rx: 12, ry: 4.5, fill: '#0b3b25', opacity: .35 }, svg);
+    const g = el('g', { filter: 'url(#kglow)' }, svg);
+    el('circle', { cx: bz.x, cy: bz.y, r: 15, fill: '#ffffff', stroke: '#1d1452', 'stroke-width': 3 }, g);
+    el('path', { d: `M${bz.x - 5},${bz.y - 6} l10,0 l3,8 l-8,6 l-8,-6 z`, fill: '#1d1452' }, g);
+  })();
+
+  // ---------- name tags ----------
+  function nameTag(team, n, text, bg, col, extra) {
+    const p = tokens.find((q) => q.team === team && q.n === n);
+    const d = document.createElement('div');
+    d.className = 'tagk';
+    d.style.cssText = `left:${p.s.x}px;top:${p.top - (extra || 10)}px;background:${bg};color:${col}`;
+    d.textContent = text;
+    f.appendChild(d);
+  }
+  (function () {
+    const p = tokens.find((q) => q.team === 'home' && q.n === 10);
+    const d = document.createElement('div');
+    d.className = 'tagk';
+    d.style.cssText = `left:${p.s.x - p.r - 20}px;top:${p.cy}px;transform:translate(-100%,-50%);background:#ffd84d;color:#1d1452;font-size:24px`;
+    d.textContent = '★ Calloway';
+    f.appendChild(d);
+  })();
+  (function () {
+    const p = tokens.find((q) => q.team === 'home' && q.n === 6);
+    const d = document.createElement('div');
+    d.className = 'tagk';
+    d.style.cssText = `left:${p.s.x}px;top:${p.s.y + 14}px;transform:translate(-50%,0);background:#ffffff;color:#2f6bff`;
+    d.textContent = 'Marchetti';
+    f.appendChild(d);
+  })();
+
+  // ---------- half-space lanes diagram (same view: attacking up) ----------
+  (function () {
+    const s = document.getElementById('lanes');
+    const w = 452, h = 196, pad = 6;
+    el('rect', { x: 0, y: 0, width: w, height: h, rx: 18, fill: '#68d698' }, s);
+    const lanes = [[0, 13.84, 'Wing'], [13.84, 24.84, 'half'], [24.84, 43.16, 'Middle'], [43.16, 54.16, 'half'], [54.16, 68, 'Wing']];
+    const X = (m) => pad + ((68 - m) / 68) * (w - 2 * pad);   // mirrored: the team's left is on the left, as on the board
+    lanes.forEach(([a, b, k], i) => {
+      el('rect', { x: X(b) + 1.5, y: pad, width: X(a) - X(b) - 3, height: h - 2 * pad, rx: 6, fill: k === 'half' ? '#ffd84d' : '#ffffff', opacity: k === 'half' ? .95 : .14 }, s);
+    });
+    el('rect', { x: pad, y: pad, width: w - 2 * pad, height: h - 2 * pad, rx: 12, fill: 'none', stroke: '#fff', 'stroke-width': 3 }, s);
+    // goal at the top, box
+    el('rect', { x: X(44), y: pad, width: X(24) - X(44), height: 40, fill: 'none', stroke: '#fff', 'stroke-width': 3 }, s);
+    el('rect', { x: X(37.7), y: 0, width: X(30.3) - X(37.7), height: 8, rx: 3, fill: '#fff' }, s);
+    const lab = (x, yy, t, c) => { const e = el('text', { x, y: yy, 'text-anchor': 'middle', 'font-family': 'Barlow Condensed', 'font-weight': 800, 'font-size': 17, 'letter-spacing': 1, fill: c }, s); e.textContent = t; };
+    [[X(19.34)], [X(48.66)]].forEach(([cx]) => { lab(cx, 150, 'HALF-', '#1d1452'); lab(cx, 170, 'SPACE', '#1d1452'); });
+    lab(X(6.9), 170, 'WING', '#ffffff'); lab(X(61.1), 170, 'WING', '#ffffff'); lab(X(34), 170, 'MIDDLE', '#ffffff');
+    // attack arrow up the middle
+    el('path', { d: `M${X(34)},${128} l0,-58`, stroke: '#1d1452', 'stroke-width': 5, 'stroke-linecap': 'round' }, s);
+    el('path', { d: `M${X(34) - 11},${82} l11,-14 l11,14`, fill: 'none', stroke: '#1d1452', 'stroke-width': 5, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, s);
+    // Calloway in his (left) half-space
+    const cx = X(48.66), cy = 92;
+    el('circle', { cx, cy, r: 17, fill: '#2f6bff', stroke: '#fff', 'stroke-width': 3 }, s);
+    const tt = el('text', { x: cx, y: cy + 6, 'text-anchor': 'middle', 'font-family': 'Barlow Condensed', 'font-weight': 800, 'font-size': 18, fill: '#fff' }, s);
+    tt.textContent = '10';
+  })();
+
+  // ---------- energy batteries ----------
+  function battery(id, n, col) {
+    const b = document.getElementById(id);
+    for (let i = 0; i < 10; i++) { const s = document.createElement('b'); if (i < n) s.style.background = col; b.appendChild(s); }
+  }
+  battery('batH', 7, '#2f6bff');
+  battery('batK', 5, '#ff6f7b');
+</script>
+</body>
+</html>

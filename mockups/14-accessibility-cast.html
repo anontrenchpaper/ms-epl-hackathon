@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Audio-described Cast — high-contrast match companion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  :root { --hc-line: rgba(255,255,255,.62); --hc-sub: #e4e7ee; --acc: #c8ff3d; --har: #5cb8ff; --kma: #ff9f1c; }
+  .frame { background: #000; font-family: "Atkinson Hyperlegible", var(--font-ui); }
+  .hc { border: 2px solid var(--hc-line); border-radius: 22px; background: #050505; }
+  .lbl { font-family: "Atkinson Hyperlegible", var(--font-ui); font-weight: 700; font-size: 20px; letter-spacing: .14em; text-transform: uppercase; color: var(--acc); }
+
+  /* top bar */
+  .top { position: absolute; left: 64px; right: 64px; top: 34px; height: 92px; display: flex; align-items: center; gap: 22px; }
+  .top .ttl .nm { font-family: var(--font-display); font-weight: 800; font-size: 46px; line-height: 1; text-transform: uppercase; }
+  .top .ttl .sb { font-size: 21px; color: var(--hc-sub); margin-top: 4px; }
+  .score { margin-left: auto; display: flex; align-items: center; height: 76px; border: 2px solid var(--hc-line); border-radius: 18px; overflow: hidden; font-family: var(--font-display); font-weight: 800; font-size: 44px; letter-spacing: .04em; }
+  .score > div { display: flex; align-items: center; gap: 12px; padding: 0 20px; height: 100%; }
+  .score .s { background: #fff; color: #000; }
+  .score .c { font-family: var(--font-mono); font-weight: 700; font-size: 32px; border-left: 2px solid var(--hc-line); }
+  .shape { display: inline-block; width: 22px; height: 22px; }
+  .bigbtn { height: 76px; padding: 0 26px; border-radius: 18px; display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 25px; border: 3px solid #fff; background: #000; }
+  .bigbtn.pri { background: var(--acc); color: #000; border-color: var(--acc); }
+
+  /* transcript */
+  .tr { position: absolute; left: 64px; top: 150px; width: 1000px; height: 566px; padding: 24px 30px; display: flex; flex-direction: column; }
+  .tr .hd { display: flex; align-items: center; gap: 16px; }
+  .tr .hd .voice { margin-left: auto; font-size: 20px; color: var(--hc-sub); display: flex; align-items: center; gap: 10px; }
+  .orient { margin-top: 16px; display: flex; align-items: center; gap: 14px; padding: 12px 18px; border-radius: 14px; border: 2px dashed var(--hc-line); font-size: 24px; font-weight: 700; }
+  .orient svg { flex: none; }
+  .lines { margin-top: 14px; display: flex; flex-direction: column; gap: 12px; }
+  .ln { display: grid; grid-template-columns: 96px 1fr; gap: 16px; align-items: baseline; }
+  .ln .t { font-family: var(--font-mono); font-weight: 700; font-size: 20px; color: #c9ccd6; }
+  .ln .x { font-size: 27px; line-height: 1.35; color: var(--hc-sub); }
+  .ln.now { padding: 16px 18px 18px; margin: 4px -18px 0; border-radius: 16px; background: #111; border: 3px solid var(--acc); }
+  .ln.now .t { color: var(--acc); }
+  .ln.now .x { font-size: 38px; line-height: 1.3; color: #fff; font-weight: 700; }
+  .ln.crowd .x { font-style: italic; }
+  .sp { display: inline-flex; align-items: center; gap: 6px; padding: 0 10px; margin: 0 2px; border-radius: 10px; border: 2px solid var(--acc); color: var(--acc); font-weight: 700; font-style: normal; font-size: .82em; line-height: 1.3; white-space: nowrap; vertical-align: 2px; }
+  .sp.w { border-color: #fff; color: #fff; }
+  .speak { display: flex; align-items: center; gap: 12px; margin-top: auto; font-size: 20px; color: var(--hc-sub); }
+
+  /* haptics */
+  .hp { position: absolute; left: 64px; top: 736px; width: 1000px; height: 286px; padding: 20px 30px; }
+  .hp .hd { display: flex; align-items: center; gap: 14px; }
+  .hp .hd .dev { margin-left: auto; font-size: 20px; color: var(--hc-sub); }
+  .legend { display: flex; gap: 26px; margin-top: 8px; font-size: 21px; align-items: center; }
+  .legend span { display: flex; align-items: center; gap: 10px; }
+
+  /* sound map */
+  .sm { position: absolute; left: 1094px; top: 150px; width: 762px; height: 448px; padding: 18px 24px; }
+  .sm .row { display: flex; gap: 18px; margin-top: 12px; }
+  .meter { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .mt { font-size: 20px; font-weight: 700; display: flex; justify-content: space-between; }
+  .mt b { color: var(--acc); }
+  .track { position: relative; height: 22px; border-radius: 11px; border: 2px solid var(--hc-line); background: #000; }
+  .track .mid { position: absolute; left: 50%; top: -6px; bottom: -6px; width: 2px; background: #fff; }
+  .track .k { position: absolute; top: 50%; width: 32px; height: 32px; border-radius: 50%; background: var(--acc); border: 3px solid #000; box-shadow: 0 0 0 3px var(--acc); transform: translate(-50%, -50%); }
+  .track .fill { position: absolute; top: 2px; bottom: 2px; border-radius: 8px; background: rgba(200,255,61,.35); }
+  .ends { display: flex; justify-content: space-between; font-size: 18px; color: var(--hc-sub); font-weight: 700; }
+
+  /* settings */
+  .st { position: absolute; left: 1094px; top: 616px; width: 762px; height: 406px; padding: 16px 24px; display: flex; flex-direction: column; }
+  .set { display: grid; grid-template-columns: 220px 1fr; align-items: center; gap: 16px; padding: 8px 0; border-top: 2px solid rgba(255,255,255,.25); }
+  .set:first-of-type { border-top: none; }
+  .set .k { font-size: 22px; font-weight: 700; }
+  .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; border: 3px solid #fff; border-radius: 14px; overflow: hidden; height: 52px; }
+  .seg span { display: grid; place-items: center; font-size: 22px; font-weight: 700; border-left: 3px solid #fff; }
+  .seg span:first-child { border-left: none; }
+  .seg .on { background: var(--acc); color: #000; }
+  .rate { display: flex; align-items: center; gap: 12px; }
+  .rb { width: 52px; height: 52px; border-radius: 14px; border: 3px solid #fff; display: grid; place-items: center; font-size: 30px; font-weight: 700; flex: none; }
+  .rate .tk { flex: 1; position: relative; height: 12px; border-radius: 6px; background: #333; }
+  .rate .tk i { position: absolute; left: 0; top: 0; bottom: 0; width: 55%; border-radius: 6px; background: var(--acc); }
+  .rate .tk b { position: absolute; left: 55%; top: 50%; width: 30px; height: 30px; border-radius: 50%; background: #fff; transform: translate(-50%, -50%); border: 3px solid #000; box-shadow: 0 0 0 2px #fff; }
+  .rate .v { font-family: var(--font-mono); font-weight: 700; font-size: 24px; min-width: 70px; text-align: right; }
+  .tg { display: flex; align-items: center; gap: 14px; }
+  .tg .d { font-size: 19px; color: var(--hc-sub); flex: 1; }
+  .sw { width: 86px; height: 48px; border-radius: 999px; background: var(--acc); position: relative; flex: none; border: 3px solid var(--acc); }
+  .sw::after { content: "ON"; position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 17px; font-weight: 700; color: #000; }
+  .sw::before { content: ""; position: absolute; right: 3px; top: 3px; width: 36px; height: 36px; border-radius: 50%; background: #000; }
+</style>
+</head>
+<body>
+<div class="frame" id="f">
+
+  <!-- top bar -->
+  <div class="top">
+    <div class="ttl"><div class="nm">Audio-described cast</div><div class="sb">Sam · Leeds · low vision · follows Harbour City</div></div>
+    <div class="score">
+      <div><svg class="shape" viewBox="0 0 22 22"><circle cx="11" cy="11" r="10" fill="var(--har)"/></svg>HAR</div>
+      <div class="s">1 – 1</div>
+      <div>KMA<svg class="shape" viewBox="0 0 22 22"><path d="M11 1 21 11 11 21 1 11Z" fill="var(--kma)"/></svg></div>
+      <div class="c">67:12</div>
+    </div>
+    <div class="bigbtn"><svg width="26" height="26" viewBox="0 0 26 26"><path d="M4 13a9 9 0 1 0 3-6.7M4 3v6h6" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Repeat</div>
+    <div class="bigbtn pri"><svg width="22" height="24" viewBox="0 0 22 24"><rect x="2" y="1" width="6" height="22" rx="2" fill="#000"/><rect x="14" y="1" width="6" height="22" rx="2" fill="#000"/></svg>Pause</div>
+  </div>
+
+  <!-- live transcript -->
+  <div class="hc tr">
+    <div class="hd"><span class="lbl">Live audio description</span>
+      <span class="voice"><svg width="26" height="22" viewBox="0 0 26 22"><path d="M2 8h5l6-5v16l-6-5H2z" fill="#fff"/><path d="M17 6a7 7 0 0 1 0 10M20.5 3a11 11 0 0 1 0 16" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>Calm voice · 1.2× · Rich detail</span></div>
+    <div class="orient"><svg width="64" height="28" viewBox="0 0 64 28"><path d="M2 14h54M44 4l12 10-12 10" stroke="#c8ff3d" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Harbour City attacking left to right. You hear them from the left.</div>
+    <div class="lines">
+      <div class="ln"><span class="t">67:04</span><span class="x">Holloway, left centre-back, rolls it short into Marchetti.</span></div>
+      <div class="ln crowd"><span class="t">67:08</span><span class="x"><span class="sp w">CROWD</span> Home fans getting restless. A low hum, then claps.</span></div>
+      <div class="ln now"><span class="t">67:12</span><span class="x">Ball with Marchetti, <span class="sp">◎ centre circle</span>… sharp pass forward, <span class="sp">↗ 18 metres</span>, to Calloway <span class="sp">between the lines</span>. Six Kingsmoor players are now behind the ball.</span></div>
+    </div>
+    <div class="speak"><svg id="spk" width="220" height="34"></svg><span>Speaking now · next: Calloway turns to face goal</span></div>
+  </div>
+
+  <!-- haptics -->
+  <div class="hc hp">
+    <div class="hd"><span class="lbl">Haptic pattern</span><span class="dev">On your watch and phone · last 20 seconds</span></div>
+    <svg id="hap" width="940" height="140" style="display:block;margin-top:10px"></svg>
+    <div class="legend">
+      <span><svg width="26" height="26" viewBox="0 0 26 26"><rect x="10" y="5" width="6" height="16" rx="3" fill="#fff"/></svg>Tap = pass</span>
+      <span><svg width="40" height="26" viewBox="0 0 40 26"><rect x="8" y="3" width="8" height="20" rx="3" fill="#c8ff3d"/><rect x="24" y="3" width="8" height="20" rx="3" fill="#c8ff3d"/></svg>Double tap = big pass</span>
+      <span><svg width="56" height="26" viewBox="0 0 56 26"><rect x="4" y="5" width="48" height="16" rx="8" fill="#fff"/></svg>Long buzz = shot</span>
+      <span><svg width="56" height="26" viewBox="0 0 56 26"><rect x="2" y="5" width="14" height="16" rx="4" fill="#ff9f1c"/><rect x="21" y="5" width="14" height="16" rx="4" fill="#ff9f1c"/><rect x="40" y="5" width="14" height="16" rx="4" fill="#ff9f1c"/></svg>Three = goal</span>
+    </div>
+  </div>
+
+  <!-- sound map -->
+  <div class="hc sm">
+    <div class="row" style="margin-top:0;align-items:center"><span class="lbl">Sound map</span><span style="margin-left:auto;font-size:20px;color:var(--hc-sub)">Where you hear the ball</span></div>
+    <div class="row" style="align-items:stretch">
+      <svg id="map" width="420" height="272" style="display:block;flex:none"></svg>
+      <div style="display:flex;flex-direction:column;gap:12px;flex:1;justify-content:center">
+        <div style="font-size:26px;font-weight:700;line-height:1.25">Ball sound is <span style="color:var(--acc)">right of centre</span>, on the <span style="color:var(--acc)">far side</span>, moving away.</div>
+        <div style="display:flex;gap:16px;align-items:center">
+          <svg width="72" height="64" viewBox="0 0 72 64"><path d="M8 40V30a28 28 0 0 1 56 0v10" stroke="#fff" stroke-width="5" fill="none"/><rect x="2" y="36" width="16" height="26" rx="6" fill="#fff"/><rect x="54" y="36" width="16" height="26" rx="6" fill="#c8ff3d"/></svg>
+          <div style="display:flex;gap:8px;align-items:flex-end;height:64px">
+            <div style="width:26px;height:24px;background:#fff;border-radius:4px"></div>
+            <div style="width:26px;height:58px;background:#c8ff3d;border-radius:4px"></div>
+          </div>
+          <div style="font-size:20px;color:var(--hc-sub);line-height:1.3">L <b style="color:#fff">35%</b><br>R <b style="color:var(--acc)">80%</b></div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="meter"><div class="mt"><span>Pan</span><b>43% right</b></div><div class="track"><span class="mid"></span><span class="fill" style="left:50%;width:21.5%"></span><span class="k" style="left:71.5%"></span></div><div class="ends"><span>Left</span><span>Right</span></div></div>
+      <div class="meter"><div class="mt"><span>Distance</span><b>far side</b></div><div class="track"><span class="fill" style="left:0;width:60%"></span><span class="k" style="left:60%"></span></div><div class="ends"><span>Near</span><span>Far</span></div></div>
+    </div>
+  </div>
+
+  <!-- settings -->
+  <div class="hc st">
+    <span class="lbl" style="margin-bottom:6px">Settings</span>
+    <div class="set"><span class="k">Description</span><div class="seg"><span>Sparse</span><span>Standard</span><span class="on">Rich</span></div></div>
+    <div class="set"><span class="k">Speaking rate</span><div class="rate"><span class="rb">−</span><span class="tk"><i></i><b></b></span><span class="rb">+</span><span class="v">1.2×</span></div></div>
+    <div class="set"><span class="k">Caption size</span><div class="seg"><span style="font-size:20px">A</span><span style="font-size:27px">A</span><span class="on" style="font-size:34px">A</span></div></div>
+    <div class="set"><span class="k">Colour-blind safe</span><div class="tg"><span class="d" style="display:flex;align-items:center;gap:10px">
+      <svg width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="10" fill="var(--har)"/></svg>HAR circle
+      <svg width="22" height="22" viewBox="0 0 22 22" style="margin-left:8px"><path d="M11 1 21 11 11 21 1 11Z" fill="var(--kma)"/></svg>KMA diamond</span><span class="sw"></span></div></div>
+    <div class="set"><span class="k">Crowd mood</span><div class="tg"><span class="d">Atmosphere only, never over live play</span><span class="sw"></span></div></div>
+  </div>
+
+  <div class="mock-title" style="color:rgba(255,255,255,.6)">Concept 14 · Audio-described Cast</div>
+  <div class="mock-note" style="color:rgba(255,255,255,.6)">Concept mockup · synthetic data · fictional clubs and players</div>
+</div>
+
+<script src="assets/pitch.js"></script>
+<script>
+  const NS = 'http://www.w3.org/2000/svg';
+  // ---- sound map: high-contrast top-down pitch ----
+  const map = document.getElementById('map');
+  const t = Pitch.tactical(map, { x: 0, y: 0, w: 420, h: 272, grass: '#000', lineColor: 'rgba(255,255,255,0.75)', stripes: false });
+  // sound rings
+  const [bx, by] = t.P(75, 40.7);
+  [64, 44, 26].forEach((r, i) => { const c = document.createElementNS(NS, 'circle');
+    Object.entries({ cx: bx, cy: by, r, fill: 'none', stroke: '#c8ff3d', 'stroke-width': 3, opacity: [0.3, 0.55, 0.85][i] }).forEach(([k, v]) => c.setAttribute(k, v)); t.g.appendChild(c); });
+  t.arrow([61.2, 32.4], [74, 40], '#c8ff3d', 4, '8 6', -0.06);
+  const sc = Pitch.SCENES.linebreak;
+  sc.away.forEach(p => { const [x, y] = t.P(p.x, p.y); const d = document.createElementNS(NS, 'path');
+    d.setAttribute('d', `M${x} ${y - 9} L${x + 9} ${y} L${x} ${y + 9} L${x - 9} ${y} Z`); d.setAttribute('fill', '#ff9f1c'); d.setAttribute('stroke', '#000'); d.setAttribute('stroke-width', 2); t.g.appendChild(d); });
+  sc.home.forEach(p => t.dot(p.x, p.y, '#5cb8ff', null, 8));
+  const ball = document.createElementNS(NS, 'circle');
+  Object.entries({ cx: bx, cy: by, r: 11, fill: '#fff', stroke: '#000', 'stroke-width': 3 }).forEach(([k, v]) => ball.setAttribute(k, v)); t.g.appendChild(ball);
+  // centre axis for pan reference
+  const ax = document.createElementNS(NS, 'text');
+  Object.entries({ x: 8, y: 264, fill: '#fff', 'font-family': 'Atkinson Hyperlegible', 'font-weight': 700, 'font-size': 18 }).forEach(([k, v]) => ax.setAttribute(k, v)); ax.textContent = 'You are here (near side)';
+  t.g.appendChild(ax);
+
+  // ---- haptic timeline (66:52 → 67:12) ----
+  const hap = document.getElementById('hap');
+  const W = 940, H = 140, x0 = 10, x1 = 890;
+  const X = s => x0 + (s / 20) * (x1 - x0);
+  let h = `<line x1="${x0}" x2="${x1}" y1="70" y2="70" stroke="rgba(255,255,255,.35)" stroke-width="2"/>`;
+  const ev = [
+    [1.5, 'tap', 'Pass'], [4.2, 'tap', 'Pass'], [7.0, 'tap', 'Pass'], [10.4, 'tap', 'Pass'], [13.0, 'tap', 'Pass'], [16.2, 'tap', 'Pass'], [19.4, 'double', 'Line-breaking pass']
+  ];
+  ev.forEach(([s, kind, label]) => {
+    const x = X(s);
+    if (kind === 'tap') h += `<rect x="${x - 5}" y="48" width="10" height="44" rx="5" fill="#fff"/>`;
+    else h += `<rect x="${x - 16}" y="34" width="12" height="72" rx="5" fill="#c8ff3d"/><rect x="${x + 4}" y="34" width="12" height="72" rx="5" fill="#c8ff3d"/>`;
+    if (kind !== 'tap') h += `<text x="${x - 24}" y="24" text-anchor="end" font-family="Atkinson Hyperlegible" font-weight="700" font-size="20" fill="#c8ff3d">${label}</text>`;
+  });
+  // now marker
+  h += `<line x1="${X(20)}" x2="${X(20)}" y1="14" y2="118" stroke="#fff" stroke-width="3"/><text x="${X(20) + 10}" y="40" font-family="Atkinson Hyperlegible" font-weight="700" font-size="20" fill="#fff">Now</text>`;
+  [['66:53', 0], ['66:58', 5], ['67:03', 10], ['67:08', 15], ['67:13', 20]].forEach(([l, s]) => { h += `<text x="${X(s)}" y="${H - 2}" text-anchor="${s === 0 ? 'start' : s === 20 ? 'middle' : 'middle'}" font-family="JetBrains Mono" font-weight="700" font-size="18" fill="#c9ccd6">${l}</text>`; });
+  hap.innerHTML = h;
+
+  // ---- speaking waveform ----
+  (function () { const s = document.getElementById('spk'); let out = '';
+    for (let i = 0; i < 44; i++) { const hh = 6 + Math.abs(Math.sin(i * 0.7) * 22) * (0.4 + 0.6 * Math.abs(Math.cos(i * 0.23)));
+      out += `<rect x="${i * 5}" y="${(34 - hh) / 2}" width="3" height="${hh}" rx="1.5" fill="${i < 30 ? '#c8ff3d' : 'rgba(255,255,255,.4)'}"/>`; }
+    s.innerHTML = out; })();
+</script>
+</body>
+</html>

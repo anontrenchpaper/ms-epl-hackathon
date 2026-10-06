@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pundit Debate — AI personas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .frame { background:
+      radial-gradient(800px 600px at 0% 40%, rgba(58,215,255,.10), transparent 60%),
+      radial-gradient(800px 600px at 100% 40%, rgba(255,182,72,.10), transparent 60%),
+      radial-gradient(1200px 700px at 50% -10%, #12204a 0%, var(--ink) 60%); }
+  .topbar { position: absolute; left: 24px; right: 24px; top: 18px; height: 66px; display: flex; align-items: center; gap: 16px; padding: 0 12px 0 14px; background: rgba(15, 23, 46, .92); border: 1px solid var(--line); border-radius: 14px; }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand .mark { width: 38px; height: 38px; border-radius: 10px; background: var(--lime); display: grid; place-items: center; }
+  .brand .name { font-family: var(--font-display); font-weight: 800; font-size: 30px; letter-spacing: .05em; text-transform: uppercase; line-height: 1; white-space: nowrap; }
+  .brand .sub { font-size: 15px; color: var(--muted); font-weight: 600; letter-spacing: .04em; margin-top: 3px; white-space: nowrap; }
+  .vsep { width: 1px; height: 36px; background: var(--line); }
+  .bug { display: flex; align-items: stretch; height: 40px; border-radius: 8px; overflow: hidden; font-family: var(--font-display); font-weight: 700; font-size: 24px; letter-spacing: .04em; }
+  .bug > div { display: flex; align-items: center; padding: 0 12px; }
+  .bug .lg { background: #0b1124; color: var(--lime); font-size: 17px; letter-spacing: .18em; }
+  .bug .tm { background: #1a2547; gap: 8px; }
+  .bug .sw { width: 6px; height: 22px; border-radius: 2px; }
+  .bug .sc { background: #f2f5fb; color: #0b1124; min-width: 70px; justify-content: center; }
+  .bug .ck { background: #0b1124; font-size: 22px; letter-spacing: .1em; }
+  .guard { margin-left: auto; display: flex; align-items: center; gap: 10px; padding: 9px 16px 9px 12px; border-radius: 10px; background: rgba(79,240,176,.12); border: 1px solid rgba(79,240,176,.55); color: var(--mint); font-weight: 700; font-size: 17px; white-space: nowrap; }
+
+  .q { position: absolute; left: 24px; right: 24px; top: 100px; height: 102px; display: flex; align-items: center; gap: 28px; padding: 0 28px; border-radius: 16px; background: linear-gradient(90deg, rgba(58,215,255,.10), rgba(15,23,46,.9) 30%, rgba(15,23,46,.9) 70%, rgba(255,182,72,.10)); border: 1px solid var(--line); }
+  .q .qt { font-family: var(--font-display); font-weight: 800; font-size: 52px; line-height: 1; text-transform: uppercase; letter-spacing: .01em; }
+  .q .qt em { font-style: normal; color: var(--lime); }
+  .q .meta { margin-left: auto; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+
+  /* personas */
+  .persona { position: absolute; top: 218px; width: 320px; height: 590px; border-radius: 18px; padding: 22px; display: flex; flex-direction: column; align-items: center; text-align: center; background: rgba(15,23,46,.9); border: 1px solid var(--line); }
+  .persona.a { left: 24px; border-top: 4px solid var(--cyan); }
+  .persona.b { right: 24px; border-top: 4px solid var(--amber); }
+  .av { width: 128px; height: 128px; border-radius: 50%; display: grid; place-items: center; margin-top: 4px; }
+  .persona h2 { font-family: var(--font-display); font-weight: 800; font-size: 38px; letter-spacing: .04em; text-transform: uppercase; margin-top: 16px; line-height: 1; }
+  .persona .tl { font-size: 17px; color: var(--muted); margin-top: 6px; font-weight: 500; }
+  .stance { margin-top: 18px; width: 100%; padding: 12px 14px; border-radius: 12px; }
+  .stance .k { font-size: 15px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; opacity: .85; }
+  .stance .v { font-family: var(--font-display); font-weight: 800; font-size: 32px; text-transform: uppercase; margin-top: 2px; line-height: 1; }
+  .facts { width: 100%; margin-top: 16px; text-align: left; }
+  .facts div { display: flex; justify-content: space-between; gap: 10px; font-size: 16px; padding: 8px 0; border-top: 1px solid var(--line); }
+  .facts div span:first-child { color: var(--muted); font-weight: 600; }
+  .facts div span:last-child { font-weight: 700; text-align: right; }
+  .fict { margin-top: auto; font-size: 15px; color: var(--dim); font-weight: 600; line-height: 1.35; }
+
+  /* thread */
+  .turn { position: absolute; width: 900px; padding: 12px 20px 12px; border-radius: 16px; background: rgba(15,23,46,.92); border: 1px solid var(--line); }
+  .turn.a { left: 368px; border-left: 4px solid var(--cyan); border-top-left-radius: 4px; }
+  .turn.b { left: 652px; border-right: 4px solid var(--amber); border-top-right-radius: 4px; }
+  .turn .hd { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+  .turn .hd .ok { margin-left: auto; text-transform: none; letter-spacing: 0; color: var(--mint); font-weight: 700; }
+  .turn p { font-size: 20px; line-height: 1.32; font-weight: 500; margin-top: 4px; }
+  .turn p b { font-weight: 800; }
+  .turn.a p b { color: var(--cyan); }
+  .turn.b p b { color: var(--amber); }
+  .ev { display: flex; gap: 8px; margin-top: 8px; flex-wrap: nowrap; }
+  .prov { font-family: var(--font-mono); font-size: 15px; font-weight: 500; color: var(--text); padding: 4px 9px; border-radius: 7px; background: rgba(255,255,255,.06); border: 1px solid var(--line-strong); white-space: nowrap; }
+  .prov i { font-style: normal; color: var(--mint); margin-right: 6px; }
+
+  /* moderator + poll */
+  .mod { position: absolute; left: 24px; top: 824px; width: 1300px; height: 208px; border-radius: 18px; padding: 18px 24px; background: rgba(15,23,46,.92); border: 1px solid rgba(156,140,255,.5); display: grid; grid-template-columns: 1fr 1fr; column-gap: 28px; }
+  .mod .h { grid-column: 1 / span 2; display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .mod .h b { font-family: var(--font-display); font-weight: 800; font-size: 26px; letter-spacing: .1em; text-transform: uppercase; color: var(--violet); }
+  .mod .h span { font-size: 15px; color: var(--muted); font-weight: 600; }
+  .mod .col .k { font-size: 15px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 6px; }
+  .mod ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .mod li { white-space: nowrap; }
+  .mod li { font-size: 18px; line-height: 1.35; padding-left: 22px; position: relative; }
+  .mod li::before { content: ''; position: absolute; left: 2px; top: 9px; width: 9px; height: 9px; border-radius: 50%; background: currentColor; }
+  .mod li.ag { color: var(--text); }
+  .mod li.ag::before { background: var(--mint); }
+  .mod li.ds::before { background: var(--amber); }
+
+  .poll { position: absolute; left: 1348px; top: 824px; width: 548px; height: 208px; border-radius: 18px; padding: 18px 24px; background: rgba(15,23,46,.92); border: 1px solid var(--line); }
+  .poll .h { display: flex; align-items: center; gap: 10px; }
+  .poll .pbar { margin-top: 14px; }
+  .poll .h b { font-family: var(--font-display); font-weight: 800; font-size: 26px; letter-spacing: .1em; text-transform: uppercase; }
+  .poll .h span.m { margin-left: auto; font-size: 15px; color: var(--muted); font-weight: 600; }
+  .pq { font-size: 18px; font-weight: 600; margin-top: 8px; }
+  .pbar { display: flex; height: 54px; border-radius: 12px; overflow: hidden; margin-top: 12px; }
+  .pbar div { display: flex; align-items: center; padding: 0 16px; font-family: var(--font-display); font-weight: 800; font-size: 32px; }
+  .plab { display: flex; justify-content: space-between; margin-top: 8px; font-size: 16px; font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="frame" id="f">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="mark"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M3 5h11v8H8l-3 3v-3H3z M10 15v2h6l3 3v-3h2V9h-4" fill="none" stroke="#0b1124" stroke-width="2.2" stroke-linejoin="round"/></svg></div>
+      <div><div class="name">Pundit Debate</div><div class="sub">Two AI personas · one shared dataset</div></div>
+    </div>
+    <div class="vsep"></div>
+    <div class="bug">
+      <div class="lg">SYN</div>
+      <div class="tm"><span class="sw" style="background:var(--home)"></span>HAR</div>
+      <div class="sc">2 – 1</div>
+      <div class="tm">KMA<span class="sw" style="background:var(--away)"></span></div>
+      <div class="ck">FT</div>
+    </div>
+    <span class="chip">Post-match studio · segment 2</span>
+    <div class="guard">
+      <svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5z" fill="none" stroke="#4ff0b0" stroke-width="2.4" stroke-linejoin="round"/><path d="M8 12l3 3 5-6" fill="none" stroke="#4ff0b0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Both personas fact-checked by Editor agent · no claims without evidence
+    </div>
+  </div>
+
+  <div class="q">
+    <div><div class="eyebrow">The question</div><div class="qt" style="margin-top:4px">Was Kingsmoor's high press after <em>58'</em> a mistake?</div></div>
+    <div class="meta"><span class="chip lime">Asked by 3,214 fans</span><span class="chip">Picked by producer · 4 turns · 90 s</span></div>
+  </div>
+
+  <!-- ===== personas ===== -->
+  <div class="persona a">
+    <div class="av" style="background:radial-gradient(circle at 35% 30%, #5be3ff, #1a6c8a); box-shadow:0 0 0 6px rgba(58,215,255,.18)">
+      <svg width="66" height="66" viewBox="0 0 24 24"><path d="M4 20V10M9.3 20V5M14.6 20v-8M20 20V8" stroke="#06202b" stroke-width="2.6" stroke-linecap="round"/></svg>
+    </div>
+    <h2>The Analyst</h2>
+    <div class="tl">Data-first · calm · cites numbers</div>
+    <div class="stance" style="background:rgba(58,215,255,.12);border:1px solid rgba(58,215,255,.45);color:var(--cyan)"><div class="k">Verdict</div><div class="v">Yes, a mistake</div></div>
+    <div class="facts">
+      <div><span>Draws on</span><span>Analyst, Tactician</span></div>
+      <div><span>Evidence cited</span><span class="mono">6 / 6 ✓</span></div>
+      <div><span>Airtime</span><span class="mono">44 s</span></div>
+      <div><span>Voice</span><span>Azure AI Speech</span></div>
+    </div>
+    <div class="fict">Fictional AI persona.<br>Not modelled on any real pundit.</div>
+  </div>
+
+  <div class="persona b">
+    <div class="av" style="background:radial-gradient(circle at 35% 30%, #ffd08a, #9a5a12); box-shadow:0 0 0 6px rgba(255,182,72,.18)">
+      <svg width="66" height="66" viewBox="0 0 24 24"><path d="M5 18c3-1 5-3 6-6l1-4 4-2 3 2-2 3-3 1c-1 3-3 6-7 8z" fill="none" stroke="#2b1704" stroke-width="2.2" stroke-linejoin="round"/><circle cx="18.5" cy="18.5" r="2.4" fill="none" stroke="#2b1704" stroke-width="2"/></svg>
+    </div>
+    <h2>The Old Pro</h2>
+    <div class="tl">Instinct · game feel · old school</div>
+    <div class="stance" style="background:rgba(255,182,72,.12);border:1px solid rgba(255,182,72,.5);color:var(--amber)"><div class="k">Verdict</div><div class="v">No, it was right</div></div>
+    <div class="facts">
+      <div><span>Draws on</span><span>Scout, Historian</span></div>
+      <div><span>Evidence cited</span><span class="mono">5 / 5 ✓</span></div>
+      <div><span>Airtime</span><span class="mono">46 s</span></div>
+      <div><span>Voice</span><span>Azure AI Speech</span></div>
+    </div>
+    <div class="fict">Fictional AI persona.<br>Not modelled on any real pundit.</div>
+  </div>
+
+  <!-- ===== thread ===== -->
+  <div class="turn a" style="top:218px">
+    <div class="hd"><span class="cyan">The Analyst</span><span class="dim">Turn 1</span><span class="ok">✓ Editor: 2 / 2 claims verified</span></div>
+    <p>It cost them control. From 58' to 79' Harbour City played <b>9 line-breaking passes</b> in 21 minutes, more than three times their earlier rate.</p>
+    <div class="ev"><span class="prov"><i>✓</i>line-breaks 9 vs 7 in 57 min</span><span class="prov"><i>✓</i>E-1893 · 6 players bypassed</span></div>
+  </div>
+
+  <div class="turn b" style="top:368px">
+    <div class="hd"><span class="amber">The Old Pro</span><span class="dim">Turn 2</span><span class="ok">✓ Editor: 2 / 2 claims verified</span></div>
+    <p>You're level away from home and losing the midfield. The press gave them their best spell: <b>7 high regains</b> in eight minutes, chaos index up to <b>74</b>.</p>
+    <div class="ev"><span class="prov"><i>✓</i>P-58→66 · regains 7 vs 2</span><span class="prov"><i>✓</i>chaos index 74 at 61'</span></div>
+  </div>
+
+  <div class="turn a" style="top:518px">
+    <div class="hd"><span class="cyan">The Analyst</span><span class="dim">Turn 3</span><span class="ok">✓ Editor: 2 / 2 claims verified</span></div>
+    <p>Those regains were worth just <b>0.18 xG</b>. Meanwhile the chances they gave up rose from <b>0.09 to 0.24 xG</b> per 10 minutes.</p>
+    <div class="ev"><span class="prov"><i>✓</i>xG from 7 regains: 0.18</span><span class="prov"><i>✓</i>xG against /10 min: 0.09 → 0.24</span></div>
+  </div>
+
+  <div class="turn b" style="top:668px">
+    <div class="hd"><span class="amber">The Old Pro</span><span class="dim">Turn 4</span><span class="ok">✓ Editor: 1 / 1 claim verified</span></div>
+    <p>They didn't lose it pressing. They lost it when they dropped into a <b>back five at 79'</b> and sat deep. Calloway scored five minutes later.</p>
+    <div class="ev"><span class="prov"><i>✓</i>79' shape change · 5-4-1</span><span class="prov"><i>✓</i>E-2271 · 84' Calloway</span></div>
+  </div>
+
+  <!-- ===== moderator ===== -->
+  <div class="mod">
+    <div class="h">
+      <svg width="26" height="26" viewBox="0 0 24 24"><path d="M12 3v18M5 7h14M5 7l-3 7a3.5 3.5 0 0 0 6 0zM19 7l-3 7a3.5 3.5 0 0 0 6 0z" fill="none" stroke="#9c8cff" stroke-width="2" stroke-linejoin="round"/></svg>
+      <b>Moderator</b><span>neutral agent · summarises, never takes a side</span>
+    </div>
+    <div class="col">
+      <div class="k mint">Where they agree</div>
+      <ul>
+        <li class="ag">Pressing won Kingsmoor the ball more: 7 regains vs 2.</li>
+        <li class="ag">It also gave Calloway more room between the lines.</li>
+        <li class="ag">The winner came after the press ended, against a back five.</li>
+      </ul>
+    </div>
+    <div class="col">
+      <div class="k amber">Still disputed</div>
+      <ul>
+        <li class="ds">Was 0.18 xG from regains worth +0.15 xG conceded per 10 min?</li>
+        <li class="ds">One match is a small sample. Data alone can't settle it.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ===== poll ===== -->
+  <div class="poll">
+    <div class="h"><span class="live-dot"></span><b>Fan poll</b><span class="m">12,408 votes · closes in 2:10</span></div>
+    <div class="pq">Was the press a mistake?</div>
+    <div class="pbar"><div style="width:58%;background:var(--cyan);color:#06202b">58%</div><div style="width:42%;background:var(--amber);color:#2b1704;justify-content:flex-end">42%</div></div>
+    <div class="plab"><span class="cyan">Yes · with the Analyst</span><span class="amber">No · with the Old Pro</span></div>
+  </div>
+
+  <div class="mock-title">Concept 12 · Pundit Debate</div>
+  <div class="mock-note">Concept mockup · synthetic data · fictional clubs and players</div>
+</div>
+</body>
+</html>
